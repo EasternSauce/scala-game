@@ -31,8 +31,8 @@ class MyGdxGame extends Game {
 
     val male1SpriteData = SpriteTextureData(
       spriteType = "male1",
-      boundsWidth = 64,
-      boundsHeight = 64,
+      boundsWidth = 2,
+      boundsHeight = 2,
       textureWidth = 32,
       textureHeight = 32,
       dirMap = Map(Direction.Up -> 3, Direction.Down -> 0, Direction.Left -> 1, Direction.Right -> 2)
@@ -42,8 +42,8 @@ class MyGdxGame extends Game {
     val player: Player = Player(
       Creature.Params(
         id = "player",
-        posX = 233,
-        posY = 235,
+        posX = 0,
+        posY = 0,
         spriteTextureData = male1SpriteData,
         animationData = male1AnimationData
       )

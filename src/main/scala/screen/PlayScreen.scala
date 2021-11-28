@@ -1,19 +1,16 @@
 package screen
 
-import com.badlogic.gdx.graphics.{OrthographicCamera, Texture}
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.graphics.{GL20, OrthographicCamera, Texture}
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.{Body, BodyDef, Box2DDebugRenderer, CircleShape, FixtureDef, PolygonShape, World}
-import com.badlogic.gdx.utils.ScreenUtils
+import com.badlogic.gdx.physics.box2d.{Box2DDebugRenderer, World}
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.softwaremill.quicklens.ModifyPimp
 import layers.model_layer.gamestate.GameState
 import layers.model_layer.gamestate.creature.Player
 import layers.view_layer.updater.GameUpdater
-import util.Direction
-import util.Constants
-
+import util.{Constants, Direction}
 
 class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var gameUpdater: GameUpdater)
     extends Screen {
@@ -31,8 +28,6 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
       camera
     )
 
-  initBody(world)
-
   def updateCamera(): Unit = {
 
     val camPosition = camera.position
@@ -44,36 +39,21 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
   }
 
-  def initBody(world: World): Option[Body] = {
-    val bodyDef = new BodyDef()
-    bodyDef.position.set(0, 0)
-
-    bodyDef.`type` = BodyDef.BodyType.KinematicBody
-    val b2Body = world.createBody(bodyDef)
-    b2Body.setUserData(this)
-
-    val fixtureDef: FixtureDef = new FixtureDef()
-    val shape: CircleShape = new CircleShape()
-    shape.setRadius(2f)
-
-    fixtureDef.shape = shape
-    fixtureDef.isSensor = false
-    b2Body.createFixture(fixtureDef)
-
-    Some(b2Body)
-  }
-
   override def show(): Unit = {}
 
   def update(delta: Float): Unit = {
+
+    world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2) //TODO: move to area class later
+
     updatePlayerPosition()
 
     updateGameState(
-      gameState.modify(_.player)
-      .using(_.update(delta))
+      gameState
+        .modify(_.player)
+        .using(_.update(delta))
     )
 
-    gameUpdater.update(gameState)
+    gameUpdater.update(gameState, world)
 
     updateCamera()
   }
@@ -86,7 +66,7 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
       import Input.Keys._
 
       val sqrt2 = 1.4142135f
-      val speed = 2.0f
+      val speed = 0.15f
 
       val directionalSpeed = List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {
         case List(true, _, true, _) => speed / sqrt2
@@ -142,9 +122,10 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
     val wasMoving = gameState.player.params.isMoving
     val startMovingAction = (wasMoving, isMoving) match {
-      case (false, true) => player: Player => {
-        player.modify(_.params.animationTimer).using(_.restart())
-      }
+      case (false, true) =>
+        player: Player => {
+          player.modify(_.params.animationTimer).using(_.restart())
+        }
       case _ => player: Player => player
     }
 
@@ -170,16 +151,25 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
   override def render(delta: Float): Unit = {
     update(delta)
 
-    ScreenUtils.clear(1, 1, 1, 1)
+    batch.setProjectionMatrix(camera.combined)
+
+    Gdx.gl.glClearColor(0, 0, 0, 1)
+
+    Gdx.gl.glClear(
+      GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT
+        | (if (Gdx.graphics.getBufferFormat.coverageSampling)
+             GL20.GL_COVERAGE_BUFFER_BIT_NV
+           else 0)
+    )
+
     batch.begin()
-    batch.draw(img, 10, 10)
+    batch.draw(img, 0, 0, 10f, 10f)
 
     gameUpdater.render(gameState, batch)
 
     batch.end()
 
     b2DebugRenderer.render(world, camera.combined)
-
 
   }
 

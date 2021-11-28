@@ -13,18 +13,18 @@ case class GameUpdater(atlas: TextureAtlas) {
   var creatureRenderers: Map[String, CreatureRenderer] = Map()
 
 
-  def update(gameState: GameState): Unit = {
+  def update(gameState: GameState, world: World): Unit = {
     val creatures = gameState.creatures
 
     creatures.keys.foreach{
       creatureId => if (creatureRenderers.contains(creatureId)) {
-        creatureRenderers(creatureId).update(gameState)
+        creatureRenderers(creatureId).update(gameState, world)
       }
       else {
         val newRenderer = CreatureRenderer(creatureId, atlas)
         creatureRenderers = creatureRenderers + (creatureId -> newRenderer)
-        newRenderer.init(gameState)
-        newRenderer.update(gameState)
+        newRenderer.init(gameState, world)
+        newRenderer.update(gameState, world)
       }
     }
 
