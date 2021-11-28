@@ -1,12 +1,17 @@
 package layers.view_layer.updater
 
+import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.{Body, BodyDef, Box2DDebugRenderer, FixtureDef, PolygonShape, World}
 import layers.model_layer.gamestate.GameState
 import layers.view_layer.updater.creature.CreatureRenderer
 
 case class GameUpdater(atlas: TextureAtlas) {
 
- var creatureRenderers: Map[String, CreatureRenderer] = Map()
+
+  var creatureRenderers: Map[String, CreatureRenderer] = Map()
+
 
   def update(gameState: GameState): Unit = {
     val creatures = gameState.creatures
@@ -27,6 +32,7 @@ case class GameUpdater(atlas: TextureAtlas) {
   }
 
   def render(gameState: GameState, spriteBatch: SpriteBatch): Unit = {
+
     val creatures = gameState.creatures
 
     creatures.keys.foreach{
@@ -34,5 +40,10 @@ case class GameUpdater(atlas: TextureAtlas) {
         creatureRenderers(creatureId).render(spriteBatch)
       }
     }
+
+
+
   }
+
+
 }

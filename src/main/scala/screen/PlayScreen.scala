@@ -1,17 +1,67 @@
 package screen
 
-import com.badlogic.gdx.graphics.Texture
+import com.badlogic.gdx.graphics.{OrthographicCamera, Texture}
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
+import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.physics.box2d.{Body, BodyDef, Box2DDebugRenderer, CircleShape, FixtureDef, PolygonShape, World}
 import com.badlogic.gdx.utils.ScreenUtils
+import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.softwaremill.quicklens.ModifyPimp
 import layers.model_layer.gamestate.GameState
 import layers.model_layer.gamestate.creature.Player
 import layers.view_layer.updater.GameUpdater
 import util.Direction
+import util.Constants
+
 
 class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var gameUpdater: GameUpdater)
     extends Screen {
+
+  var b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
+
+  var world = new World(new Vector2(0, 0), true)
+
+  val camera: OrthographicCamera = new OrthographicCamera()
+
+  val viewport: Viewport =
+    new FitViewport(
+      Constants.ViewpointWorldWidth / Constants.PPM,
+      Constants.ViewpointWorldHeight / Constants.PPM,
+      camera
+    )
+
+  initBody(world)
+
+  def updateCamera(): Unit = {
+
+    val camPosition = camera.position
+
+    camPosition.x = (math.floor(0 * 100) / 100).toFloat
+    camPosition.y = (math.floor(0 * 100) / 100).toFloat
+
+    camera.update()
+
+  }
+
+  def initBody(world: World): Option[Body] = {
+    val bodyDef = new BodyDef()
+    bodyDef.position.set(0, 0)
+
+    bodyDef.`type` = BodyDef.BodyType.KinematicBody
+    val b2Body = world.createBody(bodyDef)
+    b2Body.setUserData(this)
+
+    val fixtureDef: FixtureDef = new FixtureDef()
+    val shape: CircleShape = new CircleShape()
+    shape.setRadius(2f)
+
+    fixtureDef.shape = shape
+    fixtureDef.isSensor = false
+    b2Body.createFixture(fixtureDef)
+
+    Some(b2Body)
+  }
 
   override def show(): Unit = {}
 
@@ -24,6 +74,8 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
     )
 
     gameUpdater.update(gameState)
+
+    updateCamera()
   }
 
   private def updatePlayerPosition(): Unit = {
@@ -126,9 +178,15 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
     batch.end()
 
+    b2DebugRenderer.render(world, camera.combined)
+
+
   }
 
-  override def resize(width: Int, height: Int): Unit = {}
+  override def resize(width: Int, height: Int): Unit = {
+    viewport.update(width, height)
+    //hudViewport.update(width, height)
+  }
 
   override def pause(): Unit = {}
 
