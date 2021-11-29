@@ -1,7 +1,7 @@
 package layers.view_layer.updater.creature
 
 import com.badlogic.gdx.graphics.g2d._
-import com.badlogic.gdx.physics.box2d.{Body, BodyDef, CircleShape, FixtureDef, World}
+import com.badlogic.gdx.physics.box2d._
 import layers.model_layer.gamestate.GameState
 import util.Direction
 
@@ -19,8 +19,7 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
 
   // var initialized = false TODO: is it needed?
 
-
-  def initBody(world: World): Body = {
+  def initBody(world: World, gameState: GameState): Body = {
     val bodyDef = new BodyDef()
     bodyDef.position.set(5, 5)
 
@@ -30,12 +29,11 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
 
     val fixtureDef: FixtureDef = new FixtureDef()
     val shape: CircleShape = new CircleShape()
-    shape.setRadius(2f)
+    shape.setRadius(gameState.creatures(id).params.spriteTextureData.boundsWidth / 2)
 
     fixtureDef.shape = shape
     fixtureDef.isSensor = false
     b2Body.createFixture(fixtureDef)
-
 
     b2Body
   }
@@ -60,7 +58,7 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
     }
 
     for (i <- 0 until 4) {
-      val frames = for {j <- (0 until animData.frameCount).toArray} yield {
+      val frames = for { j <- (0 until animData.frameCount).toArray } yield {
         new TextureRegion(
           textureRegion,
           j * spriteData.textureWidth,
@@ -73,14 +71,15 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
 
     }
 
-    body = initBody(world)
+    body = initBody(world, gameState)
 
   }
 
   def runningAnimation(gameState: GameState, currentDirection: Direction.Value): TextureRegion = {
     val creature = gameState.creatures(id)
 
-    runningAnimations(creature.params.spriteTextureData.dirMap(currentDirection)).getKeyFrame(gameState.player.params.animationTimer.time, true)
+    runningAnimations(creature.params.spriteTextureData.dirMap(currentDirection))
+      .getKeyFrame(gameState.player.params.animationTimer.time, true)
   }
 
   def facingTexture(gameState: GameState, currentDirection: Direction.Value): TextureRegion = {
@@ -93,13 +92,18 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
     val creature = gameState.creatures(id)
     val spriteInfo = creature.params.spriteTextureData
 
-    val texture = if (!creature.params.isMoving) facingTexture(gameState, creature.params.facingDirection)
-    else runningAnimation(gameState, creature.params.facingDirection)
+    val texture =
+      if (!creature.params.isMoving) facingTexture(gameState, creature.params.facingDirection)
+      else runningAnimation(gameState, creature.params.facingDirection)
     sprite.setRegion(texture)
-    sprite.setBounds(creature.params.posX, creature.params.posY, spriteInfo.boundsWidth, spriteInfo.boundsHeight)
+    sprite.setBounds(
+      creature.params.posX - creature.params.spriteTextureData.boundsWidth / 2,
+      creature.params.posY - creature.params.spriteTextureData.boundsHeight / 2,
+      spriteInfo.boundsWidth,
+      spriteInfo.boundsHeight
+    )
 
     body.setLinearVelocity(0.5f, 0.5f)
-
 
   }
 

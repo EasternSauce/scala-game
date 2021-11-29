@@ -45,8 +45,6 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
     world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2) //TODO: move to area class later
 
-    updatePlayerPosition()
-
     updateGameState(
       gameState
         .modify(_.player)
@@ -54,6 +52,8 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
     )
 
     gameUpdater.update(gameState, world)
+
+    updatePlayerPosition()
 
     updateCamera()
   }
@@ -66,7 +66,7 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
       import Input.Keys._
 
       val sqrt2 = 1.4142135f
-      val speed = 0.15f
+      val speed = 10f
 
       val directionalSpeed = List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {
         case List(true, _, true, _) => speed / sqrt2
@@ -78,44 +78,32 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
       directionalSpeed
     }
 
-    val (newPosX: Float, newPosY: Float) = {
+    val (vectorX, vectorY) = {
       import Input.Keys._
 
       val x: Float = List(A, D).map(Gdx.input.isKeyPressed(_)) match {
-        case List(true, false) => oldPosX - directionalSpeed
-        case List(false, true) => oldPosX + directionalSpeed
-        case _                 => oldPosX
+        case List(true, false) => -directionalSpeed
+        case List(false, true) => directionalSpeed
+        case _                 => 0
       }
 
       val y: Float = List(S, W).map(Gdx.input.isKeyPressed(_)) match {
-        case List(true, false) => oldPosY - directionalSpeed
-        case List(false, true) => oldPosY + directionalSpeed
-        case _                 => oldPosY
+        case List(true, false) => -directionalSpeed
+        case List(false, true) => directionalSpeed
+        case _                 => 0
       }
 
       (x, y)
     }
 
-    val facingDirection = {
+    val (facingDirection, isMoving) = {
       import Input.Keys._
       List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {
-        case List(true, _, _, _) => Direction.Up
-        case List(_, true, _, _) => Direction.Down
-        case List(_, _, true, _) => Direction.Left
-        case List(_, _, _, true) => Direction.Right
-        case _                   => gameState.player.params.facingDirection
-      }
-
-    }
-
-    val isMoving = {
-      import Input.Keys._
-      List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {
-        case List(true, _, _, _) => true
-        case List(_, true, _, _) => true
-        case List(_, _, true, _) => true
-        case List(_, _, _, true) => true
-        case _                   => false
+        case List(true, _, _, _) => (Direction.Up, true)
+        case List(_, true, _, _) => (Direction.Down, true)
+        case List(_, _, true, _) => (Direction.Left, true)
+        case List(_, _, _, true) => (Direction.Right, true)
+        case _                   => (gameState.player.params.facingDirection, false)
       }
 
     }
@@ -129,12 +117,15 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
       case _ => player: Player => player
     }
 
+    gameUpdater.creatureRenderers(gameState.player.params.id).body.setLinearVelocity(new Vector2(vectorX, vectorY))
+    val pos = gameUpdater.creatureRenderers(gameState.player.params.id).body.getPosition
+
     updateGameState(
       gameState
         .modify(_.player.params.posX)
-        .setTo(newPosX)
+        .setTo(pos.x)
         .modify(_.player.params.posY)
-        .setTo(newPosY)
+        .setTo(pos.y)
         .modify(_.player.params.facingDirection)
         .setTo(facingDirection)
         .modify(_.player.params.isMoving)
