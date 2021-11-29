@@ -6,9 +6,9 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.{Box2DDebugRenderer, World}
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
-import com.softwaremill.quicklens.ModifyPimp
+import com.softwaremill.quicklens._
 import layers.model_layer.gamestate.GameState
-import layers.model_layer.gamestate.creature.Player
+import layers.model_layer.gamestate.creature.Creature
 import layers.view_layer.updater.GameUpdater
 import util.{Constants, Direction}
 
@@ -41,24 +41,40 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
   override def show(): Unit = {}
 
+  def updateCreatures(): Unit = {
+
+    val operation = (creature: Creature) => {
+      val pos = gameUpdater.creatureRenderers(creature.params.id).body.getWorldCenter
+
+      creature.modify(_.params.posX).setTo(pos.x).modify(_.params.posY).setTo(pos.y)
+    }
+
+    gameState = gameState
+      .modify(_.player)
+      .using(operation)
+      .modifyAll(_.nonPlayers.each)
+      .using(operation)
+
+  }
+
   def update(delta: Float): Unit = {
 
     world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2) //TODO: move to area class later
 
-    updateGameState(
-      gameState
-        .modify(_.player)
-        .using(_.update(delta))
-    )
+    gameState = gameState
+      .modify(_.player)
+      .using(_.update(delta))
 
     gameUpdater.update(gameState, world)
 
-    updatePlayerPosition()
+    processPlayerMovement()
+
+    updateCreatures()
 
     updateCamera()
   }
 
-  private def updatePlayerPosition(): Unit = {
+  private def processPlayerMovement(): Unit = {
     val directionalSpeed: Float = {
       import Input.Keys._
 
@@ -108,32 +124,27 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
     val wasMoving = gameState.player.params.isMoving
     val startMovingAction = (wasMoving, isMoving) match {
       case (false, true) =>
-        player: Player => {
+        player: Creature => {
           player.modify(_.params.animationTimer).using(_.restart())
         }
-      case _ => player: Player => player
+      case _ => player: Creature => player
     }
 
     gameUpdater.creatureRenderers(gameState.player.params.id).body.setLinearVelocity(new Vector2(vectorX, vectorY))
     val pos = gameUpdater.creatureRenderers(gameState.player.params.id).body.getWorldCenter
 
-    updateGameState(
-      gameState
-        .modify(_.player.params.posX)
-        .setTo(pos.x)
-        .modify(_.player.params.posY)
-        .setTo(pos.y)
-        .modify(_.player.params.facingDirection)
-        .setTo(facingDirection)
-        .modify(_.player.params.isMoving)
-        .setTo(isMoving)
-        .modify(_.player)
-        .using(startMovingAction)
-    )
-  }
+    gameState = gameState
+      .modify(_.player.params.posX)
+      .setTo(pos.x)
+      .modify(_.player.params.posY)
+      .setTo(pos.y)
+      .modify(_.player.params.facingDirection)
+      .setTo(facingDirection)
+      .modify(_.player.params.isMoving)
+      .setTo(isMoving)
+      .modify(_.player)
+      .using(startMovingAction)
 
-  def updateGameState(gameState: GameState): Unit = {
-    this.gameState = gameState
   }
 
   override def render(delta: Float): Unit = {

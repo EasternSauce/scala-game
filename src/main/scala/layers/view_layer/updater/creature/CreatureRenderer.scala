@@ -3,9 +3,10 @@ package layers.view_layer.updater.creature
 import com.badlogic.gdx.graphics.g2d._
 import com.badlogic.gdx.physics.box2d._
 import layers.model_layer.gamestate.GameState
+import layers.view_layer.updater.GameUpdater
 import util.Direction
 
-case class CreatureRenderer(id: String, atlas: TextureAtlas) {
+case class CreatureRenderer(gameUpdater: GameUpdater, id: String, atlas: TextureAtlas) {
 
   val sprite: Sprite = new Sprite()
 
@@ -23,17 +24,19 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
     val bodyDef = new BodyDef()
     bodyDef.position.set(creature.params.posX, creature.params.posY)
 
-    bodyDef.`type` = BodyDef.BodyType.KinematicBody
+    bodyDef.`type` = BodyDef.BodyType.DynamicBody
     val b2Body = world.createBody(bodyDef)
     b2Body.setUserData(this)
+    b2Body.setSleepingAllowed(false)
 
     val fixtureDef: FixtureDef = new FixtureDef()
     val shape: CircleShape = new CircleShape()
-    shape.setRadius(creature.params.spriteTextureData.boundsWidth / 2)
+    shape.setRadius(creature.width / 2)
 
     fixtureDef.shape = shape
     fixtureDef.isSensor = false
     b2Body.createFixture(fixtureDef)
+    b2Body.setLinearDamping(10f)
 
     b2Body
   }
@@ -41,33 +44,30 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
   def init(gameState: GameState, world: World): Unit = {
     val creature = gameState.creatures(id)
 
-    val spriteData = creature.params.spriteTextureData
-    val animData = creature.params.animationData
-
-    textureRegion = atlas.findRegion(spriteData.spriteType)
+    textureRegion = atlas.findRegion(creature.spriteType)
 
     for (i <- 0 until 4) {
       facingTextures(i) = new TextureRegion(
         textureRegion,
-        animData.neutralStanceFrame * spriteData.textureWidth,
-        i * spriteData.textureHeight,
-        spriteData.textureWidth,
-        spriteData.textureHeight
+        creature.neutralStanceFrame * creature.textureWidth,
+        i * creature.textureHeight,
+        creature.textureWidth,
+        creature.textureHeight
       )
 
     }
 
     for (i <- 0 until 4) {
-      val frames = for { j <- (0 until animData.frameCount).toArray } yield {
+      val frames = for { j <- (0 until creature.frameCount).toArray } yield {
         new TextureRegion(
           textureRegion,
-          j * spriteData.textureWidth,
-          i * spriteData.textureHeight,
-          spriteData.textureHeight,
-          spriteData.textureHeight
+          j * creature.textureWidth,
+          i * creature.textureHeight,
+          creature.textureHeight,
+          creature.textureHeight
         )
       }
-      runningAnimations(i) = new Animation[TextureRegion](animData.frameDuration, frames: _*)
+      runningAnimations(i) = new Animation[TextureRegion](creature.frameDuration, frames: _*)
 
     }
 
@@ -78,26 +78,24 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
   def runningAnimation(gameState: GameState, currentDirection: Direction.Value): TextureRegion = {
     val creature = gameState.creatures(id)
 
-    runningAnimations(creature.params.spriteTextureData.dirMap(currentDirection))
+    runningAnimations(creature.dirMap(currentDirection))
       .getKeyFrame(gameState.player.params.animationTimer.time, true)
   }
 
   def facingTexture(gameState: GameState, currentDirection: Direction.Value): TextureRegion = {
     val creature = gameState.creatures(id)
 
-    facingTextures(creature.params.spriteTextureData.dirMap(currentDirection))
+    facingTextures(creature.dirMap(currentDirection))
   }
 
   def update(gameState: GameState, world: World): Unit = {
     val creature = gameState.creatures(id)
-    val spriteInfo = creature.params.spriteTextureData
-
     val texture =
       if (!creature.params.isMoving) facingTexture(gameState, creature.params.facingDirection)
       else runningAnimation(gameState, creature.params.facingDirection)
     sprite.setRegion(texture)
     sprite.setCenter(creature.params.posX, creature.params.posY)
-    sprite.setSize(spriteInfo.boundsWidth, spriteInfo.boundsHeight)
+    sprite.setSize(creature.width, creature.height)
 
   }
 

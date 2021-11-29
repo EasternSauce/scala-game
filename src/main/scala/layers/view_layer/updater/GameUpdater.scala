@@ -14,7 +14,7 @@ case class GameUpdater(atlas: TextureAtlas) {
 
     creatures.keys.foreach { creatureId =>
       if (!creatureRenderers.contains(creatureId)) {
-        val newRenderer = CreatureRenderer(creatureId, atlas)
+        val newRenderer = CreatureRenderer(this, creatureId, atlas)
         creatureRenderers = creatureRenderers + (creatureId -> newRenderer)
         newRenderer.init(gameState, world)
       }

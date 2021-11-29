@@ -3,12 +3,10 @@ package game
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
-import data.{AnimationData, SpriteTextureData}
 import layers.model_layer.gamestate.GameState
-import layers.model_layer.gamestate.creature.{Creature, Player}
+import layers.model_layer.gamestate.creature.{Creature, Player, Skeleton}
 import layers.view_layer.updater.GameUpdater
 import screen.PlayScreen
-import util.Direction
 
 class MyGdxGame extends Game {
 
@@ -29,27 +27,11 @@ class MyGdxGame extends Game {
     //TODO: add another class that hold animation parameters
     //val playerAnimation: WrAnimation = WrAnimation(atlas, "male1", 0, 0, 32, 32)
 
-    val male1SpriteData = SpriteTextureData(
-      spriteType = "male1",
-      boundsWidth = 2,
-      boundsHeight = 2,
-      textureWidth = 32,
-      textureHeight = 32,
-      dirMap = Map(Direction.Up -> 3, Direction.Down -> 0, Direction.Left -> 1, Direction.Right -> 2)
-    )
-    val male1AnimationData = AnimationData(frameDuration = 0.1f, frameCount = 3, neutralStanceFrame = 1)
+    val player: Player = Player(Creature.Params(id = "player", posX = 0, posY = 0))
 
-    val player: Player = Player(
-      Creature.Params(
-        id = "player",
-        posX = 0,
-        posY = 0,
-        spriteTextureData = male1SpriteData,
-        animationData = male1AnimationData
-      )
-    )
+    val skeleton: Skeleton = Skeleton(Creature.Params(id = "skel", posX = 4, posY = 0))
 
-    gameState = GameState(player)
+    gameState = GameState(player, nonPlayers = Map(skeleton.params.id -> skeleton))
     gameUpdater = GameUpdater(atlas)
     //gameState = gameState.modify(_.nonPlayers).using(list => player :: list)
 
