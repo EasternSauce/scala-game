@@ -1,6 +1,5 @@
 package util
 
-
 import scala.util.Random
 
 object Direction extends Enumeration {
