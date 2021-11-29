@@ -17,11 +17,11 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
 
   var body: Body = _
 
-  // var initialized = false TODO: is it needed?
-
   def initBody(world: World, gameState: GameState): Body = {
+    val creature = gameState.creatures(id)
+
     val bodyDef = new BodyDef()
-    bodyDef.position.set(5, 5)
+    bodyDef.position.set(creature.params.posX, creature.params.posY)
 
     bodyDef.`type` = BodyDef.BodyType.KinematicBody
     val b2Body = world.createBody(bodyDef)
@@ -29,7 +29,7 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
 
     val fixtureDef: FixtureDef = new FixtureDef()
     val shape: CircleShape = new CircleShape()
-    shape.setRadius(gameState.creatures(id).params.spriteTextureData.boundsWidth / 2)
+    shape.setRadius(creature.params.spriteTextureData.boundsWidth / 2)
 
     fixtureDef.shape = shape
     fixtureDef.isSensor = false
@@ -96,14 +96,8 @@ case class CreatureRenderer(id: String, atlas: TextureAtlas) {
       if (!creature.params.isMoving) facingTexture(gameState, creature.params.facingDirection)
       else runningAnimation(gameState, creature.params.facingDirection)
     sprite.setRegion(texture)
-    sprite.setBounds(
-      creature.params.posX - creature.params.spriteTextureData.boundsWidth / 2,
-      creature.params.posY - creature.params.spriteTextureData.boundsHeight / 2,
-      spriteInfo.boundsWidth,
-      spriteInfo.boundsHeight
-    )
-
-    body.setLinearVelocity(0.5f, 0.5f)
+    sprite.setCenter(creature.params.posX, creature.params.posY)
+    sprite.setSize(spriteInfo.boundsWidth, spriteInfo.boundsHeight)
 
   }
 

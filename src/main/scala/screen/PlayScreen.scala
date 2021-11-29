@@ -59,9 +59,6 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
   }
 
   private def updatePlayerPosition(): Unit = {
-    val oldPosX = gameState.player.params.posX
-    val oldPosY = gameState.player.params.posY
-
     val directionalSpeed: Float = {
       import Input.Keys._
 
@@ -118,7 +115,7 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
     }
 
     gameUpdater.creatureRenderers(gameState.player.params.id).body.setLinearVelocity(new Vector2(vectorX, vectorY))
-    val pos = gameUpdater.creatureRenderers(gameState.player.params.id).body.getPosition
+    val pos = gameUpdater.creatureRenderers(gameState.player.params.id).body.getWorldCenter
 
     updateGameState(
       gameState
