@@ -1,9 +1,9 @@
-package layers.view_layer.updater
+package view
 
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
 import com.badlogic.gdx.physics.box2d.World
-import layers.model_layer.gamestate.GameState
-import layers.view_layer.updater.creature.CreatureRenderer
+import model.GameState
+import view.creature.CreatureRenderer
 
 case class GameView(atlas: TextureAtlas) {
 

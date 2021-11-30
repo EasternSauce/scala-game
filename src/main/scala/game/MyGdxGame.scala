@@ -3,10 +3,10 @@ package game
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
-import layers.model_layer.gamestate.GameState
-import layers.model_layer.gamestate.creature.{Creature, Player, Skeleton}
-import layers.view_layer.updater.GameView
+import model.GameState
+import model.creature.{Creature, Player, Skeleton}
 import screen.PlayScreen
+import view.GameView
 
 class MyGdxGame extends Game {
 
@@ -32,7 +32,7 @@ class MyGdxGame extends Game {
     val skeleton: Skeleton = Skeleton(Creature.Params(id = "skel", posX = 4, posY = 4))
 
     gameState = GameState(player, nonPlayers = Map(skeleton.params.id -> skeleton))
-    gameUpdater = GameView(atlas)
+    gameUpdater = view.GameView(atlas)
     //gameState = gameState.modify(_.nonPlayers).using(list => player :: list)
 
     val playScreen = new PlayScreen(batch, img, gameState, gameUpdater)

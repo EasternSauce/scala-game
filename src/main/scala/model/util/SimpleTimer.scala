@@ -1,4 +1,4 @@
-package util
+package model.util
 
 import com.softwaremill.quicklens.ModifyPimp
 

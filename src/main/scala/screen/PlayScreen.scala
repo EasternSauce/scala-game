@@ -9,10 +9,10 @@ import com.badlogic.gdx.physics.box2d.{Box2DDebugRenderer, World}
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.softwaremill.quicklens._
-import layers.model_layer.gamestate.GameState
-import layers.model_layer.gamestate.creature.Creature
-import layers.view_layer.updater.GameView
+import model.GameState
+import model.creature.Creature
 import util.{Constants, Direction}
+import view.GameView
 
 class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var gameUpdater: GameView) extends Screen {
 

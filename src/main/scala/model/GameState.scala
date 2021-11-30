@@ -1,6 +1,6 @@
-package layers.model_layer.gamestate
+package model
 
-import layers.model_layer.gamestate.creature.Creature
+import model.creature.Creature
 
 case class GameState(player: Creature, nonPlayers: Map[String, Creature] = Map()) {
 

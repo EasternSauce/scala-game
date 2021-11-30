@@ -1,10 +1,10 @@
-package layers.view_layer.updater.creature
+package view.creature
 
 import com.badlogic.gdx.graphics.g2d._
 import com.badlogic.gdx.physics.box2d._
-import layers.model_layer.gamestate.GameState
-import layers.view_layer.updater.GameView
+import model.GameState
 import util.Direction
+import view.GameView
 
 case class CreatureRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
 

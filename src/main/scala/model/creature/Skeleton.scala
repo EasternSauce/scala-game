@@ -1,4 +1,4 @@
-package layers.model_layer.gamestate.creature
+package model.creature
 
 import util.Direction
 

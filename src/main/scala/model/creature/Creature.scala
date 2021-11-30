@@ -1,8 +1,9 @@
-package layers.model_layer.gamestate.creature
+package model.creature
 
 import com.softwaremill.quicklens.ModifyPimp
-import layers.model_layer.gamestate.creature.Creature.Params
-import util.{Direction, SimpleTimer}
+import model.creature.Creature.Params
+import model.util.SimpleTimer
+import util.Direction
 
 abstract class Creature {
   val isPlayer = false
