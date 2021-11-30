@@ -1,0 +1,346 @@
+{
+  "spawnpoints": [
+    {
+      "id": "0",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Serpent",
+      "location": {
+        "x": 108.0625,
+        "y": 183.6875
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "1",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 11.15625,
+        "y": 191.28125
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "2",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 55.78125,
+        "y": 157.75
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "3",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 102.0625,
+        "y": 145.5
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "4",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 96.78125,
+        "y": 137.5
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "5",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 131.15625,
+        "y": 147.09375
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "6",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 131.15625,
+        "y": 145.3125
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "7",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 189.96875,
+        "y": 166.96875
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "8",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 189.96875,
+        "y": 165.625
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "9",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 51.96875,
+        "y": 84.1875
+      },
+      "weaponType": null
+    },
+    {
+      "id": "10",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 84.90625,
+        "y": 81.96875
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "11",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 15.96875,
+        "y": 95.15625
+      },
+      "weaponType": null
+    },
+    {
+      "id": "12",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 15,
+        "y": 95.15625
+      },
+      "weaponType": null
+    },
+    {
+      "id": "13",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 15,
+        "y": 93.75
+      },
+      "weaponType": null
+    },
+    {
+      "id": "14",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 97.625,
+        "y": 41.8125
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "15",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 97.625,
+        "y": 40.625
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "16",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 82,
+        "y": 57.34375
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "17",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 81.25,
+        "y": 57.34375
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "18",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 82,
+        "y": 59.375
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "19",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 14.15625,
+        "y": 28.3125
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "20",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 14.6875,
+        "y": 28.3125
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "21",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 14.15625,
+        "y": 31.25
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "22",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 54.65625,
+        "y": 17.28125
+      },
+      "weaponType": null
+    },
+    {
+      "id": "23",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 54.65625,
+        "y": 17.28125
+      },
+      "weaponType": null
+    },
+    {
+      "id": "24",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 54.65625,
+        "y": 17.8125
+      },
+      "weaponType": null
+    },
+    {
+      "id": "25",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 81.03125,
+        "y": 7.03125
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "26",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 131.5625,
+        "y": 33.46875
+      },
+      "weaponType": null
+    },
+    {
+      "id": "27",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 131.5625,
+        "y": 34.375
+      },
+      "weaponType": null
+    },
+    {
+      "id": "28",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 132.8125,
+        "y": 33.46875
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "29",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 130.1875,
+        "y": 5.34375
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "30",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 130.625,
+        "y": 5.34375
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "31",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 130.1875,
+        "y": 5.9375
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "32",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 175.71875,
+        "y": 50.9375
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "33",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 175.71875,
+        "y": 50.1875
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "34",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 175,
+        "y": 50.1875
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "35",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 179.875,
+        "y": 91.09375
+      },
+      "weaponType": null
+    },
+    {
+      "id": "36",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Wolf",
+      "location": {
+        "x": 179.875,
+        "y": 91.875
+      },
+      "weaponType": null
+    },
+    {
+      "id": "37",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 191.65625,
+        "y": 131.6875
+      },
+      "weaponType": "crossbow"
+    }
+  ]
+}

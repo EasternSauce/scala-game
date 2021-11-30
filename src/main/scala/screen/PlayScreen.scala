@@ -2,6 +2,8 @@ package screen
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.{GL20, OrthographicCamera, Texture}
+import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
+import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.{Box2DDebugRenderer, World}
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
@@ -18,6 +20,13 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
   var world = new World(new Vector2(0, 0), true)
 
+  val area1DataLocation = "assets/areas/area1"
+  val mapLoader: TmxMapLoader = new TmxMapLoader()
+  val mapScale = 4.0f
+  val map: TiledMap = mapLoader.load(area1DataLocation + "/tile_map.tmx")
+  protected val tiledMapRenderer: OrthogonalTiledMapRenderer =
+    new OrthogonalTiledMapRenderer(map, mapScale / Constants.PPM)
+
   val camera: OrthographicCamera = new OrthographicCamera()
 
   val viewport: Viewport =
@@ -27,12 +36,12 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
       camera
     )
 
-  def updateCamera(): Unit = {
+  def updateCamera(player: Creature): Unit = {
 
     val camPosition = camera.position
 
-    camPosition.x = (math.floor(0 * 100) / 100).toFloat
-    camPosition.y = (math.floor(0 * 100) / 100).toFloat
+    camPosition.x = (math.floor(player.params.posX * 100) / 100).toFloat
+    camPosition.y = (math.floor(player.params.posY * 100) / 100).toFloat
 
     camera.update()
 
@@ -40,17 +49,21 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
   override def show(): Unit = {}
 
-  def updateCreatures(gameState: GameState): GameState = {
+  def updateCreatures(delta: Float)(gameState: GameState): GameState = {
 
     val operation = (creature: Creature) => {
-
       val pos =
         if (gameUpdater.creatureRenderers.contains(creature.params.id))
           gameUpdater.creatureRenderers(creature.params.id).body.getWorldCenter
         else
           new Vector2(creature.params.posX, creature.params.posY)
 
-      creature.modify(_.params.posX).setTo(pos.x).modify(_.params.posY).setTo(pos.y)
+      creature
+        .modify(_.params.posX)
+        .setTo(pos.x)
+        .modify(_.params.posY)
+        .setTo(pos.y)
+        .update(delta)
     }
 
     gameState
@@ -68,7 +81,7 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
     // --- update model
     val performGameStateUpdates = (identity(_: GameState)) andThen
       processPlayerMovement andThen
-      updateCreatures
+      updateCreatures(delta)
 
     gameState = performGameStateUpdates(gameState)
     // ---
@@ -77,7 +90,9 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
     gameUpdater.update(gameState, world)
     // ---
 
-    updateCamera()
+    tiledMapRenderer.setView(camera)
+
+    updateCamera(gameState.player)
   }
 
   private def processPlayerMovement(gameState: GameState): GameState = {
@@ -175,8 +190,9 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
            else 0)
     )
 
+    tiledMapRenderer.render(Array(0, 1, 2, 3))
+
     batch.begin()
-    batch.draw(img, 0, 0, 10f, 10f)
 
     gameUpdater.render(gameState, batch)
 

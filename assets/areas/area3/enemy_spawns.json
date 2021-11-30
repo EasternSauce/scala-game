@@ -1,0 +1,226 @@
+{
+  "spawnpoints": [
+    {
+      "id": "0",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 49.1875,
+        "y": 43.34375
+      },
+      "weaponType": "ironSword"
+    },
+    {
+      "id": "1",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 50,
+        "y": 43.34375
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "2",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Ghost",
+      "location": {
+        "x": 6.4375,
+        "y": 50.375
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "3",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 99.65625,
+        "y": 64.78125
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "4",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 98.0625,
+        "y": 20.375
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "5",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 98.0625,
+        "y": 21.875
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "6",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 13.90625,
+        "y": 84.96875
+      },
+      "weaponType": "ironSword"
+    },
+    {
+      "id": "7",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 54.71875,
+        "y": 115.375
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "8",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 53.90625,
+        "y": 115.375
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "9",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 54.71875,
+        "y": 116.25
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "10",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Ghost",
+      "location": {
+        "x": 69.46875,
+        "y": 154.65625
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "11",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 69.46875,
+        "y": 155.46875
+      },
+      "weaponType": "crossbow"
+    },
+    {
+      "id": "12",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 127.03125,
+        "y": 159
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "13",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 127.03125,
+        "y": 159.375
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "14",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Ghost",
+      "location": {
+        "x": 162,
+        "y": 157.46875
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "15",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Ghost",
+      "location": {
+        "x": 83.03125,
+        "y": 183.09375
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "16",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 83.03125,
+        "y": 183.75
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "17",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 82.1875,
+        "y": 183.09375
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "18",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 166.1875,
+        "y": 182.96875
+      },
+      "weaponType": "ironSword"
+    },
+    {
+      "id": "19",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Skeleton",
+      "location": {
+        "x": 167.1875,
+        "y": 182.96875
+      },
+      "weaponType": "ironSword"
+    },
+    {
+      "id": "20",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Ghost",
+      "location": {
+        "x": 166.1875,
+        "y": 183.4375
+      },
+      "weaponType": "woodenSword"
+    },
+    {
+      "id": "21",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 166.1875,
+        "y": 181.5625
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "22",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.Goblin",
+      "location": {
+        "x": 185.375,
+        "y": 138.875
+      },
+      "weaponType": "poisonDagger"
+    },
+    {
+      "id": "23",
+      "creatureClass": "com.easternsauce.libgdxgame.creature.FireDemon",
+      "location": {
+        "x": 164.46875,
+        "y": 93.25
+      },
+      "weaponType": "demonTrident",
+      "blockades": [
+        {
+          "x": 164.46875,
+          "y": 100
+        }
+      ]
+    }
+  ]
+}
