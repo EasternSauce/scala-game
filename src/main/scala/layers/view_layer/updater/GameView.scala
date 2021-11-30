@@ -5,7 +5,7 @@ import com.badlogic.gdx.physics.box2d.World
 import layers.model_layer.gamestate.GameState
 import layers.view_layer.updater.creature.CreatureRenderer
 
-case class GameUpdater(atlas: TextureAtlas) {
+case class GameView(atlas: TextureAtlas) {
 
   var creatureRenderers: Map[String, CreatureRenderer] = Map()
 

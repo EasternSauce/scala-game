@@ -3,10 +3,10 @@ package layers.view_layer.updater.creature
 import com.badlogic.gdx.graphics.g2d._
 import com.badlogic.gdx.physics.box2d._
 import layers.model_layer.gamestate.GameState
-import layers.view_layer.updater.GameUpdater
+import layers.view_layer.updater.GameView
 import util.Direction
 
-case class CreatureRenderer(gameUpdater: GameUpdater, id: String, atlas: TextureAtlas) {
+case class CreatureRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
 
   val sprite: Sprite = new Sprite()
 

@@ -9,11 +9,10 @@ import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.softwaremill.quicklens._
 import layers.model_layer.gamestate.GameState
 import layers.model_layer.gamestate.creature.Creature
-import layers.view_layer.updater.GameUpdater
+import layers.view_layer.updater.GameView
 import util.{Constants, Direction}
 
-class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var gameUpdater: GameUpdater)
-    extends Screen {
+class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var gameUpdater: GameView) extends Screen {
 
   var b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
