@@ -1,7 +1,6 @@
 package game
 
 import com.badlogic.gdx.Game
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
 import model.GameState
 import model.creature.{Creature, Player, Skeleton}
@@ -11,7 +10,6 @@ import view.GameView
 class MyGdxGame extends Game {
 
   private var batch: SpriteBatch = _
-  private var img: Texture = _
 
   var atlas: TextureAtlas = _
 
@@ -20,12 +18,8 @@ class MyGdxGame extends Game {
 
   override def create(): Unit = {
     batch = new SpriteBatch
-    img = new Texture("badlogic.jpg")
 
     atlas = new TextureAtlas("assets/atlas/packed_atlas.atlas")
-
-    //TODO: add another class that hold animation parameters
-    //val playerAnimation: WrAnimation = WrAnimation(atlas, "male1", 0, 0, 32, 32)
 
     val player: Player = Player(Creature.Params(id = "player", posX = 10, posY = 10))
 
@@ -33,15 +27,13 @@ class MyGdxGame extends Game {
 
     gameState = GameState(player, nonPlayers = Map(skeleton.params.id -> skeleton))
     gameUpdater = view.GameView(atlas)
-    //gameState = gameState.modify(_.nonPlayers).using(list => player :: list)
 
-    val playScreen = new PlayScreen(batch, img, gameState, gameUpdater)
+    val playScreen = new PlayScreen(batch, gameState, gameUpdater)
 
     setScreen(playScreen)
   }
 
   override def dispose(): Unit = {
     batch.dispose()
-    img.dispose()
   }
 }

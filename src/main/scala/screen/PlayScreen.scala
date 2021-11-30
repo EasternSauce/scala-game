@@ -1,7 +1,7 @@
 package screen
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch
-import com.badlogic.gdx.graphics.{GL20, OrthographicCamera, Texture}
+import com.badlogic.gdx.graphics.{GL20, OrthographicCamera}
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import com.badlogic.gdx.math.Vector2
@@ -14,7 +14,7 @@ import model.creature.Creature
 import util.{Constants, Direction}
 import view.GameView
 
-class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var gameUpdater: GameView) extends Screen {
+class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: GameView) extends Screen {
 
   var b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
@@ -204,7 +204,6 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
   override def resize(width: Int, height: Int): Unit = {
     viewport.update(width, height)
-    //hudViewport.update(width, height)
   }
 
   override def pause(): Unit = {}
@@ -215,6 +214,5 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
   override def dispose(): Unit = {
     batch.dispose()
-    img.dispose()
   }
 }
