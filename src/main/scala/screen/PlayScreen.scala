@@ -41,7 +41,7 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
   override def show(): Unit = {}
 
-  def updateCreatures(): Unit = {
+  def updateCreatures(gameState: GameState): GameState = {
 
     val operation = (creature: Creature) => {
       val pos = gameUpdater.creatureRenderers(creature.params.id).body.getWorldCenter
@@ -49,7 +49,7 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
       creature.modify(_.params.posX).setTo(pos.x).modify(_.params.posY).setTo(pos.y)
     }
 
-    gameState = gameState
+    gameState
       .modify(_.player)
       .using(operation)
       .modifyAll(_.nonPlayers.each)
@@ -61,20 +61,19 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
     world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2) //TODO: move to area class later
 
-    gameState = gameState
-      .modify(_.player)
-      .using(_.update(delta))
-
     gameUpdater.update(gameState, world)
 
-    processPlayerMovement()
+    val performGameStateUpdates = (identity(_: GameState)) andThen
+      processPlayerMovement andThen
+      updateCreatures
 
-    updateCreatures()
+    gameState = performGameStateUpdates(gameState)
+
 
     updateCamera()
   }
 
-  private def processPlayerMovement(): Unit = {
+  private def processPlayerMovement(gameState: GameState): GameState = {
     val directionalSpeed: Float = {
       import Input.Keys._
 
@@ -133,7 +132,7 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
     gameUpdater.creatureRenderers(gameState.player.params.id).body.setLinearVelocity(new Vector2(vectorX, vectorY))
     val pos = gameUpdater.creatureRenderers(gameState.player.params.id).body.getWorldCenter
 
-    gameState = gameState
+    gameState
       .modify(_.player.params.posX)
       .setTo(pos.x)
       .modify(_.player.params.posY)
