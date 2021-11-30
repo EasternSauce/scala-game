@@ -27,9 +27,9 @@ class MyGdxGame extends Game {
     //TODO: add another class that hold animation parameters
     //val playerAnimation: WrAnimation = WrAnimation(atlas, "male1", 0, 0, 32, 32)
 
-    val player: Player = Player(Creature.Params(id = "player", posX = 0, posY = 0))
+    val player: Player = Player(Creature.Params(id = "player", posX = 10, posY = 10))
 
-    val skeleton: Skeleton = Skeleton(Creature.Params(id = "skel", posX = 4, posY = 0))
+    val skeleton: Skeleton = Skeleton(Creature.Params(id = "skel", posX = 4, posY = 4))
 
     gameState = GameState(player, nonPlayers = Map(skeleton.params.id -> skeleton))
     gameUpdater = GameUpdater(atlas)

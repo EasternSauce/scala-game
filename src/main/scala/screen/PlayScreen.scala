@@ -44,7 +44,12 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
   def updateCreatures(gameState: GameState): GameState = {
 
     val operation = (creature: Creature) => {
-      val pos = gameUpdater.creatureRenderers(creature.params.id).body.getWorldCenter
+
+      val pos =
+        if (gameUpdater.creatureRenderers.contains(creature.params.id))
+          gameUpdater.creatureRenderers(creature.params.id).body.getWorldCenter
+        else
+          new Vector2(creature.params.posX, creature.params.posY)
 
       creature.modify(_.params.posX).setTo(pos.x).modify(_.params.posY).setTo(pos.y)
     }
@@ -61,14 +66,17 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
 
     world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2) //TODO: move to area class later
 
-    gameUpdater.update(gameState, world)
-
+    // --- update model
     val performGameStateUpdates = (identity(_: GameState)) andThen
       processPlayerMovement andThen
       updateCreatures
 
     gameState = performGameStateUpdates(gameState)
+    // ---
 
+    // --- update view
+    gameUpdater.update(gameState, world)
+    // ---
 
     updateCamera()
   }
@@ -129,8 +137,16 @@ class PlayScreen(batch: SpriteBatch, img: Texture, var gameState: GameState, var
       case _ => player: Creature => player
     }
 
-    gameUpdater.creatureRenderers(gameState.player.params.id).body.setLinearVelocity(new Vector2(vectorX, vectorY))
-    val pos = gameUpdater.creatureRenderers(gameState.player.params.id).body.getWorldCenter
+    val playerCreated = gameUpdater.creatureRenderers.contains(gameState.player.params.id)
+
+    if (playerCreated)
+      gameUpdater.creatureRenderers(gameState.player.params.id).body.setLinearVelocity(new Vector2(vectorX, vectorY))
+
+    val pos =
+      if (playerCreated)
+        gameUpdater.creatureRenderers(gameState.player.params.id).body.getWorldCenter
+      else
+        new Vector2(gameState.player.params.posX, gameState.player.params.posY)
 
     gameState
       .modify(_.player.params.posX)
