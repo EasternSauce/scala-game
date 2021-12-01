@@ -183,7 +183,8 @@ case class AreaRenderer(id: String, filesDirectory: String, mapLoader: TmxMapLoa
     new Vector2(x / tileWidth, y / tileHeight)
   }
 
-  def dispose(): Unit = { // TODO: use it
+  def dispose(): Unit = {
     tiledMapRenderer.dispose()
+    world.dispose()
   }
 }

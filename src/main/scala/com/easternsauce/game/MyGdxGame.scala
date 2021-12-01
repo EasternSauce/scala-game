@@ -42,5 +42,6 @@ class MyGdxGame extends Game {
 
   override def dispose(): Unit = {
     batch.dispose()
+    gameView.dispose()
   }
 }

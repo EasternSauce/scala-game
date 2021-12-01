@@ -48,4 +48,8 @@ case class GameView(atlas: TextureAtlas) {
 
   }
 
+  def dispose(): Unit = {
+    areaRenderers.values.foreach(_.dispose())
+  }
+
 }
