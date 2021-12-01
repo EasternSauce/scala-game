@@ -2,6 +2,7 @@ package com.easternsauce.game
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
+import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.{Creature, Player, Skeleton}
 import com.easternsauce.screen.PlayScreen
@@ -14,7 +15,9 @@ class MyGdxGame extends Game {
   var atlas: TextureAtlas = _
 
   var gameState: GameState = _
-  var gameUpdater: GameView = _
+  var gameView: GameView = _
+
+  var mapLoader: TmxMapLoader = _
 
   override def create(): Unit = {
     batch = new SpriteBatch
@@ -25,10 +28,14 @@ class MyGdxGame extends Game {
 
     val skeleton: Skeleton = Skeleton(Creature.Params(id = "skel", posX = 4, posY = 4))
 
-    gameState = GameState(player, nonPlayers = Map(skeleton.params.id -> skeleton))
-    gameUpdater = GameView(atlas)
+    gameState = GameState(player, nonPlayers = Map(skeleton.params.id -> skeleton), "area1")
+    gameView = GameView(atlas)
 
-    val playScreen = new PlayScreen(batch, gameState, gameUpdater)
+    mapLoader = new TmxMapLoader()
+
+    gameView.init(mapLoader)
+
+    val playScreen = new PlayScreen(batch, gameState, gameView)
 
     setScreen(playScreen)
   }
