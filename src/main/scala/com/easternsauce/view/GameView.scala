@@ -1,9 +1,9 @@
-package view
+package com.easternsauce.view
 
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
 import com.badlogic.gdx.physics.box2d.World
-import model.GameState
-import view.creature.CreatureRenderer
+import com.easternsauce.model.GameState
+import com.easternsauce.view.creature.CreatureRenderer
 
 case class GameView(atlas: TextureAtlas) {
 

@@ -1,6 +1,6 @@
-package model
+package com.easternsauce.model
 
-import model.creature.Creature
+import com.easternsauce.model.creature.Creature
 
 case class GameState(player: Creature, nonPlayers: Map[String, Creature] = Map()) {
 

@@ -1,10 +1,10 @@
-package view.creature
+package com.easternsauce.view.creature
 
 import com.badlogic.gdx.graphics.g2d._
 import com.badlogic.gdx.physics.box2d._
-import model.GameState
-import util.Direction
-import view.GameView
+import com.easternsauce.model.GameState
+import com.easternsauce.util.Direction
+import com.easternsauce.view.GameView
 
 case class CreatureRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
 

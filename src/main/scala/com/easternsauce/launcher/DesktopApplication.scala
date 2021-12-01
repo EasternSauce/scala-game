@@ -1,8 +1,8 @@
-package launcher
+package com.easternsauce.launcher
 
 import com.badlogic.gdx.backends.lwjgl3.{Lwjgl3Application, Lwjgl3ApplicationConfiguration}
-import game.MyGdxGame
-import util.Constants
+import com.easternsauce.game.MyGdxGame
+import com.easternsauce.util.Constants
 
 object DesktopApplication {
 

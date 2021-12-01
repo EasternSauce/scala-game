@@ -1,4 +1,4 @@
-package util
+package com.easternsauce.util
 
 import scala.util.Random
 

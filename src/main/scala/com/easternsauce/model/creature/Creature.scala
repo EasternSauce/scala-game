@@ -1,9 +1,9 @@
-package model.creature
+package com.easternsauce.model.creature
 
+import com.easternsauce.model.creature.Creature.Params
+import com.easternsauce.model.util.SimpleTimer
+import com.easternsauce.util.Direction
 import com.softwaremill.quicklens.ModifyPimp
-import model.creature.Creature.Params
-import model.util.SimpleTimer
-import util.Direction
 
 abstract class Creature {
   val isPlayer = false

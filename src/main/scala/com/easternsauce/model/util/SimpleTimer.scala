@@ -1,4 +1,4 @@
-package model.util
+package com.easternsauce.model.util
 
 import com.softwaremill.quicklens.ModifyPimp
 

@@ -1,11 +1,11 @@
-package game
+package com.easternsauce.game
 
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
-import model.GameState
-import model.creature.{Creature, Player, Skeleton}
-import screen.PlayScreen
-import view.GameView
+import com.easternsauce.model.GameState
+import com.easternsauce.model.creature.{Creature, Player, Skeleton}
+import com.easternsauce.screen.PlayScreen
+import com.easternsauce.view.GameView
 
 class MyGdxGame extends Game {
 
@@ -26,7 +26,7 @@ class MyGdxGame extends Game {
     val skeleton: Skeleton = Skeleton(Creature.Params(id = "skel", posX = 4, posY = 4))
 
     gameState = GameState(player, nonPlayers = Map(skeleton.params.id -> skeleton))
-    gameUpdater = view.GameView(atlas)
+    gameUpdater = GameView(atlas)
 
     val playScreen = new PlayScreen(batch, gameState, gameUpdater)
 

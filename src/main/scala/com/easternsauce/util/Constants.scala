@@ -1,4 +1,4 @@
-package util
+package com.easternsauce.util
 
 object Constants {
   val PPM = 32

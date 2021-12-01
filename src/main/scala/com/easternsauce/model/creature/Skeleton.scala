@@ -1,6 +1,6 @@
-package model.creature
+package com.easternsauce.model.creature
 
-import util.Direction
+import com.easternsauce.util.Direction
 
 case class Skeleton(override val params: Creature.Params) extends Creature {
 

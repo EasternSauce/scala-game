@@ -1,4 +1,4 @@
-name := "action-rpg-game"
+name := "action-rpg-com.easternsauce.game"
 
 version := "0.1"
 
