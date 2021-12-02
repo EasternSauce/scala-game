@@ -21,7 +21,7 @@ case class AreaRenderer(id: String, filesDirectory: String, mapLoader: TmxMapLoa
   var tileWidth: Float = _
   var tileHeight: Float = _
 
-  val terrainTiles: ListBuffer[TerrainTile] = ListBuffer()
+  val terrainTiles: ListBuffer[AreaTileBody] = ListBuffer()
 
   var traversable: Array[Array[Boolean]] = _
   var traversableWithMargins: Array[Array[Boolean]] = _
@@ -100,13 +100,6 @@ case class AreaRenderer(id: String, filesDirectory: String, mapLoader: TmxMapLoa
       } {
 
         if (!traversable(y)(x)) {
-          val bodyDef = new BodyDef()
-          bodyDef.`type` = BodyDef.BodyType.StaticBody
-          bodyDef.position
-            .set(x * tileWidth + tileWidth / 2, y * tileHeight + tileHeight / 2)
-
-          val body: Body = world.createBody(bodyDef)
-
           val polygon = new Polygon(
             Array(
               x * tileWidth,
@@ -120,21 +113,11 @@ case class AreaRenderer(id: String, filesDirectory: String, mapLoader: TmxMapLoa
             )
           )
 
-          val tile: TerrainTile = area.TerrainTile((layerNum, x, y), body, flyover(y)(x), polygon)
+          val tile: AreaTileBody = area.AreaTileBody(layerNum, x, y, tileWidth, tileHeight, flyover(y)(x), polygon)
+
+          tile.init(world)
 
           terrainTiles += tile
-
-          body.setUserData(tile)
-
-          val shape: PolygonShape = new PolygonShape()
-
-          shape.setAsBox(tileWidth / 2, tileHeight / 2)
-
-          val fixtureDef: FixtureDef = new FixtureDef
-
-          fixtureDef.shape = shape
-
-          body.createFixture(fixtureDef)
         }
       }
 

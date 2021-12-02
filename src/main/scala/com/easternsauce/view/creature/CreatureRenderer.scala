@@ -1,7 +1,6 @@
 package com.easternsauce.view.creature
 
 import com.badlogic.gdx.graphics.g2d._
-import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.model.GameState
 import com.easternsauce.util.Direction
 import com.easternsauce.view.GameView
@@ -16,7 +15,7 @@ case class CreatureRenderer(gameView: GameView, id: String, atlas: TextureAtlas)
 
   var textureRegion: TextureRegion = _
 
-  def init(gameState: GameState, world: World): Unit = {
+  def init(gameState: GameState): Unit = {
     val creature = gameState.creatures(id)
 
     textureRegion = atlas.findRegion(creature.spriteType)
@@ -61,7 +60,7 @@ case class CreatureRenderer(gameView: GameView, id: String, atlas: TextureAtlas)
     facingTextures(creature.dirMap(currentDirection))
   }
 
-  def update(gameState: GameState, world: World): Unit = {
+  def update(gameState: GameState): Unit = {
     val creature = gameState.creatures(id)
     val texture =
       if (!creature.params.isMoving) facingTexture(gameState, creature.params.facingDirection)

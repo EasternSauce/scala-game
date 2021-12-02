@@ -29,7 +29,7 @@ case class GameView(atlas: TextureAtlas) {
       if (!creatureRenderers.contains(creatureId)) {
         val newRenderer = CreatureRenderer(this, creatureId, atlas)
         creatureRenderers = creatureRenderers + (creatureId -> newRenderer)
-        newRenderer.init(gameState, world)
+        newRenderer.init(gameState)
       }
 
       if (!creatureBodies.contains(creatureId)) {
@@ -38,7 +38,7 @@ case class GameView(atlas: TextureAtlas) {
         newBody.init(gameState)
       }
 
-      creatureRenderers(creatureId).update(gameState, world)
+      creatureRenderers(creatureId).update(gameState)
     }
 
   }
