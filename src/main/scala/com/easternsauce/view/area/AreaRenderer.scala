@@ -154,7 +154,7 @@ case class AreaRenderer(id: String, filesDirectory: String, mapLoader: TmxMapLoa
     }
   }
 
-  private def createBorderTile(x: Int, y: Int) = {
+  private def createBorderTile(x: Int, y: Int): Unit = {
     val bodyDef = new BodyDef()
     bodyDef.`type` = BodyDef.BodyType.StaticBody
     val tileCenter = getTileCenter(x, y)

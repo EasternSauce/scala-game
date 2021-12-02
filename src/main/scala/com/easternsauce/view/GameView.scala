@@ -5,11 +5,12 @@ import com.badlogic.gdx.maps.tiled.TmxMapLoader
 import com.badlogic.gdx.physics.box2d.World
 import com.easternsauce.model.GameState
 import com.easternsauce.view.area.AreaRenderer
-import com.easternsauce.view.creature.CreatureRenderer
+import com.easternsauce.view.creature.{CreatureBody, CreatureRenderer}
 
 case class GameView(atlas: TextureAtlas) {
 
   var creatureRenderers: Map[String, CreatureRenderer] = Map()
+  var creatureBodies: Map[String, CreatureBody] = Map()
   var areaRenderers: Map[String, AreaRenderer] = Map()
 
   def init(mapLoader: TmxMapLoader): Unit = {
@@ -29,6 +30,12 @@ case class GameView(atlas: TextureAtlas) {
         val newRenderer = CreatureRenderer(this, creatureId, atlas)
         creatureRenderers = creatureRenderers + (creatureId -> newRenderer)
         newRenderer.init(gameState, world)
+      }
+
+      if (!creatureBodies.contains(creatureId)) {
+        val newBody = CreatureBody(creatureId, world)
+        creatureBodies = creatureBodies + (creatureId -> newBody)
+        newBody.init(gameState)
       }
 
       creatureRenderers(creatureId).update(gameState, world)

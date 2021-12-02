@@ -44,8 +44,8 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
 
     val operation = (creature: Creature) => {
       val pos =
-        if (gameUpdater.creatureRenderers.contains(creature.params.id))
-          gameUpdater.creatureRenderers(creature.params.id).body.getWorldCenter
+        if (gameUpdater.creatureBodies.contains(creature.params.id))
+          gameUpdater.creatureBodies(creature.params.id).pos
         else
           new Vector2(creature.params.posX, creature.params.posY)
 
@@ -144,14 +144,14 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
       case _ => player: Creature => player
     }
 
-    val playerCreated = gameUpdater.creatureRenderers.contains(gameState.player.params.id)
+    val playerBodyCreated = gameUpdater.creatureBodies.contains(gameState.player.params.id)
 
-    if (playerCreated)
-      gameUpdater.creatureRenderers(gameState.player.params.id).body.setLinearVelocity(new Vector2(vectorX, vectorY))
+    if (playerBodyCreated)
+      gameUpdater.creatureBodies(gameState.player.params.id).setVelocity(new Vector2(vectorX, vectorY))
 
     val pos =
-      if (playerCreated)
-        gameUpdater.creatureRenderers(gameState.player.params.id).body.getWorldCenter
+      if (playerBodyCreated)
+        gameUpdater.creatureBodies(gameState.player.params.id).pos
       else
         new Vector2(gameState.player.params.posX, gameState.player.params.posY)
 
