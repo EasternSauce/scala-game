@@ -44,8 +44,8 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
 
     val operation = (creature: Creature) => {
       val pos =
-        if (gameUpdater.creatureBodies.contains(creature.params.id))
-          gameUpdater.creatureBodies(creature.params.id).pos
+        if (gameUpdater.entities.contains(creature.params.id))
+          gameUpdater.entities(creature.params.id).pos
         else
           new Vector2(creature.params.posX, creature.params.posY)
 
@@ -67,9 +67,9 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
 
   def update(delta: Float): Unit = {
 
-    val currentArea = gameUpdater.areaRenderers(gameState.currentAreaId)
+    val currentArea = gameUpdater.areas(gameState.currentAreaId)
 
-    currentArea.world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2) //TODO: move to area class later
+    currentArea.step()
 
     // --- update com.easternsauce.model
     val performGameStateUpdates = (identity(_: GameState)) andThen
@@ -83,7 +83,7 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
     gameUpdater.update(gameState, currentArea.world)
     // ---
 
-    currentArea.tiledMapRenderer.setView(camera)
+    currentArea.setView(camera)
 
     updateCamera(gameState.player)
   }
@@ -144,14 +144,14 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
       case _ => player: Creature => player
     }
 
-    val playerBodyCreated = gameUpdater.creatureBodies.contains(gameState.player.params.id)
+    val playerBodyCreated = gameUpdater.entities.contains(gameState.player.params.id)
 
     if (playerBodyCreated)
-      gameUpdater.creatureBodies(gameState.player.params.id).setVelocity(new Vector2(vectorX, vectorY))
+      gameUpdater.entities(gameState.player.params.id).setVelocity(new Vector2(vectorX, vectorY))
 
     val pos =
       if (playerBodyCreated)
-        gameUpdater.creatureBodies(gameState.player.params.id).pos
+        gameUpdater.entities(gameState.player.params.id).pos
       else
         new Vector2(gameState.player.params.posX, gameState.player.params.posY)
 
@@ -179,9 +179,9 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
     val coverageBuffer = if (Gdx.graphics.getBufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | coverageBuffer)
 
-    val currentArea = gameUpdater.areaRenderers(gameState.currentAreaId)
+    val currentArea = gameUpdater.areas(gameState.currentAreaId)
 
-    currentArea.tiledMapRenderer.render(Array(0, 1))
+    currentArea.render(Array(0, 1))
 
     batch.begin()
 
@@ -189,7 +189,7 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
 
     batch.end()
 
-    currentArea.tiledMapRenderer.render(Array(2, 3))
+    currentArea.render(Array(2, 3))
 
     if (debugRenderEnabled) b2DebugRenderer.render(currentArea.world, camera.combined)
 

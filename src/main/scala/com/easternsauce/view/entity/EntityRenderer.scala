@@ -1,11 +1,11 @@
-package com.easternsauce.view.creature
+package com.easternsauce.view.entity
 
 import com.badlogic.gdx.graphics.g2d._
 import com.easternsauce.model.GameState
 import com.easternsauce.util.Direction
 import com.easternsauce.view.GameView
 
-case class CreatureRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
+case class EntityRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
 
   val sprite: Sprite = new Sprite()
 

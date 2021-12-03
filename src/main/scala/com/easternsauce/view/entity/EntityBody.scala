@@ -1,10 +1,10 @@
-package com.easternsauce.view.creature
+package com.easternsauce.view.entity
 
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.model.GameState
 
-case class CreatureBody(id: String, world: World) {
+case class EntityBody(id: String, world: World) {
 
   private var body: Body = _
 

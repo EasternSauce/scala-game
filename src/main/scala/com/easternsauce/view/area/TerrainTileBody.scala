@@ -3,7 +3,7 @@ package com.easternsauce.view.area
 import com.badlogic.gdx.math.Polygon
 import com.badlogic.gdx.physics.box2d._
 
-case class AreaTileBody(
+case class TerrainTileBody(
   layer: Int,
   x: Int,
   y: Int,
