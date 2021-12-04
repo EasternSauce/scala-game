@@ -1,14 +1,16 @@
-package com.easternsauce.view.area
+package com.easternsauce.physics.area
 
+import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
 import com.badlogic.gdx.math.{Polygon, Vector2}
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.util.Constants
-import com.easternsauce.view.area
 
 import scala.collection.mutable.ListBuffer
 
-case class Terrain(world: World, map: TiledMap, mapScale: Float) {
+case class Terrain(map: TiledMap, mapScale: Float) {
+
+  val world = new World(new Vector2(0, 0), true)
 
   private val layer = map.getLayers.get(0).asInstanceOf[TiledMapTileLayer]
 
@@ -104,7 +106,7 @@ case class Terrain(world: World, map: TiledMap, mapScale: Float) {
           )
 
           val tile: TerrainTileBody =
-            area.TerrainTileBody(layerNum, x, y, tileWidth, tileHeight, flyover(y)(x), polygon)
+            TerrainTileBody(layerNum, x, y, tileWidth, tileHeight, flyover(y)(x), polygon)
 
           tile.init(world)
 
@@ -156,4 +158,8 @@ case class Terrain(world: World, map: TiledMap, mapScale: Float) {
   def getClosestTile(x: Float, y: Float): Vector2 = {
     new Vector2(x / tileWidth, y / tileHeight)
   }
+
+  def step(): Unit = world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2)
+
+  def dispose(): Unit = world.dispose()
 }

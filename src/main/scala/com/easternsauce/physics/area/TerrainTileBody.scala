@@ -1,4 +1,4 @@
-package com.easternsauce.view.area
+package com.easternsauce.physics.area
 
 import com.badlogic.gdx.math.Polygon
 import com.badlogic.gdx.physics.box2d._

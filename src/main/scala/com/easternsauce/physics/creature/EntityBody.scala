@@ -1,21 +1,25 @@
-package com.easternsauce.view.entity
+package com.easternsauce.physics.creature
 
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.model.GameState
+import com.easternsauce.physics.PhysicsController
+import com.easternsauce.physics.area.Terrain
 
 case class EntityBody(id: String) {
 
   private var body: Body = _
 
-  def init(gameState: GameState, world: World): Unit = {
+  def init(gameState: GameState, physicsController: PhysicsController): Unit = {
     val creature = gameState.creatures(id)
+
+    val terrain: Terrain = physicsController.terrain(gameState.creatures(id).params.areaId)
 
     val bodyDef = new BodyDef()
     bodyDef.position.set(creature.params.posX, creature.params.posY)
 
     bodyDef.`type` = BodyDef.BodyType.DynamicBody
-    val b2Body = world.createBody(bodyDef)
+    val b2Body = terrain.world.createBody(bodyDef)
     b2Body.setUserData(this)
     b2Body.setSleepingAllowed(false)
 

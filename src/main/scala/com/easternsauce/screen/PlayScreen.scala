@@ -8,11 +8,17 @@ import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
+import com.easternsauce.physics.PhysicsController
 import com.easternsauce.util.{Constants, Direction}
 import com.easternsauce.view.GameView
 import com.softwaremill.quicklens._
 
-class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: GameView) extends Screen {
+class PlayScreen(
+  batch: SpriteBatch,
+  var gameState: GameState,
+  var gameView: GameView,
+  var physicsController: PhysicsController
+) extends Screen {
 
   var b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
@@ -40,12 +46,12 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
 
   override def show(): Unit = {}
 
-  def updateCreatures(delta: Float)(gameState: GameState): GameState = {
+  def updateCreaturePositions(physicsController: PhysicsController, delta: Float)(gameState: GameState): GameState = {
 
     val operation = (creature: Creature) => {
       val pos =
-        if (gameUpdater.entities.contains(creature.params.id))
-          gameUpdater.entities(creature.params.id).pos
+        if (gameView.entityRenderers.contains(creature.params.id))
+          physicsController.entityBodies(creature.params.id).pos
         else
           new Vector2(creature.params.posX, creature.params.posY)
 
@@ -67,20 +73,21 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
 
   def update(delta: Float): Unit = {
 
-    val currentArea = gameUpdater.areas(gameState.currentAreaId)
+    val currentArea = gameView.areaRenderers(gameState.currentAreaId)
+    val currentTerrain = physicsController.terrain(gameState.currentAreaId)
 
-    currentArea.step()
+    currentTerrain.step()
 
-    // --- update com.easternsauce.model
+    // --- update functional model
     val performGameStateUpdates = (identity(_: GameState)) andThen
       processPlayerMovement andThen
-      updateCreatures(delta)
+      updateCreaturePositions(physicsController, delta)
 
     gameState = performGameStateUpdates(gameState)
     // ---
 
-    // --- update com.easternsauce.view
-    gameUpdater.update(gameState, currentArea.world)
+    // --- update imperative libGDX view
+    gameView.update(gameState, currentTerrain.world)
     // ---
 
     currentArea.setView(camera)
@@ -144,14 +151,14 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
       case _ => player: Creature => player
     }
 
-    val playerBodyCreated = gameUpdater.entities.contains(gameState.player.params.id)
+    val playerBodyCreated = physicsController.entityBodies.contains(gameState.player.params.id)
 
     if (playerBodyCreated)
-      gameUpdater.entities(gameState.player.params.id).setVelocity(new Vector2(vectorX, vectorY))
+      physicsController.entityBodies(gameState.player.params.id).setVelocity(new Vector2(vectorX, vectorY))
 
     val pos =
       if (playerBodyCreated)
-        gameUpdater.entities(gameState.player.params.id).pos
+        physicsController.entityBodies(gameState.player.params.id).pos
       else
         new Vector2(gameState.player.params.posX, gameState.player.params.posY)
 
@@ -179,19 +186,20 @@ class PlayScreen(batch: SpriteBatch, var gameState: GameState, var gameUpdater: 
     val coverageBuffer = if (Gdx.graphics.getBufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | coverageBuffer)
 
-    val currentArea = gameUpdater.areas(gameState.currentAreaId)
+    val currentArea = gameView.areaRenderers(gameState.currentAreaId)
+    val currentTerrain = physicsController.terrain(gameState.currentAreaId)
 
     currentArea.render(Array(0, 1))
 
     batch.begin()
 
-    gameUpdater.render(gameState, batch)
+    gameView.render(gameState, batch)
 
     batch.end()
 
     currentArea.render(Array(2, 3))
 
-    if (debugRenderEnabled) b2DebugRenderer.render(currentArea.world, camera.combined)
+    if (debugRenderEnabled) b2DebugRenderer.render(currentTerrain.world, camera.combined)
 
   }
 
