@@ -2,16 +2,18 @@ package com.easternsauce.view.entity
 
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
 import com.badlogic.gdx.math.Vector2
-import com.badlogic.gdx.physics.box2d.World
 import com.easternsauce.model.GameState
 import com.easternsauce.view.GameView
+import com.easternsauce.view.area.Area
 
-case class Entity(id: String, world: World, gameView: GameView, atlas: TextureAtlas) {
-  val body: EntityBody = EntityBody(id, world)
+case class Entity(id: String, gameView: GameView, atlas: TextureAtlas) {
+  val body: EntityBody = EntityBody(id)
   val renderer: EntityRenderer = EntityRenderer(gameView, id, atlas)
 
   def init(gameState: GameState): Unit = {
-    body.init(gameState)
+    val area: Area = gameView.areas(gameState.creatures(id).params.areaId)
+
+    body.init(gameState, area.world)
     renderer.init(gameState)
   }
 

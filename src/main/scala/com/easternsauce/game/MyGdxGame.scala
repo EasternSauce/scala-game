@@ -24,16 +24,16 @@ class MyGdxGame extends Game {
 
     atlas = new TextureAtlas("assets/atlas/packed_atlas.atlas")
 
-    val player: Player = Player(Creature.Params(id = "player", posX = 10, posY = 10))
+    val player: Player = Player(Creature.Params(id = "player", posX = 10, posY = 10, areaId = "area1"))
 
-    val skeleton: Skeleton = Skeleton(Creature.Params(id = "skel", posX = 4, posY = 4))
+    val skeleton: Skeleton = Skeleton(Creature.Params(id = "skel", posX = 4, posY = 4, areaId = "area1"))
 
-    gameState = GameState(player, nonPlayers = Map(skeleton.params.id -> skeleton), "area1")
+    gameState = GameState(player = player, nonPlayers = Map(skeleton.params.id -> skeleton), currentAreaId = "area1")
     gameView = GameView(atlas)
 
     mapLoader = new TmxMapLoader()
 
-    gameView.init(mapLoader)
+    gameView.init(gameState, mapLoader)
 
     val playScreen = new PlayScreen(batch, gameState, gameView)
 

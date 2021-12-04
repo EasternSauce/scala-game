@@ -12,22 +12,20 @@ case class GameView(atlas: TextureAtlas) {
   var entities: Map[String, Entity] = Map()
   var areas: Map[String, Area] = Map()
 
-  def init(mapLoader: TmxMapLoader): Unit = {
+  def init(gameState: GameState, mapLoader: TmxMapLoader): Unit = {
     val area1DataDirectory = "assets/areas/area1"
     val area1 = Area("area1", area1DataDirectory, mapLoader)
     areas = areas + (area1.id -> area1)
+
+    gameState.creatures.keys.foreach { creatureId =>
+      val newEntity = Entity(creatureId, this, atlas) // TODO: change this
+      entities = entities + (creatureId -> newEntity)
+      newEntity.init(gameState)
+    }
   }
 
   def update(gameState: GameState, world: World): Unit = {
-    val creatures = gameState.creatures
-
-    creatures.keys.foreach { creatureId =>
-      if (!entities.contains(creatureId)) {
-        val newEntity = Entity(creatureId, areas("area1").world, this, atlas) // TODO: change this
-        entities = entities + (creatureId -> newEntity)
-        newEntity.init(gameState)
-      }
-
+    gameState.creatures.keys.foreach { creatureId =>
       entities(creatureId).update(gameState)
     }
 
@@ -35,9 +33,7 @@ case class GameView(atlas: TextureAtlas) {
 
   def render(gameState: GameState, spriteBatch: SpriteBatch): Unit = {
 
-    val creatures = gameState.creatures
-
-    creatures.keys.foreach { creatureId =>
+    gameState.creatures.keys.foreach { creatureId =>
       if (entities.contains(creatureId)) {
         entities(creatureId).render(spriteBatch)
       }

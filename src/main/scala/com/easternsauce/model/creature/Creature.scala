@@ -38,6 +38,7 @@ object Creature {
     posY: Float,
     facingDirection: Direction.Value = Direction.Down,
     animationTimer: SimpleTimer = SimpleTimer(),
-    isMoving: Boolean = false
+    isMoving: Boolean = false,
+    areaId: String
   )
 }

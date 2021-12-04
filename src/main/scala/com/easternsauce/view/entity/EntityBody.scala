@@ -4,11 +4,11 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.model.GameState
 
-case class EntityBody(id: String, world: World) {
+case class EntityBody(id: String) {
 
   private var body: Body = _
 
-  def init(gameState: GameState): Unit = {
+  def init(gameState: GameState, world: World): Unit = {
     val creature = gameState.creatures(id)
 
     val bodyDef = new BodyDef()
