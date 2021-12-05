@@ -4,16 +4,16 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.model.GameState
 import com.easternsauce.physics.PhysicsController
-import com.easternsauce.physics.area.Terrain
+import com.easternsauce.physics.terrain.Terrain
 
 case class EntityBody(id: String) {
 
-  private var body: Body = _
+  var body: Body = _
 
-  def init(gameState: GameState, physicsController: PhysicsController): Unit = {
+  def init(gameState: GameState, physicsController: PhysicsController, areaId: String): Unit = {
     val creature = gameState.creatures(id)
 
-    val terrain: Terrain = physicsController.terrain(gameState.creatures(id).params.areaId)
+    val terrain: Terrain = physicsController.terrain(areaId)
 
     val bodyDef = new BodyDef()
     bodyDef.position.set(creature.params.posX, creature.params.posY)

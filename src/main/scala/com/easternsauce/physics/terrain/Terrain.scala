@@ -1,4 +1,4 @@
-package com.easternsauce.physics.area
+package com.easternsauce.physics.terrain
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}

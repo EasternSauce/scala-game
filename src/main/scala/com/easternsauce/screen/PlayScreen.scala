@@ -33,12 +33,14 @@ class PlayScreen(
       camera
     )
 
+  var areaChangeQueue: List[(String, String, String)] = List()
+
   def updateCamera(player: Creature): Unit = {
 
     val camPosition = camera.position
 
-    camPosition.x = (math.floor(player.params.posX * 1000) / 1000).toFloat
-    camPosition.y = (math.floor(player.params.posY * 1000) / 1000).toFloat
+    camPosition.x = (math.floor(player.params.posX * 100) / 100).toFloat
+    camPosition.y = (math.floor(player.params.posY * 100) / 100).toFloat
 
     camera.update()
 
@@ -46,28 +48,27 @@ class PlayScreen(
 
   override def show(): Unit = {}
 
-  def updateCreaturePositions(physicsController: PhysicsController, delta: Float)(gameState: GameState): GameState = {
+  def updateCreatures(physicsController: PhysicsController, delta: Float)(gameState: GameState): GameState = {
 
-    val operation = (creature: Creature) => {
-      val pos =
-        if (gameView.entityRenderers.contains(creature.params.id))
-          physicsController.entityBodies(creature.params.id).pos
-        else
-          new Vector2(creature.params.posX, creature.params.posY)
+    def physicsPos(physicsController: PhysicsController, creature: Creature): Vector2 =
+      if (physicsController.entityBodies.contains(creature.params.id))
+        physicsController.entityBodies(creature.params.id).pos
+      else
+        new Vector2(creature.params.posX, creature.params.posY)
+
+    val updateCreature = (creature: Creature) => {
+      val pos = physicsPos(physicsController, creature)
 
       creature
-        .modify(_.params.posX)
-        .setTo(pos.x)
-        .modify(_.params.posY)
-        .setTo(pos.y)
+        .updatePosition(pos.x, pos.y)
         .update(delta)
     }
 
     gameState
       .modify(_.player)
-      .using(operation)
-      .modifyAll(_.nonPlayers.each)
-      .using(operation)
+      .using(updateCreature)
+      .modify(_.nonPlayers.each)
+      .using(updateCreature)
 
   }
 
@@ -78,21 +79,44 @@ class PlayScreen(
 
     currentTerrain.step()
 
-    // --- update functional model
+    // TODO: creature changing area logic goes here
+    // ...
+    // TODO: temporarily simulate creature changing areas on SPACE
+    if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+      areaChangeQueue = ("player", "area1", "area2") :: areaChangeQueue
+    }
+
+    // --- update model (can update based on player input)
     val performGameStateUpdates = (identity(_: GameState)) andThen
       processPlayerMovement andThen
-      updateCreaturePositions(physicsController, delta)
+      updateCreatures(physicsController, delta) andThen
+      (_.processCreatureAreaChanges(areaChangeQueue))
 
     gameState = performGameStateUpdates(gameState)
     // ---
 
-    // --- update imperative libGDX view
+    // --- update libGDX view
     gameView.update(gameState, currentTerrain.world)
     // ---
+
+    // --- update physics
+    physicsController.processCreatureAreaChanges(gameState, areaChangeQueue)
+    //
+
+    areaChangeQueue = List()
 
     currentArea.setView(camera)
 
     updateCamera(gameState.player)
+  }
+
+  def changeEntityArea(id: String, str: String): Unit = {
+
+    //gameState = gameState.modify(_.).creatures(id).
+
+    physicsController
+    // gameState + physics.terrain
+    //CHANGE STATE + REMOVE BODY IN OLD AREA + CREATE BODY IN NEW AREA
   }
 
   private def processPlayerMovement(gameState: GameState): GameState = {

@@ -2,11 +2,10 @@ package com.easternsauce.physics
 
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.easternsauce.model.GameState
-import com.easternsauce.physics.area.Terrain
 import com.easternsauce.physics.creature.EntityBody
-import com.easternsauce.view.GameView
+import com.easternsauce.physics.terrain.Terrain
 
-case class PhysicsController(gameView: GameView) {
+case class PhysicsController() {
   var entityBodies: Map[String, EntityBody] = Map()
   var terrain: Map[String, Terrain] = Map()
 
@@ -18,6 +17,21 @@ case class PhysicsController(gameView: GameView) {
 
     entityBodies = gameState.creatures.keys.map(creatureId => creatureId -> EntityBody(creatureId)).toMap
 
-    entityBodies.values.foreach(_.init(gameState, this))
+    entityBodies.values.foreach(entityBody => {
+
+      val areaId = gameState.creatures(entityBody.id).params.areaId
+
+      entityBody.init(gameState = gameState, physicsController = this, areaId = areaId)
+    })
   }
+
+  def processCreatureAreaChanges(gameState: GameState, areaChangeQueue: List[(String, String, String)]): Unit = {
+    areaChangeQueue.foreach {
+      case (creatureId, oldAreaId, newAreaId) =>
+        terrain(oldAreaId).world.destroyBody(entityBodies(creatureId).body)
+        entityBodies(creatureId).init(gameState = gameState, physicsController = this, areaId = newAreaId)
+    }
+  }
+
+  def dispose(): Unit = terrain.values.foreach(_.dispose())
 }

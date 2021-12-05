@@ -27,6 +27,14 @@ abstract class Creature {
     this.modify(_.params.animationTimer).using(_.update(delta))
   }
 
+  def updatePosition(newPosX: Float, newPosY: Float): Creature = {
+    this
+      .modify(_.params.posX)
+      .setTo(newPosX)
+      .modify(_.params.posY)
+      .setTo(newPosY)
+  }
+
   def copy(params: Params = params): Creature
 
 }

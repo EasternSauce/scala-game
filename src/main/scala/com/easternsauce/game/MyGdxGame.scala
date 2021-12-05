@@ -4,6 +4,7 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import com.easternsauce.model.GameState
+import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.{Creature, Player, Skeleton}
 import com.easternsauce.physics.PhysicsController
 import com.easternsauce.screen.PlayScreen
@@ -41,12 +42,19 @@ class MyGdxGame extends Game {
       case (areaId, directory) => areaId -> mapLoader.load(directory + "/tile_map.tmx")
     }
 
-    gameState = GameState(player = player, nonPlayers = Map(skeleton.params.id -> skeleton), currentAreaId = "area1")
+    val areas = maps.map { case (key, _) => (key, Area()) }
+
+    gameState = GameState(
+      player = player,
+      nonPlayers = Map(skeleton.params.id -> skeleton),
+      currentAreaId = "area1",
+      areas = areas
+    )
     gameView = GameView(atlas)
-    physicsController = PhysicsController(gameView)
+    physicsController = PhysicsController()
 
     gameView.init(gameState, maps, mapScale)
-    physicsController.init(gameState, maps, mapScale)
+    physicsController.init(gameState, maps, mapScale) // areaid.get
 
     val playScreen = new PlayScreen(batch, gameState, gameView, physicsController)
 
@@ -56,5 +64,6 @@ class MyGdxGame extends Game {
   override def dispose(): Unit = {
     batch.dispose()
     gameView.dispose()
+    physicsController.dispose()
   }
 }

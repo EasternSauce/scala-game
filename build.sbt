@@ -1,4 +1,4 @@
-name := "action-rpg-com.easternsauce.game"
+name := "scala-game"
 
 version := "0.1"
 
