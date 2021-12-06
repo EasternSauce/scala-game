@@ -1,8 +1,10 @@
 package com.easternsauce.view.entity
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d._
+import com.badlogic.gdx.math.Rectangle
 import com.easternsauce.model.GameState
-import com.easternsauce.util.Direction
+import com.easternsauce.util.{Direction, RendererBatch}
 import com.easternsauce.view.GameView
 
 case class EntityRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
@@ -71,7 +73,23 @@ case class EntityRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
 
   }
 
-  def render(batch: SpriteBatch): Unit = {
-    sprite.draw(batch)
+  def render(batch: RendererBatch): Unit = {
+    sprite.draw(batch.spriteBatch)
+  }
+
+  def renderLifeBar(batch: RendererBatch, gameState: GameState): Unit = {
+    val lifeBarHeight = 0.16f
+    val lifeBarWidth = 2.0f
+
+    val creature = gameState.creatures(id)
+
+    val currentLifeBarWidth = lifeBarWidth * creature.params.life / creature.params.maxLife
+    val barPosX = creature.params.posX - lifeBarWidth / 2
+    val barPosY = creature.params.posY + sprite.getWidth / 2 + 0.3125f
+
+    batch.filledRectangle(new Rectangle(barPosX, barPosY, lifeBarWidth, lifeBarHeight), Color.ORANGE)
+    batch
+      .filledRectangle(new Rectangle(barPosX, barPosY, currentLifeBarWidth, lifeBarHeight), Color.RED)
+
   }
 }

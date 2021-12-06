@@ -1,9 +1,10 @@
 package com.easternsauce.view
 
-import com.badlogic.gdx.graphics.g2d.{SpriteBatch, TextureAtlas}
+import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.physics.box2d.World
 import com.easternsauce.model.GameState
+import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.area.AreaRenderer
 import com.easternsauce.view.entity.EntityRenderer
 
@@ -32,11 +33,17 @@ case class GameView(atlas: TextureAtlas) {
 
   }
 
-  def render(gameState: GameState, spriteBatch: SpriteBatch): Unit = {
+  def render(gameState: GameState, batch: RendererBatch): Unit = {
 
     gameState.creatures.keys.foreach { creatureId =>
       if (entityRenderers.contains(creatureId)) {
-        entityRenderers(creatureId).render(spriteBatch)
+        entityRenderers(creatureId).render(batch)
+      }
+    }
+
+    gameState.creatures.keys.foreach { creatureId =>
+      if (entityRenderers.contains(creatureId)) {
+        entityRenderers(creatureId).renderLifeBar(batch, gameState)
       }
     }
 

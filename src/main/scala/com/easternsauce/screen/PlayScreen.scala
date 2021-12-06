@@ -1,6 +1,5 @@
 package com.easternsauce.screen
 
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.graphics.{GL20, OrthographicCamera}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
@@ -9,12 +8,12 @@ import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.physics.PhysicsController
-import com.easternsauce.util.{Constants, Direction}
+import com.easternsauce.util.{Constants, Direction, RendererBatch}
 import com.easternsauce.view.GameView
 import com.softwaremill.quicklens._
 
 class PlayScreen(
-  batch: SpriteBatch,
+  batch: RendererBatch,
   var gameState: GameState,
   var gameView: GameView,
   var physicsController: PhysicsController
@@ -83,10 +82,14 @@ class PlayScreen(
     // ...
     // TODO: temporarily simulate creature changing areas on SPACE
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-      areaChangeQueue = ("player", "area1", "area2") :: areaChangeQueue
+      if (gameState.currentAreaId == "area1") {
+        areaChangeQueue = ("player", "area1", "area2") :: areaChangeQueue
+      } else {
+        areaChangeQueue = ("player", "area2", "area1") :: areaChangeQueue
+      }
     }
 
-    // --- update model (can update based on player input)
+    // --- update model (can update based on player input or physical world state)
     val performGameStateUpdates = (identity(_: GameState)) andThen
       processPlayerMovement andThen
       updateCreatures(physicsController, delta) andThen
@@ -108,15 +111,6 @@ class PlayScreen(
     currentArea.setView(camera)
 
     updateCamera(gameState.player)
-  }
-
-  def changeEntityArea(id: String, str: String): Unit = {
-
-    //gameState = gameState.modify(_.).creatures(id).
-
-    physicsController
-    // gameState + physics.terrain
-    //CHANGE STATE + REMOVE BODY IN OLD AREA + CREATE BODY IN NEW AREA
   }
 
   private def processPlayerMovement(gameState: GameState): GameState = {
@@ -203,7 +197,7 @@ class PlayScreen(
   override def render(delta: Float): Unit = {
     update(delta)
 
-    batch.setProjectionMatrix(camera.combined)
+    batch.spriteBatch.setProjectionMatrix(camera.combined)
 
     Gdx.gl.glClearColor(0, 0, 0, 1)
 
