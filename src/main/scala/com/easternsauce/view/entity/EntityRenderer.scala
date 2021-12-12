@@ -87,7 +87,8 @@ case class EntityRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
     val barPosX = creature.params.posX - lifeBarWidth / 2
     val barPosY = creature.params.posY + sprite.getWidth / 2 + 0.3125f
 
-    batch.filledRectangle(new Rectangle(barPosX, barPosY, lifeBarWidth, lifeBarHeight), Color.ORANGE)
+    batch
+      .filledRectangle(new Rectangle(barPosX, barPosY, lifeBarWidth, lifeBarHeight), Color.ORANGE)
     batch
       .filledRectangle(new Rectangle(barPosX, barPosY, currentLifeBarWidth, lifeBarHeight), Color.RED)
 

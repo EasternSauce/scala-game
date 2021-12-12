@@ -2,7 +2,7 @@ package com.easternsauce.model.creature
 
 import com.easternsauce.util.Direction
 
-case class Player(override val params: Creature.Params) extends Creature {
+case class Player(override val params: CreatureParams) extends Creature {
 
   override val spriteType: String = "male1"
   override val textureWidth: Int = 32
@@ -21,7 +21,7 @@ case class Player(override val params: Creature.Params) extends Creature {
     super.update(delta).asInstanceOf[Player]
   }
 
-  override def copy(params: Creature.Params): Player = {
+  override def copy(params: CreatureParams): Player = {
     Player(params)
   }
 

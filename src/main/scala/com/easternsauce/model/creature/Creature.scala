@@ -1,14 +1,14 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.model.creature.Creature.Params
-import com.easternsauce.model.util.SimpleTimer
+import com.easternsauce.model.creature.ability.Ability
 import com.easternsauce.util.Direction
-import com.softwaremill.quicklens.ModifyPimp
+import com.softwaremill.quicklens._
 
 abstract class Creature {
+
   val isPlayer = false
 
-  val params: Params
+  val params: CreatureParams
   val spriteType: String
   val textureWidth: Int
   val textureHeight: Int
@@ -35,20 +35,15 @@ abstract class Creature {
       .setTo(newPosY)
   }
 
-  def copy(params: Params = params): Creature
+  def takeStaminaDamage(staminaDamage: Float): Creature = ???
+
+  def modifyAbility(abilityId: String)(operation: Ability => Ability): Creature =
+    this
+      .modify(_.params.abilities.at(abilityId))
+      .using(operation)
+
+  def copy(params: CreatureParams = params): Creature
 
 }
 
-object Creature {
-  case class Params(
-    id: String,
-    posX: Float,
-    posY: Float,
-    facingDirection: Direction.Value = Direction.Down,
-    animationTimer: SimpleTimer = SimpleTimer(),
-    isMoving: Boolean = false,
-    areaId: String,
-    life: Float,
-    maxLife: Float
-  )
-}
+object Creature {}
