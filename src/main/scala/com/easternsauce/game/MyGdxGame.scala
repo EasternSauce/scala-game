@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.area.Area
-import com.easternsauce.model.creature.{Player, Skeleton}
+import com.easternsauce.model.creature.{CreatureParams, Player, Skeleton}
 import com.easternsauce.physics.PhysicsController
 import com.easternsauce.screen.PlayScreen
 import com.easternsauce.util.RendererBatch
@@ -36,11 +36,29 @@ class MyGdxGame extends Game {
     atlas = new TextureAtlas("assets/atlas/packed_atlas.atlas")
 
     val player: Player = Player(
-      CreatureParams(id = "player", posX = 10, posY = 10, areaId = "area1", life = 62f, maxLife = 100f)
+      CreatureParams(
+        id = "player",
+        posX = 10,
+        posY = 10,
+        areaId = "area1",
+        life = 62f,
+        maxLife = 100f,
+        stamina = 100f,
+        maxStamina = 100f
+      )
     )
 
     val skeleton: Skeleton = Skeleton(
-      CreatureParams(id = "skel", posX = 4, posY = 4, areaId = "area1", life = 100f, maxLife = 100f)
+      CreatureParams(
+        id = "skel",
+        posX = 4,
+        posY = 4,
+        areaId = "area1",
+        life = 100f,
+        maxLife = 100f,
+        stamina = 100f,
+        maxStamina = 100f
+      )
     )
 
     maps = mapsToLoad.map {
