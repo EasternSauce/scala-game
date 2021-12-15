@@ -59,7 +59,7 @@ class PlayScreen(
       val pos = physicsPos(physicsController, creature)
 
       creature
-        .updatePosition(pos.x, pos.y)
+        .setPosition(pos.x, pos.y)
         .update(delta)
     }
 
@@ -87,6 +87,10 @@ class PlayScreen(
       } else {
         areaChangeQueue = ("player", "area2", "area1") :: areaChangeQueue
       }
+    }
+
+    if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+      gameState = gameState.modifyGameStateCreature("player")(_.performAbility("regularAttack"))
     }
 
     // --- update model (can update based on player input or physical world state)

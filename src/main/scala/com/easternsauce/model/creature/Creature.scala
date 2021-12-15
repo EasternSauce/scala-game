@@ -1,11 +1,12 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.model.creature.ability.Ability
+import com.easternsauce.model.creature.ability.{Ability, AbilityState}
 import com.easternsauce.util.Direction
 import com.softwaremill.quicklens._
 
-abstract class Creature {
+import scala.util.chaining.scalaUtilChainingOps
 
+abstract class Creature {
   val isPlayer = false
 
   val params: CreatureParams
@@ -27,7 +28,7 @@ abstract class Creature {
     this.modify(_.params.animationTimer).using(_.update(delta))
   }
 
-  def updatePosition(newPosX: Float, newPosY: Float): Creature = {
+  def setPosition(newPosX: Float, newPosY: Float): Creature = {
     this
       .modify(_.params.posX)
       .setTo(newPosX)
@@ -37,10 +38,25 @@ abstract class Creature {
 
   def takeStaminaDamage(staminaDamage: Float): Creature = ???
 
-  def modifyAbility(abilityId: String)(operation: Ability => Ability): Creature =
+  def modifyCreatureAbility(abilityId: String)(operation: Ability => Ability): Creature =
     this
       .modify(_.params.abilities.at(abilityId))
       .using(operation)
+
+  def performAbility(abilityId: String): Creature = {
+    val ability = params.abilities(abilityId)
+    val channelTimer = ability.params.channelTimer
+
+    this.pipe(
+      creature =>
+        if (
+          creature.params.stamina > 0 && ability.params.state == AbilityState.Inactive && !ability.params.onCooldown
+          /*&& !creature.abilityActive*/
+        ) this.modifyCreatureAbility(abilityId)(_.modify(_.params.channelTimer).using(_.restart()))
+        else creature
+    )
+
+  }
 
   def copy(params: CreatureParams = params): Creature
 

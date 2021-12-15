@@ -1,8 +1,5 @@
 package com.easternsauce.model
 
-import com.easternsauce.model.creature.ability.{Ability, AbilityState}
-import com.softwaremill.quicklens._
-
 import scala.util.chaining._
 
 trait AbilityInteractions {
@@ -10,19 +7,12 @@ trait AbilityInteractions {
 
   def onAbilityActiveStart(creatureId: String, abilityId: String): GameState = {
 
-    this.modifyCreature(creatureId) { creature =>
-      val restartTimers: Ability => Ability = _.modify(_.params.abilityActiveAnimationTimer)
-        .using(_.restart())
-        .modify(_.params.activeTimer)
-        .using(_.restart())
-      val setDirVector: Ability => Ability = _.modify(_.params.dirVector).setTo(creature.params.dirVector)
-
+    this.modifyGameStateCreature(creatureId) { creature =>
       creature
-        .modifyAbility(abilityId)(restartTimers)
+        .modifyCreatureAbility(abilityId)(_.restartActiveTimers())
         .takeStaminaDamage(15f)
-        .modifyAbility(abilityId)(setDirVector)
-        .modifyAbility(abilityId)(_.updateHitbox(creature))
-
+        .modifyCreatureAbility(abilityId)(_.setDirVector(creature.params.dirVector))
+        .modifyCreatureAbility(abilityId)(_.updateHitbox(creature))
     }
   }
 
@@ -52,11 +42,7 @@ trait AbilityInteractions {
         this.pipe {
           case state if activeTimer.time > ability.totalActiveTime =>
             state
-              .modifyAbility(creatureId, abilityId) {
-                _.onStop()
-                  .modify(_.params.state)
-                  .setTo(AbilityState.Inactive)
-              }
+              .modifyGameStateAbility(creatureId, abilityId)(_.stop().makeInactive())
               //.updateHitbox ??
               .onAbilityActiveUpdate(creatureId, abilityId)
 
@@ -66,7 +52,7 @@ trait AbilityInteractions {
         this.pipe(
           state =>
             if (ability.params.onCooldown && activeTimer.time > ability.cooldownTime)
-              modifyAbility(creatureId, abilityId)(_.modify(_.params.onCooldown).setTo(false))
+              modifyGameStateAbility(creatureId, abilityId)(_.setNotOnCooldown())
             else state
         )
       case _ => this

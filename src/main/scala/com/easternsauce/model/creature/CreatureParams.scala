@@ -15,6 +15,8 @@ case class CreatureParams(
   areaId: String,
   life: Float,
   maxLife: Float,
+  stamina: Float,
+  maxStamina: Float,
   abilities: Map[String, Ability] = Map("regularAttack" -> RegularAttack()),
   dirVector: Vector2 = new Vector2(0, 0)
 )
