@@ -58,6 +58,7 @@ case class GameState(
 
   }
 
+
   def modifyGameStateAbility(creatureId: String, abilityId: String)(operation: Ability => Ability): GameState = {
     if (creatureId == player.params.id) {
       this

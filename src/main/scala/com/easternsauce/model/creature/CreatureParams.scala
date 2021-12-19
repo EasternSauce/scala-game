@@ -18,5 +18,7 @@ case class CreatureParams(
   stamina: Float,
   maxStamina: Float,
   abilities: Map[String, Ability] = Map("regularAttack" -> RegularAttack()),
-  dirVector: Vector2 = new Vector2(0, 0)
+  dirVector: Vector2 = new Vector2(0, 0),
+  staminaOveruse: Boolean = false,
+  staminaOveruseTimer: SimpleTimer = SimpleTimer()
 )

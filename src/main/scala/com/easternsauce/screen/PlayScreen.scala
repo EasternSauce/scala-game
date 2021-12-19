@@ -12,6 +12,8 @@ import com.easternsauce.util.{Constants, Direction, RendererBatch}
 import com.easternsauce.view.GameView
 import com.softwaremill.quicklens._
 
+import scala.util.chaining._
+
 class PlayScreen(
   batch: RendererBatch,
   var gameState: GameState,
@@ -63,11 +65,18 @@ class PlayScreen(
         .update(delta)
     }
 
-    gameState
+    gameState // TODO: dont update creatures outside the current area
       .modify(_.player)
       .using(updateCreature)
       .modify(_.nonPlayers.each)
       .using(updateCreature)
+      .pipe(gameState => {
+        val creatureAbilityPairs =
+          gameState.creatures.values.flatMap(creature => creature.params.abilities.keys.map((_, creature.params.id)))
+        creatureAbilityPairs.foldLeft(gameState)({
+          case (acc, (abilityId, creatureId)) => acc.updateCreatureAbility(creatureId, abilityId, delta)
+        })
+      })
 
   }
 
@@ -94,12 +103,11 @@ class PlayScreen(
     }
 
     // --- update model (can update based on player input or physical world state)
-    val performGameStateUpdates = (identity(_: GameState)) andThen
-      processPlayerMovement andThen
-      updateCreatures(physicsController, delta) andThen
-      (_.processCreatureAreaChanges(areaChangeQueue))
 
-    gameState = performGameStateUpdates(gameState)
+    gameState = gameState
+      .pipe(processPlayerMovement)
+      .pipe(updateCreatures(physicsController, delta))
+      .pipe(_.processCreatureAreaChanges(areaChangeQueue))
     // ---
 
     // --- update libGDX view

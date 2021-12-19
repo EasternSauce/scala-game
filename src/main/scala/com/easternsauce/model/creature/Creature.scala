@@ -25,7 +25,11 @@ abstract class Creature {
   }
 
   def updateTimers(delta: Float): Creature = {
-    this.modify(_.params.animationTimer).using(_.update(delta))
+    this
+      .modify(_.params.animationTimer)
+      .using(_.update(delta))
+      .modify(_.params.staminaOveruseTimer)
+      .using(_.update(delta))
   }
 
   def setPosition(newPosX: Float, newPosY: Float): Creature = {
@@ -36,7 +40,17 @@ abstract class Creature {
       .setTo(newPosY)
   }
 
-  def takeStaminaDamage(staminaDamage: Float): Creature = ???
+  def takeStaminaDamage(staminaDamage: Float): Creature =
+    if (params.stamina - staminaDamage > 0) this.modify(_.params.stamina).setTo(this.params.stamina - staminaDamage)
+    else {
+      this
+        .modify(_.params.stamina)
+        .setTo(0f)
+        .modify(_.params.staminaOveruse)
+        .setTo(true)
+        .modify(_.params.staminaOveruseTimer)
+        .using(_.restart())
+    }
 
   def modifyCreatureAbility(abilityId: String)(operation: Ability => Ability): Creature =
     this
@@ -44,15 +58,19 @@ abstract class Creature {
       .using(operation)
 
   def performAbility(abilityId: String): Creature = {
+    println("performing ability")
     val ability = params.abilities(abilityId)
-    val channelTimer = ability.params.channelTimer
+    //val channelTimer = ability.params.channelTimer
 
     this.pipe(
       creature =>
         if (
           creature.params.stamina > 0 && ability.params.state == AbilityState.Inactive && !ability.params.onCooldown
           /*&& !creature.abilityActive*/
-        ) this.modifyCreatureAbility(abilityId)(_.modify(_.params.channelTimer).using(_.restart()))
+        )
+          this.modifyCreatureAbility(abilityId)(
+            _.modify(_.params.channelTimer).using(_.restart()).modify(_.params.state).setTo(AbilityState.Channeling)
+          )
         else creature
     )
 

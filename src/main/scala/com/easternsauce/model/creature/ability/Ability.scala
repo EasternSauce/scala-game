@@ -29,9 +29,13 @@ abstract class Ability(val params: AbilityParams) {
     1.4f
   }
 
-  def stop(): Ability = ???
+  def stop(): Ability = {
+    this // TODO?
+  }
 
   def makeInactive(): Ability = this.modify(_.params.state).setTo(AbilityState.Inactive)
+
+  def makeActive(): Ability = this.modify(_.params.state).setTo(AbilityState.Active)
 
   def setNotOnCooldown(): Ability = this.modify(_.params.onCooldown).setTo(false)
 
