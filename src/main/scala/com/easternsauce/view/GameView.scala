@@ -5,8 +5,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.physics.box2d.World
 import com.easternsauce.model.GameState
 import com.easternsauce.util.RendererBatch
-import com.easternsauce.view.area.AreaRenderer
-import com.easternsauce.view.entity.EntityRenderer
+import com.easternsauce.view.renderer.{AreaRenderer, EntityRenderer}
 
 case class GameView(atlas: TextureAtlas) {
 
@@ -20,7 +19,7 @@ case class GameView(atlas: TextureAtlas) {
 
     entityRenderers.values.foreach(_.init(gameState))
 
-    areaRenderers = maps.map { case (areaId, map) => areaId -> AreaRenderer(areaId, map, mapScale) }
+    areaRenderers = maps.map { case (areaId, map) => areaId -> renderer.AreaRenderer(areaId, map, mapScale) }
 
     areaRenderers.values.foreach(_.init())
 

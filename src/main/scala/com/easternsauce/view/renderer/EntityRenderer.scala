@@ -1,13 +1,13 @@
-package com.easternsauce.view.entity
+package com.easternsauce.view.renderer
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d._
 import com.badlogic.gdx.math.Rectangle
 import com.easternsauce.model.GameState
 import com.easternsauce.util.{Direction, RendererBatch}
-import com.easternsauce.view.GameView
+import com.easternsauce.view.{GameView, renderer}
 
-case class EntityRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
+case class EntityRenderer(gameView: GameView, creatureId: String, atlas: TextureAtlas) {
 
   val sprite: Sprite = new Sprite()
 
@@ -17,8 +17,10 @@ case class EntityRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
 
   var textureRegion: TextureRegion = _
 
+  var abilityRenderers: List[AbilityRenderer] = _
+
   def init(gameState: GameState): Unit = {
-    val creature = gameState.creatures(id)
+    val creature = gameState.creatures(creatureId)
 
     textureRegion = atlas.findRegion(creature.spriteType)
 
@@ -47,23 +49,27 @@ case class EntityRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
 
     }
 
+    abilityRenderers =
+      creature.params.abilities.keys.map(key => renderer.AbilityRenderer(gameView, creatureId, key, atlas)).toList
+    abilityRenderers.foreach(_.init(gameState))
+
   }
 
   def runningAnimation(gameState: GameState, currentDirection: Direction.Value): TextureRegion = {
-    val creature = gameState.creatures(id)
+    val creature = gameState.creatures(creatureId)
 
     runningAnimations(creature.dirMap(currentDirection))
       .getKeyFrame(gameState.player.params.animationTimer.time, true)
   }
 
   def facingTexture(gameState: GameState, currentDirection: Direction.Value): TextureRegion = {
-    val creature = gameState.creatures(id)
+    val creature = gameState.creatures(creatureId)
 
     facingTextures(creature.dirMap(currentDirection))
   }
 
   def update(gameState: GameState): Unit = {
-    val creature = gameState.creatures(id)
+    val creature = gameState.creatures(creatureId)
     val texture =
       if (!creature.params.isMoving) facingTexture(gameState, creature.params.facingDirection)
       else runningAnimation(gameState, creature.params.facingDirection)
@@ -71,17 +77,22 @@ case class EntityRenderer(gameView: GameView, id: String, atlas: TextureAtlas) {
     sprite.setCenter(creature.params.posX, creature.params.posY)
     sprite.setSize(creature.width, creature.height)
 
+    abilityRenderers.foreach(_.update(gameState))
+
   }
 
   def render(batch: RendererBatch): Unit = {
     sprite.draw(batch.spriteBatch)
+
+    abilityRenderers.foreach(_.render(batch))
+
   }
 
   def renderLifeBar(batch: RendererBatch, gameState: GameState): Unit = {
     val lifeBarHeight = 0.16f
     val lifeBarWidth = 2.0f
 
-    val creature = gameState.creatures(id)
+    val creature = gameState.creatures(creatureId)
 
     val currentLifeBarWidth = lifeBarWidth * creature.params.life / creature.params.maxLife
     val barPosX = creature.params.posX - lifeBarWidth / 2

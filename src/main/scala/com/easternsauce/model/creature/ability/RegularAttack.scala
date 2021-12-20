@@ -14,6 +14,13 @@ case class RegularAttack(override val params: AbilityParams = AbilityParams()) e
 
   override val cooldownTime: Float = 0.8f
 
+  override val channelSpriteType: String = "slash_windup"
+  override val activeSpriteType: String = "slash"
+  override val channelFrameCount: Int = 6
+  override val activeFrameCount: Int = 6
+  override val channelFrameDuration: Float = 0.3f
+  override val activeFrameDuration: Float = 0.3f
+
   override def updateHitbox(creature: Creature): Ability = {
     val theta = new Vector2(params.dirVector.x, params.dirVector.y).angleDeg()
     val attackShiftX = params.dirVector.nor().x * params.attackRange.get

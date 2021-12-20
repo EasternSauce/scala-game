@@ -19,6 +19,13 @@ abstract class Ability(val params: AbilityParams) {
 
   val cooldownTime: Float = 0f
 
+  val channelSpriteType: String
+  val activeSpriteType: String
+  val channelFrameCount: Int
+  val activeFrameCount: Int
+  val channelFrameDuration: Float
+  val activeFrameDuration: Float
+
   protected def width: Float = spriteWidth.toFloat / Constants.PPM
 
   protected def height: Float = spriteHeight.toFloat / Constants.PPM
