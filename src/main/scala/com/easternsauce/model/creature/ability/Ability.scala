@@ -11,8 +11,8 @@ abstract class Ability(val params: AbilityParams) {
   val activeAnimation: Option[Animation[TextureRegion]] = None
   val channelAnimation: Option[Animation[TextureRegion]] = None
 
-  val spriteWidth: Int = 0
-  val spriteHeight: Int = 0
+  val textureWidth: Int = 0
+  val textureHeight: Int = 0
 
   val totalActiveTime: Float = 0f
   val totalChannelTime: Float = 0f
@@ -26,9 +26,9 @@ abstract class Ability(val params: AbilityParams) {
   val channelFrameDuration: Float
   val activeFrameDuration: Float
 
-  protected def width: Float = spriteWidth.toFloat / Constants.PPM
+  protected def width: Float = textureWidth.toFloat / Constants.PPM
 
-  protected def height: Float = spriteHeight.toFloat / Constants.PPM
+  protected def height: Float = textureHeight.toFloat / Constants.PPM
 
   def scale: Float = {
     //if (creature.isWeaponEquipped) creature.currentWeapon.template.attackScale.get

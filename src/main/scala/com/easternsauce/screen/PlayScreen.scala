@@ -99,7 +99,7 @@ class PlayScreen(
     }
 
     if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-      gameState = gameState.modifyGameStateCreature("player")(_.performAbility("regularAttack"))
+      gameState = gameState.performAbility("player", "regularAttack")
     }
 
     // --- update model (can update based on player input or physical world state)

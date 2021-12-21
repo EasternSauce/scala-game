@@ -6,8 +6,8 @@ import com.softwaremill.quicklens.ModifyPimp
 
 case class RegularAttack(override val params: AbilityParams = AbilityParams()) extends Ability(params = params) {
 
-  override val spriteWidth: Int = 40
-  override val spriteHeight: Int = 40
+  override val textureWidth: Int = 40
+  override val textureHeight: Int = 40
 
   override val totalActiveTime: Float = 0.3f
   override val totalChannelTime: Float = 0.3f
@@ -18,8 +18,8 @@ case class RegularAttack(override val params: AbilityParams = AbilityParams()) e
   override val activeSpriteType: String = "slash"
   override val channelFrameCount: Int = 6
   override val activeFrameCount: Int = 6
-  override val channelFrameDuration: Float = 0.3f
-  override val activeFrameDuration: Float = 0.3f
+  override val channelFrameDuration: Float = 0.05f
+  override val activeFrameDuration: Float = 0.05f
 
   override def updateHitbox(creature: Creature): Ability = {
     val theta = new Vector2(params.dirVector.x, params.dirVector.y).angleDeg()

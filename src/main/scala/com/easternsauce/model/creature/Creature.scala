@@ -57,24 +57,7 @@ abstract class Creature {
       .modify(_.params.abilities.at(abilityId))
       .using(operation)
 
-  def performAbility(abilityId: String): Creature = {
-    println("performing ability")
-    val ability = params.abilities(abilityId)
-    //val channelTimer = ability.params.channelTimer
 
-    this.pipe(
-      creature =>
-        if (
-          creature.params.stamina > 0 && ability.params.state == AbilityState.Inactive && !ability.params.onCooldown
-          /*&& !creature.abilityActive*/
-        )
-          this.modifyCreatureAbility(abilityId)(
-            _.modify(_.params.channelTimer).using(_.restart()).modify(_.params.state).setTo(AbilityState.Channeling)
-          )
-        else creature
-    )
-
-  }
 
   def copy(params: CreatureParams = params): Creature
 

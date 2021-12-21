@@ -81,10 +81,10 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
 
   }
 
-  def render(batch: RendererBatch): Unit = {
+  def render(gameState: GameState, batch: RendererBatch): Unit = {
     sprite.draw(batch.spriteBatch)
 
-    abilityRenderers.foreach(_.render(batch))
+    abilityRenderers.foreach(_.render(gameState, batch))
 
   }
 
