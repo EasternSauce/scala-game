@@ -66,10 +66,6 @@ case class AbilityRenderer(gameView: GameView, creatureId: String, abilityId: St
     val ability = gameState.abilities(creatureId, abilityId)
 
     if (state == AbilityState.Channeling || state == AbilityState.Active) {
-      println(
-        "rendering at " + sprite.getX + " " + sprite.getY + " channeling: " + ability.params.abilityChannelAnimationTimer.time + " active " + ability.params.abilityActiveAnimationTimer.time
-      )
-
       sprite.draw(batch.spriteBatch)
     }
   }

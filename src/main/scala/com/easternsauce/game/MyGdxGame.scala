@@ -13,7 +13,8 @@ import com.easternsauce.view.GameView
 
 class MyGdxGame extends Game {
 
-  private var batch: RendererBatch = _
+  private var worldBatch: RendererBatch = _
+  private var hudBatch: RendererBatch = _
 
   var atlas: TextureAtlas = _
 
@@ -31,7 +32,8 @@ class MyGdxGame extends Game {
   var physicsController: PhysicsController = _
 
   override def create(): Unit = {
-    batch = new RendererBatch
+    worldBatch = RendererBatch()
+    hudBatch = RendererBatch()
 
     atlas = new TextureAtlas("assets/atlas/packed_atlas.atlas")
 
@@ -79,13 +81,14 @@ class MyGdxGame extends Game {
     gameView.init(gameState, maps, mapScale)
     physicsController.init(gameState, maps, mapScale) // areaid.get
 
-    val playScreen = new PlayScreen(batch, gameState, gameView, physicsController)
+    val playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController)
 
     setScreen(playScreen)
   }
 
   override def dispose(): Unit = {
-    batch.dispose()
+    worldBatch.dispose()
+    hudBatch.dispose()
     gameView.dispose()
     physicsController.dispose()
   }

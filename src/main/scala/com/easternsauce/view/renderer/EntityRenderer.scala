@@ -83,9 +83,10 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
 
   def render(gameState: GameState, batch: RendererBatch): Unit = {
     sprite.draw(batch.spriteBatch)
+  }
 
+  def renderAbilities(gameState: GameState, batch: RendererBatch): Unit = {
     abilityRenderers.foreach(_.render(gameState, batch))
-
   }
 
   def renderLifeBar(batch: RendererBatch, gameState: GameState): Unit = {

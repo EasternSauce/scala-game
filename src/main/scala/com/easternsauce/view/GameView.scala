@@ -1,7 +1,9 @@
 package com.easternsauce.view
 
+import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
+import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.physics.box2d.World
 import com.easternsauce.model.GameState
 import com.easternsauce.util.RendererBatch
@@ -32,7 +34,23 @@ case class GameView(atlas: TextureAtlas) {
 
   }
 
-  def render(gameState: GameState, batch: RendererBatch): Unit = {
+  def renderHud(gameState: GameState, batch: RendererBatch): Unit = {
+    val player = gameState.player
+
+    val maxLifeRect = new Rectangle(10, 40, 100, 10)
+    val lifeRect =
+      new Rectangle(10, 40, 100 * player.params.life / player.params.maxLife, 10)
+    val maxStaminaRect = new Rectangle(10, 25, 100, 10)
+    val staminaRect =
+      new Rectangle(10, 25, 100 * player.params.stamina / player.params.maxStamina, 10)
+
+    batch.shapeDrawer.filledRectangle(maxLifeRect, Color.ORANGE)
+    batch.shapeDrawer.filledRectangle(lifeRect, Color.RED)
+    batch.shapeDrawer.filledRectangle(maxStaminaRect, Color.ORANGE)
+    batch.shapeDrawer.filledRectangle(staminaRect, Color.GREEN)
+  }
+
+  def renderEntities(gameState: GameState, batch: RendererBatch): Unit = {
 
     gameState.creatures.keys.foreach { creatureId =>
       if (entityRenderers.contains(creatureId)) {
@@ -43,6 +61,16 @@ case class GameView(atlas: TextureAtlas) {
     gameState.creatures.keys.foreach { creatureId =>
       if (entityRenderers.contains(creatureId)) {
         entityRenderers(creatureId).renderLifeBar(batch, gameState)
+      }
+    }
+
+  }
+
+  def renderAbilties(gameState: GameState, batch: RendererBatch): Unit = {
+
+    gameState.creatures.keys.foreach { creatureId =>
+      if (entityRenderers.contains(creatureId)) {
+        entityRenderers(creatureId).renderAbilities(gameState, batch)
       }
     }
 

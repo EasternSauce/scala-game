@@ -1,6 +1,6 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.model.creature.ability.{Ability, AbilityState}
+import com.easternsauce.model.creature.ability.Ability
 import com.easternsauce.util.Direction
 import com.softwaremill.quicklens._
 
@@ -20,8 +20,15 @@ abstract class Creature {
   val neutralStanceFrame: Int
   val dirMap: Map[Direction.Value, Int]
 
+  protected val staminaRegenerationTickTime = 0.005f
+  protected val staminaRegeneration = 0.8f
+  protected val staminaOveruseTime = 2f
+  protected val staminaRegenerationDisabled = 1f
+
   def update(delta: Float): Creature = {
-    this.updateTimers(delta)
+    this
+      .updateTimers(delta)
+      .updateStamina(delta)
   }
 
   def updateTimers(delta: Float): Creature = {
@@ -29,6 +36,10 @@ abstract class Creature {
       .modify(_.params.animationTimer)
       .using(_.update(delta))
       .modify(_.params.staminaOveruseTimer)
+      .using(_.update(delta))
+      .modify(_.params.staminaRegenerationTimer)
+      .using(_.update(delta))
+      .modify(_.params.staminaRegenerationDisabledTimer)
       .using(_.update(delta))
   }
 
@@ -57,10 +68,49 @@ abstract class Creature {
       .modify(_.params.abilities.at(abilityId))
       .using(operation)
 
+  def updateStamina(delta: Float): Creature = {
+    this
+      .pipe(
+        creature =>
+          if (creature.params.isSprinting && creature.params.stamina > 0) {
+            creature.modify(_.params.staminaDrainTimer).using(_.update(delta))
+          } else creature
+      )
+      .pipe(
+        creature =>
+          if (!params.isStaminaRegenerationDisabled && !creature.params.isSprinting) {
+            if (
+              creature.params.staminaRegenerationTimer.time > creature.staminaRegenerationTickTime /* && !abilityActive */ && !creature.params.staminaOveruse
+            ) {
+              creature
+                .pipe(creature => {
+                  val afterRegeneration = creature.params.stamina + creature.staminaRegeneration
+                  creature
+                    .modify(_.params.stamina)
+                    .setToIf(creature.params.stamina < creature.params.maxStamina)(
+                      Math.min(afterRegeneration, creature.params.maxStamina)
+                    )
+                })
+                .modify(_.params.staminaRegenerationTimer)
+                .using(_.restart())
+            } else creature
 
+          } else creature
+      )
+      .pipe(
+        creature =>
+          creature
+            .modify(_.params.staminaOveruse)
+            .setToIf(
+              creature.params.staminaOveruse && creature.params.staminaOveruseTimer.time > creature.staminaOveruseTime
+            )(false)
+      )
+      .pipe(
+        _.modify(_.params.isStaminaRegenerationDisabled)
+          .setToIf(params.staminaRegenerationDisabledTimer.time > staminaRegenerationDisabled)(false)
+      )
+  }
 
   def copy(params: CreatureParams = params): Creature
 
 }
-
-object Creature {}

@@ -1,7 +1,7 @@
 package com.easternsauce.screen
 
 import com.badlogic.gdx.graphics.{GL20, OrthographicCamera}
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.{Vector2, Vector3}
 import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
@@ -15,7 +15,8 @@ import com.softwaremill.quicklens._
 import scala.util.chaining._
 
 class PlayScreen(
-  batch: RendererBatch,
+  worldBatch: RendererBatch,
+  hudBatch: RendererBatch,
   var gameState: GameState,
   var gameView: GameView,
   var physicsController: PhysicsController
@@ -25,25 +26,33 @@ class PlayScreen(
 
   val debugRenderEnabled = false
 
-  val camera: OrthographicCamera = new OrthographicCamera()
+  val worldCamera: OrthographicCamera = new OrthographicCamera()
+  val hudCamera: OrthographicCamera = {
+    val cam = new OrthographicCamera()
+    cam.position.set(Constants.WindowWidth / 2f, Constants.WindowHeight / 2f, 0)
+    cam
+  }
 
-  val viewport: Viewport =
+  val worldViewport: Viewport =
     new FitViewport(
       Constants.ViewpointWorldWidth / Constants.PPM,
       Constants.ViewpointWorldHeight / Constants.PPM,
-      camera
+      worldCamera
     )
+
+  val hudViewport: Viewport =
+    new FitViewport(Constants.WindowWidth.toFloat, Constants.WindowHeight.toFloat, hudCamera)
 
   var areaChangeQueue: List[(String, String, String)] = List()
 
   def updateCamera(player: Creature): Unit = {
 
-    val camPosition = camera.position
+    val camPosition = worldCamera.position
 
     camPosition.x = (math.floor(player.params.posX * 100) / 100).toFloat
     camPosition.y = (math.floor(player.params.posY * 100) / 100).toFloat
 
-    camera.update()
+    worldCamera.update()
 
   }
 
@@ -105,7 +114,6 @@ class PlayScreen(
       val centerX = Gdx.graphics.getWidth / 2f
       val centerY = Gdx.graphics.getHeight / 2f
 
-
       val facingVector = new Vector2(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).nor()
 
       gameState = gameState
@@ -131,7 +139,7 @@ class PlayScreen(
 
     areaChangeQueue = List()
 
-    currentArea.setView(camera)
+    currentArea.setView(worldCamera)
 
     updateCamera(gameState.player)
   }
@@ -220,7 +228,8 @@ class PlayScreen(
   override def render(delta: Float): Unit = {
     update(delta)
 
-    batch.spriteBatch.setProjectionMatrix(camera.combined)
+    worldBatch.spriteBatch.setProjectionMatrix(worldCamera.combined)
+    hudBatch.spriteBatch.setProjectionMatrix(hudCamera.combined)
 
     Gdx.gl.glClearColor(0, 0, 0, 1)
 
@@ -232,20 +241,34 @@ class PlayScreen(
 
     currentArea.render(Array(0, 1))
 
-    batch.begin()
+    worldBatch.begin()
 
-    gameView.render(gameState, batch)
+    gameView.renderEntities(gameState, worldBatch)
 
-    batch.end()
+    worldBatch.end()
 
     currentArea.render(Array(2, 3))
 
-    if (debugRenderEnabled) b2DebugRenderer.render(currentTerrain.world, camera.combined)
+    worldBatch.begin()
+
+    gameView.renderAbilties(gameState, worldBatch)
+
+    worldBatch.end()
+
+    hudBatch.begin()
+
+    gameView.renderHud(gameState, hudBatch)
+
+    hudBatch.end()
+
+    if (debugRenderEnabled) b2DebugRenderer.render(currentTerrain.world, worldCamera.combined)
 
   }
 
   override def resize(width: Int, height: Int): Unit = {
-    viewport.update(width, height)
+    worldViewport.update(width, height)
+    hudViewport.update(width, height)
+
   }
 
   override def pause(): Unit = {}
@@ -255,6 +278,12 @@ class PlayScreen(
   override def hide(): Unit = {}
 
   override def dispose(): Unit = {
-    batch.dispose()
+    worldBatch.dispose()
+  }
+
+  def mousePosWindowScaled: Vector3 = {
+    val v = new Vector3(Gdx.input.getX.toFloat, Gdx.input.getY.toFloat, 0f)
+    hudCamera.unproject(v)
+    v
   }
 }

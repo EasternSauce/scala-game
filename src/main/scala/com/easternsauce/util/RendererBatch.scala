@@ -5,9 +5,9 @@ import com.badlogic.gdx.graphics.{Color, Texture}
 import com.badlogic.gdx.math.{Matrix4, Rectangle}
 import space.earlygrey.shapedrawer.ShapeDrawer
 
-class RendererBatch {
+case class RendererBatch() {
   val spriteBatch: SpriteBatch = new SpriteBatch()
-  private val shapeDrawer: ShapeDrawer = new ShapeDrawer(spriteBatch, createTextureAndRegion())
+  val shapeDrawer: ShapeDrawer = new ShapeDrawer(spriteBatch, createTextureAndRegion())
 
   private var texture: Texture = _
 

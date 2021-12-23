@@ -19,6 +19,8 @@ abstract class Ability(val params: AbilityParams) {
 
   val cooldownTime: Float = 0f
 
+  val isAttack = false
+
   val channelSpriteType: String
   val activeSpriteType: String
   val channelFrameCount: Int

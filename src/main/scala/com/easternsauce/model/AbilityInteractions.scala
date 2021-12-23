@@ -10,8 +10,6 @@ trait AbilityInteractions {
 
   def onCreatureAbilityActiveStart(creatureId: String, abilityId: String): GameState = {
 
-    println("active start")
-
     this.modifyGameStateCreature(creatureId) { creature =>
       creature
         .modifyCreatureAbility(abilityId)(_.restartActiveTimers())
@@ -24,9 +22,6 @@ trait AbilityInteractions {
   }
 
   def onCreatureAbilityChannelingStart(creatureId: String, abilityId: String): GameState = {
-
-    println("channeling start")
-
     this.modifyGameStateCreature(creatureId) { creature =>
       creature
         .modifyCreatureAbility(abilityId)(_.modify(_.params.channelTimer).using(_.restart()))
@@ -115,6 +110,12 @@ trait AbilityInteractions {
             .setTo(AbilityState.Channeling)
         }
         .onCreatureAbilityChannelingStart(creatureId, abilityId)
+        .modifyGameStateCreature(creatureId)(
+          _.modify(_.params.staminaRegenerationDisabledTimer)
+            .using(_.restart())
+            .modify(_.params.isStaminaRegenerationDisabled)
+            .setTo(true)
+        )
     } else this
 
   }
