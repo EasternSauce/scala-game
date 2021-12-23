@@ -40,8 +40,9 @@ case class AbilityRenderer(gameView: GameView, creatureId: String, abilityId: St
       val texture =
         channelAnimation.getKeyFrame(ability.params.abilityChannelAnimationTimer.time)
       sprite.setRegion(texture)
-      sprite.setPosition(ability.params.abilityHitbox.x, ability.params.abilityHitbox.y)
+      sprite.setCenter(ability.params.abilityHitbox.x, ability.params.abilityHitbox.y)
       sprite.setRotation(ability.params.abilityHitbox.rotationAngle)
+      sprite.setOriginCenter()
       sprite.setScale(ability.params.abilityHitbox.scale)
       sprite.setSize(ability.params.abilityHitbox.width, ability.params.abilityHitbox.height)
 
@@ -51,8 +52,9 @@ case class AbilityRenderer(gameView: GameView, creatureId: String, abilityId: St
       val texture =
         activeAnimation.getKeyFrame(ability.params.abilityActiveAnimationTimer.time)
       sprite.setRegion(texture)
-      sprite.setPosition(ability.params.abilityHitbox.x, ability.params.abilityHitbox.y)
+      sprite.setCenter(ability.params.abilityHitbox.x, ability.params.abilityHitbox.y)
       sprite.setRotation(ability.params.abilityHitbox.rotationAngle)
+      sprite.setOriginCenter()
       sprite.setScale(ability.params.abilityHitbox.scale)
       sprite.setSize(ability.params.abilityHitbox.width, ability.params.abilityHitbox.height)
     }

@@ -13,5 +13,5 @@ case class AbilityParams(
   abilityActiveAnimationTimer: SimpleTimer = SimpleTimer(),
   dirVector: Vector2 = new Vector2(0, 0),
   abilityHitbox: AbilityHitbox = AbilityHitbox(0, 0, 1, 1, 0, 1),
-  attackRange: Option[Float] = Some(1.0f)
+  attackRange: Option[Float] = Some(1.8f)
 )

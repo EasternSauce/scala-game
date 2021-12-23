@@ -23,6 +23,7 @@ case class RegularAttack(override val params: AbilityParams = AbilityParams()) e
 
   override def updateHitbox(creature: Creature): Ability = {
     val theta = new Vector2(params.dirVector.x, params.dirVector.y).angleDeg()
+
     val attackShiftX = params.dirVector.nor().x * params.attackRange.get
     val attackShiftY = params.dirVector.nor().y * params.attackRange.get
 

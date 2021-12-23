@@ -99,7 +99,18 @@ class PlayScreen(
     }
 
     if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-      gameState = gameState.performAbility("player", "regularAttack")
+      val mouseX = Gdx.input.getX
+      val mouseY = Gdx.input.getY
+
+      val centerX = Gdx.graphics.getWidth / 2f
+      val centerY = Gdx.graphics.getHeight / 2f
+
+
+      val facingVector = new Vector2(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).nor()
+
+      gameState = gameState
+        .modifyGameStateCreature("player")(_.modify(_.params.dirVector).setTo(facingVector))
+        .performAbility("player", "regularAttack")
     }
 
     // --- update model (can update based on player input or physical world state)
