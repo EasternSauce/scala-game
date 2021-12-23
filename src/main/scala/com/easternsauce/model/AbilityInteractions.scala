@@ -46,22 +46,19 @@ trait AbilityInteractions {
     }
   }
 
-    def onCreatureAbilityChannelingUpdate(creatureId: String, abilityId: String): GameState = this
+  def onCreatureAbilityChannelingUpdate(creatureId: String, abilityId: String): GameState =
+    this.modifyGameStateCreature(creatureId)(
+      creature => creature.modifyCreatureAbility(abilityId)(_.updateHitbox(creature))
+    )
 
   def onCreatureAbilityActiveUpdate(creatureId: String, abilityId: String): GameState = {
-    println("active update")
-    this
+    this.modifyGameStateCreature(creatureId)(
+      creature => creature.modifyCreatureAbility(abilityId)(_.updateHitbox(creature))
+    )
   }
 
   def updateCreatureAbility(creatureId: String, abilityId: String, delta: Float): GameState = {
-    //val creature = creatures(creatureId)
     val ability = abilities(creatureId, abilityId)
-
-//    if (creatureId == "player") {
-//      println(
-//        "updating ability " + creatureId + " " + abilityId + " state: " + ability.params.state + " channel time: " + ability.params.channelTimer.time
-//      )
-//    }
 
     val channelTimer = ability.params.channelTimer
     val activeTimer = ability.params.activeTimer
@@ -77,20 +74,18 @@ trait AbilityInteractions {
                 .onCreatureAbilityActiveStart(creatureId, abilityId)
             case state => state
           }
-          //.updateHitbox ??
           .onCreatureAbilityChannelingUpdate(creatureId, abilityId)
       case Active =>
-        this.pipe {
-          case state if activeTimer.time > ability.totalActiveTime =>
-            state
-              .modifyGameStateAbility(creatureId, abilityId)(_.stop().makeInactive())
-              .onCreatureAbilityInactiveStart(creatureId, abilityId)
+        this
+          .pipe {
+            case state if activeTimer.time > ability.totalActiveTime =>
+              state
+                .modifyGameStateAbility(creatureId, abilityId)(_.stop().makeInactive())
+                .onCreatureAbilityInactiveStart(creatureId, abilityId)
 
-          //.updateHitbox ??
-
-
-          case state => state
-        }.onCreatureAbilityActiveUpdate(creatureId, abilityId)
+            case state => state
+          }
+          .onCreatureAbilityActiveUpdate(creatureId, abilityId)
       case Inactive =>
         this.pipe(
           state =>
@@ -105,9 +100,7 @@ trait AbilityInteractions {
   def performAbility(creatureId: String, abilityId: String): GameState = {
     val creature = creatures(creatureId)
 
-    //    println("performing ability")
     val ability = creature.params.abilities(abilityId)
-    //val channelTimer = ability.params.channelTimer
 
     if (
       creature.params.stamina > 0 && ability.params.state == AbilityState.Inactive && !ability.params.onCooldown
