@@ -1,8 +1,8 @@
-package com.easternsauce.physics.terrain
+package com.easternsauce.box2d_physics.terrain
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
-import com.badlogic.gdx.math.{Polygon, Vector2}
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.util.Constants
 
@@ -22,6 +22,7 @@ case class Terrain(map: TiledMap, mapScale: Float) {
   val tileHeight: Float = layer.getTileHeight * mapScale / Constants.PPM
 
   val terrainTiles: ListBuffer[TerrainTileBody] = ListBuffer()
+  val terrainBorders: ListBuffer[TerrainTileBody] = ListBuffer()
 
   def init(): Unit = {
 
@@ -92,21 +93,8 @@ case class Terrain(map: TiledMap, mapScale: Float) {
       } {
 
         if (!traversable(y)(x)) {
-          val polygon = new Polygon(
-            Array(
-              x * tileWidth,
-              y * tileHeight,
-              x * tileWidth + tileWidth,
-              y * tileHeight,
-              x * tileWidth + tileWidth,
-              y * tileHeight + tileHeight,
-              x * tileWidth,
-              y * tileHeight + tileHeight
-            )
-          )
-
           val tile: TerrainTileBody =
-            TerrainTileBody(layerNum, x, y, tileWidth, tileHeight, flyover(y)(x), polygon)
+            TerrainTileBody(x, y, tileWidth, tileHeight, layerNum, flyover(y)(x))
 
           tile.init(world)
 
@@ -120,14 +108,16 @@ case class Terrain(map: TiledMap, mapScale: Float) {
   private def createBorders(widthInTiles: Int, heightInTiles: Int): Unit = {
 
     for { x <- Seq.range(0, widthInTiles) } {
-      Terrain.createTileBody(world, x, -1, tileWidth, tileHeight)
-      Terrain.createTileBody(world, x, heightInTiles, tileWidth, tileHeight)
+      terrainBorders += TerrainTileBody(x, -1, tileWidth, tileHeight)
+      terrainBorders += TerrainTileBody(x, heightInTiles, tileWidth, tileHeight)
     }
 
     for { y <- Seq.range(0, heightInTiles) } {
-      Terrain.createTileBody(world, -1, y, tileWidth, tileHeight)
-      Terrain.createTileBody(world, widthInTiles, y, tileWidth, tileHeight)
+      terrainBorders += TerrainTileBody(-1, y, tileWidth, tileHeight)
+      terrainBorders += TerrainTileBody(widthInTiles, y, tileWidth, tileHeight)
     }
+
+    terrainBorders.foreach(_.init(world))
   }
 
   def getTileCenter(x: Int, y: Int): Vector2 = {
@@ -141,35 +131,4 @@ case class Terrain(map: TiledMap, mapScale: Float) {
   def step(): Unit = world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2)
 
   def dispose(): Unit = world.dispose()
-}
-
-object Terrain {
-  def createTileBody(
-    world: com.badlogic.gdx.physics.box2d.World,
-    tileX: Float,
-    tileY: Float,
-    tileWidth: Float,
-    tileHeight: Float
-  ): Body = {
-    val bodyDef = new BodyDef()
-    bodyDef.`type` = BodyDef.BodyType.StaticBody
-    bodyDef.position
-      .set(tileX * tileWidth + tileWidth / 2, tileY * tileHeight + tileHeight / 2)
-
-    val body = world.createBody(bodyDef)
-
-    body.setUserData(this)
-
-    val shape: PolygonShape = new PolygonShape()
-
-    shape.setAsBox(tileWidth / 2, tileHeight / 2)
-
-    val fixtureDef: FixtureDef = new FixtureDef
-
-    fixtureDef.shape = shape
-
-    body.createFixture(fixtureDef)
-
-    body
-  }
 }

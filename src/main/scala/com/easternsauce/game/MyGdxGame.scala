@@ -3,10 +3,10 @@ package com.easternsauce.game
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
+import com.easternsauce.box2d_physics.PhysicsController
 import com.easternsauce.model.GameState
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.{CreatureParams, Player, Skeleton}
-import com.easternsauce.physics.PhysicsController
 import com.easternsauce.screen.PlayScreen
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.GameView

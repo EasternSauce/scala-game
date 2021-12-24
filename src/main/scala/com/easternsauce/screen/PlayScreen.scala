@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
-import com.easternsauce.physics.PhysicsController
+import com.easternsauce.box2d_physics.PhysicsController
 import com.easternsauce.util.{Constants, Direction, RendererBatch}
 import com.easternsauce.view.GameView
 import com.softwaremill.quicklens._

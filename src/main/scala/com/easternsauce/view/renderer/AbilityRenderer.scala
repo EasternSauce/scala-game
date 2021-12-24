@@ -36,7 +36,7 @@ case class AbilityRenderer(gameView: GameView, creatureId: String, abilityId: St
     val ability = gameState.abilities(creatureId, abilityId)
     val abilityState = ability.params.state
 
-    def updateSprite(texture: com.badlogic.gdx.graphics.g2d.TextureRegion): Unit = {
+    def updateSprite(texture: TextureRegion): Unit = {
       sprite.setRegion(texture)
       sprite.setCenter(ability.params.abilityHitbox.x, ability.params.abilityHitbox.y)
       sprite.setRotation(ability.params.abilityHitbox.rotationAngle)

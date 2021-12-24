@@ -1,9 +1,9 @@
-package com.easternsauce.physics
+package com.easternsauce.box2d_physics
 
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.easternsauce.model.GameState
-import com.easternsauce.physics.creature.EntityBody
-import com.easternsauce.physics.terrain.Terrain
+import com.easternsauce.box2d_physics.creature.EntityBody
+import com.easternsauce.box2d_physics.terrain.Terrain
 
 case class PhysicsController() {
   var entityBodies: Map[String, EntityBody] = Map()
@@ -28,7 +28,7 @@ case class PhysicsController() {
   def processCreatureAreaChanges(gameState: GameState, areaChangeQueue: List[(String, String, String)]): Unit = {
     areaChangeQueue.foreach {
       case (creatureId, oldAreaId, newAreaId) =>
-        terrain(oldAreaId).world.destroyBody(entityBodies(creatureId).body)
+        terrain(oldAreaId).world.destroyBody(entityBodies(creatureId).b2Body)
         entityBodies(creatureId).init(gameState = gameState, physicsController = this, areaId = newAreaId)
     }
   }
