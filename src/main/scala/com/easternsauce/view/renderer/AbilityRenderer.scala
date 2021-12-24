@@ -36,34 +36,39 @@ case class AbilityRenderer(gameView: GameView, creatureId: String, abilityId: St
     val ability = gameState.abilities(creatureId, abilityId)
     val abilityState = ability.params.state
 
-    if (abilityState == AbilityState.Channeling) {
-      val texture =
-        channelAnimation.getKeyFrame(ability.params.abilityChannelAnimationTimer.time)
+    def updateSprite(texture: com.badlogic.gdx.graphics.g2d.TextureRegion): Unit = {
       sprite.setRegion(texture)
       sprite.setCenter(ability.params.abilityHitbox.x, ability.params.abilityHitbox.y)
       sprite.setRotation(ability.params.abilityHitbox.rotationAngle)
       sprite.setOriginCenter()
       sprite.setScale(ability.params.abilityHitbox.scale)
       sprite.setSize(ability.params.abilityHitbox.width, ability.params.abilityHitbox.height)
+    }
+
+    if (abilityState == AbilityState.Channeling) {
+      val texture =
+        channelAnimation.getKeyFrame(ability.params.abilityChannelAnimationTimer.time)
+      updateSprite(texture)
+
+      // sprite.getvertices! TODO
+
+//      val shape: PolygonShape = new PolygonShape()
+//
+//      shape.set(sprite.getVertices)
 
     }
 
     if (abilityState == AbilityState.Active) {
       val texture =
         activeAnimation.getKeyFrame(ability.params.abilityActiveAnimationTimer.time)
-      sprite.setRegion(texture)
-      sprite.setCenter(ability.params.abilityHitbox.x, ability.params.abilityHitbox.y)
-      sprite.setRotation(ability.params.abilityHitbox.rotationAngle)
-      sprite.setOriginCenter()
-      sprite.setScale(ability.params.abilityHitbox.scale)
-      sprite.setSize(ability.params.abilityHitbox.width, ability.params.abilityHitbox.height)
+      updateSprite(texture)
+
     }
 
   }
 
   def render(gameState: GameState, batch: RendererBatch): Unit = {
     val state = gameState.abilities(creatureId, abilityId).params.state
-    val ability = gameState.abilities(creatureId, abilityId)
 
     if (state == AbilityState.Channeling || state == AbilityState.Active) {
       sprite.draw(batch.spriteBatch)

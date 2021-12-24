@@ -11,9 +11,9 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
 
   val sprite: Sprite = new Sprite()
 
-  var facingTextures: Array[TextureRegion] = new Array[TextureRegion](4)
+  val facingTextures: Array[TextureRegion] = new Array[TextureRegion](4)
 
-  var runningAnimations: Array[Animation[TextureRegion]] = new Array[Animation[TextureRegion]](4)
+  val runningAnimations: Array[Animation[TextureRegion]] = new Array[Animation[TextureRegion]](4)
 
   var textureRegion: TextureRegion = _
 
@@ -81,7 +81,7 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
 
   }
 
-  def render(gameState: GameState, batch: RendererBatch): Unit = {
+  def render(batch: RendererBatch): Unit = {
     sprite.draw(batch.spriteBatch)
   }
 

@@ -54,7 +54,7 @@ case class GameView(atlas: TextureAtlas) {
 
     gameState.creatures.keys.foreach { creatureId =>
       if (entityRenderers.contains(creatureId)) {
-        entityRenderers(creatureId).render(gameState, batch)
+        entityRenderers(creatureId).render(batch)
       }
     }
 

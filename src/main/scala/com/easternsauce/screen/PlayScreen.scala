@@ -1,6 +1,6 @@
 package com.easternsauce.screen
 
-import com.badlogic.gdx.graphics.{GL20, OrthographicCamera}
+import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{Vector2, Vector3}
 import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
@@ -22,9 +22,9 @@ class PlayScreen(
   var physicsController: PhysicsController
 ) extends Screen {
 
-  var b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
+  val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
-  val debugRenderEnabled = false
+  val debugRenderEnabled = true
 
   val worldCamera: OrthographicCamera = new OrthographicCamera()
   val hudCamera: OrthographicCamera = {

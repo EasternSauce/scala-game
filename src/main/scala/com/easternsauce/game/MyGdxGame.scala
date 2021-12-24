@@ -25,7 +25,7 @@ class MyGdxGame extends Game {
 
   val mapsToLoad = Map("area1" -> "assets/areas/area1", "area2" -> "assets/areas/area2")
 
-  var mapLoader: TmxMapLoader = new TmxMapLoader()
+  val mapLoader: TmxMapLoader = new TmxMapLoader()
 
   var maps: Map[String, TiledMap] = _
 
@@ -53,8 +53,8 @@ class MyGdxGame extends Game {
     val skeleton: Skeleton = Skeleton(
       CreatureParams(
         id = "skel",
-        posX = 4,
-        posY = 4,
+        posX = 15,
+        posY = 10,
         areaId = "area1",
         life = 100f,
         maxLife = 100f,

@@ -120,35 +120,14 @@ case class Terrain(map: TiledMap, mapScale: Float) {
   private def createBorders(widthInTiles: Int, heightInTiles: Int): Unit = {
 
     for { x <- Seq.range(0, widthInTiles) } {
-      createBorderTile(x, -1)
-      createBorderTile(x, heightInTiles)
+      Terrain.createTileBody(world, x, -1, tileWidth, tileHeight)
+      Terrain.createTileBody(world, x, heightInTiles, tileWidth, tileHeight)
     }
 
     for { y <- Seq.range(0, heightInTiles) } {
-      createBorderTile(-1, y)
-      createBorderTile(widthInTiles, y)
+      Terrain.createTileBody(world, -1, y, tileWidth, tileHeight)
+      Terrain.createTileBody(world, widthInTiles, y, tileWidth, tileHeight)
     }
-  }
-
-  private def createBorderTile(x: Int, y: Int): Unit = {
-    val bodyDef = new BodyDef()
-    bodyDef.`type` = BodyDef.BodyType.StaticBody
-    val tileCenter = getTileCenter(x, y)
-    bodyDef.position.set(tileCenter.x, tileCenter.y)
-
-    val body: Body = world.createBody(bodyDef)
-
-    body.setUserData(this)
-
-    val shape: PolygonShape = new PolygonShape()
-
-    shape.setAsBox(tileWidth / 2, tileHeight / 2)
-
-    val fixtureDef: FixtureDef = new FixtureDef
-
-    fixtureDef.shape = shape
-
-    body.createFixture(fixtureDef)
   }
 
   def getTileCenter(x: Int, y: Int): Vector2 = {
@@ -162,4 +141,35 @@ case class Terrain(map: TiledMap, mapScale: Float) {
   def step(): Unit = world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2)
 
   def dispose(): Unit = world.dispose()
+}
+
+object Terrain {
+  def createTileBody(
+    world: com.badlogic.gdx.physics.box2d.World,
+    tileX: Float,
+    tileY: Float,
+    tileWidth: Float,
+    tileHeight: Float
+  ): Body = {
+    val bodyDef = new BodyDef()
+    bodyDef.`type` = BodyDef.BodyType.StaticBody
+    bodyDef.position
+      .set(tileX * tileWidth + tileWidth / 2, tileY * tileHeight + tileHeight / 2)
+
+    val body = world.createBody(bodyDef)
+
+    body.setUserData(this)
+
+    val shape: PolygonShape = new PolygonShape()
+
+    shape.setAsBox(tileWidth / 2, tileHeight / 2)
+
+    val fixtureDef: FixtureDef = new FixtureDef
+
+    fixtureDef.shape = shape
+
+    body.createFixture(fixtureDef)
+
+    body
+  }
 }
