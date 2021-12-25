@@ -134,7 +134,7 @@ class PlayScreen(
     // ---
 
     // --- update physics
-    physicsController.processCreatureAreaChanges(gameState, areaChangeQueue)
+    physicsController.update(gameState, areaChangeQueue)
     //
 
     areaChangeQueue = List()

@@ -69,6 +69,7 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
   }
 
   def update(gameState: GameState): Unit = {
+
     val creature = gameState.creatures(creatureId)
     val texture =
       if (!creature.params.isMoving) facingTexture(gameState, creature.params.facingDirection)

@@ -40,7 +40,7 @@ class MyGdxGame extends Game {
     val player: Player = Player(
       CreatureParams(
         id = "player",
-        posX = 10,
+        posX = 15,
         posY = 10,
         areaId = "area1",
         life = 62f,

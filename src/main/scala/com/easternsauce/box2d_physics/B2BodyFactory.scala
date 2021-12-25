@@ -1,8 +1,9 @@
 package com.easternsauce.box2d_physics
 
+import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.box2d_physics.creature.EntityBody
+import com.easternsauce.box2d_physics.entity.{AbilityBody, EntityBody}
 import com.easternsauce.box2d_physics.terrain.TerrainTileBody
 import com.easternsauce.model.creature.Creature
 
@@ -76,8 +77,14 @@ object B2BodyFactory {
     )
   }
 
-  def createAttackB2body(): Body = {
-    null
+  def createAbilityB2body(world: World, abilityBody: AbilityBody, posX: Float, posY: Float, vertices: Array[Float]): Body = {
+    createB2body(world = world,
+      posX = posX,
+      posY = posY,
+      bodyType = BodyType.KinematicBody,
+      userData = abilityBody,
+      shape = Polygon(vertices),
+      isSensor = true)
   }
 }
 
@@ -88,4 +95,7 @@ case class Circle(radius: Float) extends BodyShape {
 }
 case class Rectangle(width: Float, height: Float) extends BodyShape {
   def b2Shape(): Shape = { val shape = new PolygonShape(); shape.setAsBox(width / 2, height / 2); shape }
+}
+case class Polygon(vertices: Array[Float]) extends BodyShape {
+  def b2Shape(): Shape = { val shape = new PolygonShape(); shape.set(vertices); shape }
 }

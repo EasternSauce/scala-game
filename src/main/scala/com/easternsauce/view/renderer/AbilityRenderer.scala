@@ -38,23 +38,17 @@ case class AbilityRenderer(gameView: GameView, creatureId: String, abilityId: St
 
     def updateSprite(texture: TextureRegion): Unit = {
       sprite.setRegion(texture)
-      sprite.setCenter(ability.params.abilityHitbox.x, ability.params.abilityHitbox.y)
-      sprite.setRotation(ability.params.abilityHitbox.rotationAngle)
-      sprite.setOriginCenter()
-      sprite.setScale(ability.params.abilityHitbox.scale)
       sprite.setSize(ability.params.abilityHitbox.width, ability.params.abilityHitbox.height)
+      sprite.setCenter(ability.params.abilityHitbox.x, ability.params.abilityHitbox.y)
+      sprite.setOriginCenter()
+      sprite.setRotation(ability.params.abilityHitbox.rotationAngle)
+      sprite.setScale(ability.params.abilityHitbox.scale)
     }
 
     if (abilityState == AbilityState.Channeling) {
       val texture =
         channelAnimation.getKeyFrame(ability.params.abilityChannelAnimationTimer.time)
       updateSprite(texture)
-
-      // sprite.getvertices! TODO
-
-//      val shape: PolygonShape = new PolygonShape()
-//
-//      shape.set(sprite.getVertices)
 
     }
 
