@@ -29,6 +29,10 @@ case class EntityBody(creatureId: String) {
   }
 
   def update(gameState: GameState, physicsController: PhysicsController): Unit = {
+    val player = gameState.creatures(creatureId)
+
+    if (!player.isAlive && !b2Body.getFixtureList.get(0).isSensor)
+      b2Body.getFixtureList.get(0).setSensor(true) // TODO: don't check this condition every tick?
     abilityBodies.values.foreach(_.update(gameState, physicsController, currentAreaId))
   }
 

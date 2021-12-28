@@ -78,6 +78,11 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
     sprite.setCenter(creature.params.posX, creature.params.posY)
     sprite.setSize(creature.width, creature.height)
 
+    if (!creature.isAlive) {
+      sprite.setOriginCenter()
+      sprite.setRotation(90f)
+    }
+
     abilityRenderers.foreach(_.update(gameState))
 
   }

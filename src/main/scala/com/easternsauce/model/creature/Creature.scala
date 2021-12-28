@@ -7,6 +7,7 @@ import com.softwaremill.quicklens._
 import scala.util.chaining.scalaUtilChainingOps
 
 abstract class Creature {
+
   val isPlayer = false
 
   val params: CreatureParams
@@ -128,6 +129,8 @@ abstract class Creature {
   def onDeath(): Creature = {
     this
   }
+
+  def isAlive: Boolean = params.life > 0f
 
   def copy(params: CreatureParams = params): Creature
 
