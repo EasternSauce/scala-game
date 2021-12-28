@@ -1,9 +1,12 @@
 package com.easternsauce.model
 
+import com.easternsauce.box2d_physics.{CollisionEvent, EntityAbilityCollision}
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.Ability
 import com.softwaremill.quicklens._
+
+import scala.collection.mutable.ListBuffer
 
 case class GameState(
   player: Creature,
@@ -35,13 +38,25 @@ case class GameState(
 
   }
 
-  def processCreatureAreaChanges(changes: List[(String, String, String)]): GameState = {
+  def processCreatureAreaChanges(changes: ListBuffer[(String, String, String)]): GameState = {
     changes.foldLeft(this) {
       case (gameState, (creatureId, oldAreaId, newAreaId)) =>
         gameState
           .assignCreatureToArea(creatureId, Some(oldAreaId), newAreaId)
           .modify(_.currentAreaId)
           .setToIf(creatureId == gameState.player.params.id)(newAreaId) // change game area
+    }
+  }
+
+  def processCollisions(collisionQueue: ListBuffer[CollisionEvent]): GameState = {
+    collisionQueue.foldLeft(this) {
+      case (gameState, EntityAbilityCollision(creatureId, abilityId)) =>
+        val ability = gameState.abilities(creatureId, abilityId)
+
+        gameState.modifyGameStateCreature(creatureId) {
+          _.takeLifeDamage(ability.damage)
+        }
+
     }
   }
 
@@ -57,7 +72,6 @@ case class GameState(
     }
 
   }
-
 
   def modifyGameStateAbility(creatureId: String, abilityId: String)(operation: Ability => Ability): GameState = {
     if (creatureId == player.params.id) {

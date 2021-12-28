@@ -35,4 +35,5 @@ case class EntityBody(creatureId: String) {
   def pos: Vector2 = b2Body.getWorldCenter
 
   def setVelocity(velocity: Vector2): Unit = b2Body.setLinearVelocity(velocity)
+
 }

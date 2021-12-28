@@ -21,6 +21,8 @@ abstract class Ability(val params: AbilityParams) {
 
   val isAttack = false
 
+  val damage = 0f
+
   val channelSpriteType: String
   val activeSpriteType: String
   val channelFrameCount: Int

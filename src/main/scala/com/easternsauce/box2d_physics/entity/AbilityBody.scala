@@ -6,7 +6,6 @@ import com.easternsauce.box2d_physics.terrain.Terrain
 import com.easternsauce.box2d_physics.{B2BodyFactory, PhysicsController}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.AbilityState
-import com.easternsauce.util.Constants
 
 case class AbilityBody(creatureId: String, abilityId: String) {
   var b2Body: Body = _
@@ -25,7 +24,7 @@ case class AbilityBody(creatureId: String, abilityId: String) {
 
     val vertices = sprite.getVertices
     Array(
-      vertices(0),
+      vertices(0), // take only coordinate sprite vertices
       vertices(1),
       vertices(5),
       vertices(6),
@@ -37,9 +36,9 @@ case class AbilityBody(creatureId: String, abilityId: String) {
   }
 
   def init(world: World, gameState: GameState): Unit = {
+    this.world = world
 
     val ability = gameState.abilities(creatureId, abilityId)
-    this.world = world
 
     val vertices = hitboxVertices(gameState)
 
@@ -59,12 +58,10 @@ case class AbilityBody(creatureId: String, abilityId: String) {
 
     val terrain: Terrain = physicsController.terrain(areaId)
 
-    if (ability.params.state == AbilityState.Channeling || ability.params.state == AbilityState.Active) {
+    if (ability.params.state == AbilityState.Active) {
       if (!isActive) {
         isActive = true
         init(terrain.world, gameState)
-//        destroy()
-//        init(terrain.world, gameState)
       }
     } else if (ability.params.state == AbilityState.Inactive) {
       if (isActive) {

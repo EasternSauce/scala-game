@@ -1,17 +1,18 @@
 package com.easternsauce.screen
 
-import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
+import com.badlogic.gdx.graphics.{GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{Vector2, Vector3}
 import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
+import com.easternsauce.box2d_physics.{CollisionEvent, PhysicsController}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
-import com.easternsauce.box2d_physics.PhysicsController
 import com.easternsauce.util.{Constants, Direction, RendererBatch}
 import com.easternsauce.view.GameView
 import com.softwaremill.quicklens._
 
+import scala.collection.mutable.ListBuffer
 import scala.util.chaining._
 
 class PlayScreen(
@@ -43,7 +44,10 @@ class PlayScreen(
   val hudViewport: Viewport =
     new FitViewport(Constants.WindowWidth.toFloat, Constants.WindowHeight.toFloat, hudCamera)
 
-  var areaChangeQueue: List[(String, String, String)] = List()
+  var areaChangeQueue: ListBuffer[(String, String, String)] = ListBuffer()
+  var collisionQueue: ListBuffer[CollisionEvent] = ListBuffer()
+
+  physicsController.setCollisionQueue(collisionQueue)
 
   def updateCamera(player: Creature): Unit = {
 
@@ -96,39 +100,14 @@ class PlayScreen(
 
     currentTerrain.step()
 
-    // TODO: creature changing area logic goes here
-    // ...
-    // TODO: temporarily simulate creature changing areas on SPACE
-    if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-      if (gameState.currentAreaId == "area1") {
-        areaChangeQueue = ("player", "area1", "area2") :: areaChangeQueue
-      } else {
-        areaChangeQueue = ("player", "area2", "area1") :: areaChangeQueue
-      }
-    }
-
-    if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
-      val mouseX = Gdx.input.getX
-      val mouseY = Gdx.input.getY
-
-      val centerX = Gdx.graphics.getWidth / 2f
-      val centerY = Gdx.graphics.getHeight / 2f
-
-      val facingVector = new Vector2(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).nor()
-
-      gameState = gameState
-        .modifyGameStateCreature("player")(_.modify(_.params.dirVector).setTo(facingVector))
-        .performAbility("player", "regularAttack")
-    }
-
     // --- update model (can update based on player input or physical world state)
 
     gameState = gameState
       .pipe(processPlayerMovement)
       .pipe(updateCreatures(physicsController, delta))
       .pipe(_.processCreatureAreaChanges(areaChangeQueue))
-    // ---
-
+      .pipe(_.processCollisions(collisionQueue))
+    // ---a
     // --- update libGDX view
     gameView.update(gameState, currentTerrain.world)
     // ---
@@ -137,7 +116,8 @@ class PlayScreen(
     physicsController.update(gameState, areaChangeQueue)
     //
 
-    areaChangeQueue = List()
+    areaChangeQueue.clear()
+    collisionQueue.clear()
 
     currentArea.setView(worldCamera)
 
@@ -145,20 +125,44 @@ class PlayScreen(
   }
 
   private def processPlayerMovement(gameState: GameState): GameState = {
+    // TODO: temporarily simulate creature changing areas on SPACE
+    if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+      if (gameState.currentAreaId == "area1") {
+        areaChangeQueue.prepend(("player", "area1", "area2"))
+      } else {
+        areaChangeQueue.prepend(("player", "area2", "area1"))
+      }
+    }
+
+    val leftClickInput: GameState => GameState =
+      if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+        val mouseX = Gdx.input.getX
+        val mouseY = Gdx.input.getY
+
+        val centerX = Gdx.graphics.getWidth / 2f
+        val centerY = Gdx.graphics.getHeight / 2f
+
+        val facingVector = new Vector2(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).nor()
+
+        val modification: GameState => GameState =
+          _.modifyGameStateCreature("player")(_.modify(_.params.dirVector).setTo(facingVector))
+            .performAbility("player", "regularAttack")
+        modification
+      } else identity
+
     val directionalSpeed: Float = {
       import Input.Keys._
 
       val sqrt2 = 1.4142135f
       val speed = 25f
 
-      val directionalSpeed = List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {
+      List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {
         case List(true, _, true, _) => speed / sqrt2
         case List(true, _, _, true) => speed / sqrt2
         case List(_, true, true, _) => speed / sqrt2
         case List(_, true, _, true) => speed / sqrt2
         case _                      => speed
       }
-      directionalSpeed
     }
 
     val (vectorX, vectorY) = {
@@ -222,6 +226,7 @@ class PlayScreen(
       .setTo(isMoving)
       .modify(_.player)
       .using(startMovingAction)
+      .pipe(leftClickInput)
 
   }
 

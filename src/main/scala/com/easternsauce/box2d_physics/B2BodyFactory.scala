@@ -1,6 +1,5 @@
 package com.easternsauce.box2d_physics
 
-import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.box2d_physics.entity.{AbilityBody, EntityBody}
@@ -77,14 +76,22 @@ object B2BodyFactory {
     )
   }
 
-  def createAbilityB2body(world: World, abilityBody: AbilityBody, posX: Float, posY: Float, vertices: Array[Float]): Body = {
-    createB2body(world = world,
+  def createAbilityB2body(
+    world: World,
+    abilityBody: AbilityBody,
+    posX: Float,
+    posY: Float,
+    vertices: Array[Float]
+  ): Body = {
+    createB2body(
+      world = world,
       posX = posX,
       posY = posY,
       bodyType = BodyType.KinematicBody,
       userData = abilityBody,
       shape = Polygon(vertices),
-      isSensor = true)
+      isSensor = true
+    )
   }
 }
 

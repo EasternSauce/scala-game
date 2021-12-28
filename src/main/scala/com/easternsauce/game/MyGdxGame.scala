@@ -78,10 +78,10 @@ class MyGdxGame extends Game {
     gameView = GameView(atlas)
     physicsController = PhysicsController()
 
-    gameView.init(gameState, maps, mapScale)
-    physicsController.init(gameState, maps, mapScale) // areaid.get
-
     val playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController)
+
+    gameView.init(gameState, maps, mapScale)
+    physicsController.init(gameState, maps, mapScale)
 
     setScreen(playScreen)
   }

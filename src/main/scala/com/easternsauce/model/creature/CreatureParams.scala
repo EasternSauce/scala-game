@@ -25,5 +25,6 @@ case class CreatureParams(
   isSprinting: Boolean = false,
   staminaDrainTimer: SimpleTimer = SimpleTimer(),
   isStaminaRegenerationDisabled: Boolean = false,
-  staminaRegenerationDisabledTimer: SimpleTimer = SimpleTimer()
+  staminaRegenerationDisabledTimer: SimpleTimer = SimpleTimer(),
+  totalArmor: Float = 0f
 )
