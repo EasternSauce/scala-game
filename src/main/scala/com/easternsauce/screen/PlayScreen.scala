@@ -101,13 +101,14 @@ class PlayScreen(
     currentTerrain.step()
 
     // --- update model (can update based on player input or physical world state)
-
     gameState = gameState
+      .pipe(_.clearEventsQueue())
       .pipe(processPlayerMovement)
       .pipe(updateCreatures(physicsController, delta))
       .pipe(_.processCreatureAreaChanges(areaChangeQueue))
       .pipe(_.processCollisions(collisionQueue))
-    // ---a
+    // ---
+
     // --- update libGDX view
     gameView.update(gameState, currentTerrain.world)
     // ---

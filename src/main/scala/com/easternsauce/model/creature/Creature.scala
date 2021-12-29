@@ -112,20 +112,6 @@ abstract class Creature {
       )
   }
 
-  def takeLifeDamage(damage: Float): Creature = {
-    val beforeLife = params.life
-
-    val actualDamage = damage * 100f / (100f + params.totalArmor)
-
-    this
-      .pipe(
-        creature =>
-          if (params.life - actualDamage > 0) creature.modify(_.params.life).setTo(params.life - actualDamage)
-          else creature.modify(_.params.life).setTo(0f)
-      )
-      .pipe(creature => if (beforeLife != params.life && params.life == 0f) creature.onDeath() else creature)
-  }
-
   def onDeath(): Creature = {
     this
   }

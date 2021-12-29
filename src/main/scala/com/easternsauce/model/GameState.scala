@@ -4,15 +4,18 @@ import com.easternsauce.box2d_physics.{CollisionEvent, EntityAbilityCollision}
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.Ability
+import com.easternsauce.model.events.{CreatureDeathEvent, UpdateEvent}
 import com.softwaremill.quicklens._
 
 import scala.collection.mutable.ListBuffer
+import scala.util.chaining.scalaUtilChainingOps
 
 case class GameState(
   player: Creature,
   nonPlayers: Map[String, Creature] = Map(),
   areas: Map[String, Area],
-  currentAreaId: String
+  currentAreaId: String,
+  events: List[UpdateEvent] = List()
 ) extends AbilityInteractions {
 
   def creatures: Map[String, Creature] = nonPlayers + (player.params.id -> player)
@@ -48,15 +51,15 @@ case class GameState(
     }
   }
 
+  def clearEventsQueue(): GameState = {
+    this.modify(_.events).setTo(List())
+  }
+
   def processCollisions(collisionQueue: ListBuffer[CollisionEvent]): GameState = {
     collisionQueue.foldLeft(this) {
       case (gameState, EntityAbilityCollision(creatureId, abilityId)) =>
         val ability = gameState.abilities(creatureId, abilityId)
-
-        gameState.modifyGameStateCreature(creatureId) {
-          _.takeLifeDamage(ability.damage)
-        }
-
+        gameState.creatureTakeLifeDamage(creatureId, ability.damage)
     }
   }
 
@@ -84,5 +87,36 @@ case class GameState(
         .using(_.modifyCreatureAbility(abilityId)(operation(_)))
     }
 
+  }
+
+  def creatureTakeLifeDamage(creatureId: String, damage: Float): GameState = {
+    val beforeLife = creatures(creatureId).params.life
+
+    val actualDamage = damage * 100f / (100f + creatures(creatureId).params.totalArmor)
+
+    this
+      .modifyGameStateCreature(creatureId)(
+        _.pipe(
+          creature =>
+            if (creature.params.life - actualDamage > 0)
+              creature.modify(_.params.life).setTo(creature.params.life - actualDamage)
+            else creature.modify(_.params.life).setTo(0f)
+        )
+      )
+      .pipe(gameState => {
+        val creature = gameState.creatures(creatureId)
+        if (beforeLife > 0f && creature.params.life <= 0f) {
+          gameState.creatureOnDeath(creatureId)
+        } else gameState
+      })
+  }
+
+  def creatureOnDeath(creatureId: String): GameState = {
+    this.pipe(
+      gameState =>
+        gameState
+          .modify(_.events)
+          .setTo(CreatureDeathEvent(creatureId) :: gameState.events)
+    )
   }
 }
