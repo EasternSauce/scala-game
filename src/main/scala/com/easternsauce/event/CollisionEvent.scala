@@ -1,4 +1,4 @@
-package com.easternsauce.box2d_physics
+package com.easternsauce.event
 
 sealed trait CollisionEvent
 

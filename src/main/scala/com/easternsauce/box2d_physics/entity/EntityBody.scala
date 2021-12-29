@@ -5,7 +5,7 @@ import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.box2d_physics.terrain.Terrain
 import com.easternsauce.box2d_physics.{B2BodyFactory, PhysicsController}
 import com.easternsauce.model.GameState
-import com.easternsauce.model.events.CreatureDeathEvent
+import com.easternsauce.model.event.CreatureDeathEvent
 
 case class EntityBody(creatureId: String) {
 

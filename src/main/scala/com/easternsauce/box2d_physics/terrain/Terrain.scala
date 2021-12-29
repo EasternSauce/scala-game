@@ -5,7 +5,7 @@ import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.box2d_physics.entity.{AbilityBody, EntityBody}
-import com.easternsauce.box2d_physics.{CollisionEvent, EntityAbilityCollision}
+import com.easternsauce.event.{CollisionEvent, EntityAbilityCollision}
 import com.easternsauce.util.Constants
 
 import scala.collection.mutable.ListBuffer

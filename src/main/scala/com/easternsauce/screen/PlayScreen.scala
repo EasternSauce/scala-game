@@ -5,7 +5,8 @@ import com.badlogic.gdx.math.{Vector2, Vector3}
 import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
-import com.easternsauce.box2d_physics.{CollisionEvent, PhysicsController}
+import com.easternsauce.box2d_physics.PhysicsController
+import com.easternsauce.event.{AreaChangeEvent, CollisionEvent}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.util.{Constants, Direction, RendererBatch}
@@ -44,7 +45,7 @@ class PlayScreen(
   val hudViewport: Viewport =
     new FitViewport(Constants.WindowWidth.toFloat, Constants.WindowHeight.toFloat, hudCamera)
 
-  var areaChangeQueue: ListBuffer[(String, String, String)] = ListBuffer()
+  var areaChangeQueue: ListBuffer[AreaChangeEvent] = ListBuffer()
   var collisionQueue: ListBuffer[CollisionEvent] = ListBuffer()
 
   physicsController.setCollisionQueue(collisionQueue)
@@ -129,9 +130,9 @@ class PlayScreen(
     // TODO: temporarily simulate creature changing areas on SPACE
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
       if (gameState.currentAreaId == "area1") {
-        areaChangeQueue.prepend(("player", "area1", "area2"))
+        areaChangeQueue.prepend(AreaChangeEvent("player", "area1", "area2"))
       } else {
-        areaChangeQueue.prepend(("player", "area2", "area1"))
+        areaChangeQueue.prepend(AreaChangeEvent("player", "area2", "area1"))
       }
     }
 

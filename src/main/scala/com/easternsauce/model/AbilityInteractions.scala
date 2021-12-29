@@ -1,7 +1,7 @@
 package com.easternsauce.model
 
 import com.easternsauce.model.creature.ability.AbilityState
-import com.easternsauce.model.events.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
+import com.easternsauce.model.event.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
 import com.softwaremill.quicklens.ModifyPimp
 
 import scala.util.chaining._

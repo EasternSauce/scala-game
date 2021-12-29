@@ -1,4 +1,4 @@
-package com.easternsauce.model.events
+package com.easternsauce.model.event
 
 sealed trait UpdateEvent
 

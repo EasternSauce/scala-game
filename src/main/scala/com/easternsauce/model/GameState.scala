@@ -1,10 +1,10 @@
 package com.easternsauce.model
 
-import com.easternsauce.box2d_physics.{CollisionEvent, EntityAbilityCollision}
+import com.easternsauce.event.{AreaChangeEvent, CollisionEvent, EntityAbilityCollision}
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.Ability
-import com.easternsauce.model.events.{CreatureDeathEvent, UpdateEvent}
+import com.easternsauce.model.event.{CreatureDeathEvent, UpdateEvent}
 import com.softwaremill.quicklens._
 
 import scala.collection.mutable.ListBuffer
@@ -41,9 +41,9 @@ case class GameState(
 
   }
 
-  def processCreatureAreaChanges(changes: ListBuffer[(String, String, String)]): GameState = {
+  def processCreatureAreaChanges(changes: ListBuffer[AreaChangeEvent]): GameState = {
     changes.foldLeft(this) {
-      case (gameState, (creatureId, oldAreaId, newAreaId)) =>
+      case (gameState, AreaChangeEvent(creatureId, oldAreaId, newAreaId)) =>
         gameState
           .assignCreatureToArea(creatureId, Some(oldAreaId), newAreaId)
           .modify(_.currentAreaId)
