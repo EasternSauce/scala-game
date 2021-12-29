@@ -45,7 +45,7 @@ case class AbilityRenderer(gameView: GameView, creatureId: String, abilityId: St
       sprite.setScale(ability.params.abilityHitbox.scale)
     }
 
-    if (abilityState == AbilityState.Channeling) {
+    if (abilityState == AbilityState.Channel) {
       val texture =
         channelAnimation.getKeyFrame(ability.params.abilityChannelAnimationTimer.time)
       updateSprite(texture)
@@ -64,7 +64,7 @@ case class AbilityRenderer(gameView: GameView, creatureId: String, abilityId: St
   def render(gameState: GameState, batch: RendererBatch): Unit = {
     val state = gameState.abilities(creatureId, abilityId).params.state
 
-    if (state == AbilityState.Channeling || state == AbilityState.Active) {
+    if (state == AbilityState.Channel || state == AbilityState.Active) {
       sprite.draw(batch.spriteBatch)
     }
   }

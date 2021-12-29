@@ -1,6 +1,7 @@
 package com.easternsauce.model
 
 import com.easternsauce.model.creature.ability.AbilityState
+import com.easternsauce.model.events.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
 import com.softwaremill.quicklens.ModifyPimp
 
 import scala.util.chaining._
@@ -10,38 +11,47 @@ trait AbilityInteractions {
 
   def onCreatureAbilityActiveStart(creatureId: String, abilityId: String): GameState = {
 
-    this.modifyGameStateCreature(creatureId) { creature =>
-      creature
-        .modifyCreatureAbility(abilityId)(_.restartActiveTimers())
-        .modifyCreatureAbility(abilityId)(_.modify(_.params.channelTimer).using(_.stop()))
-        .modifyCreatureAbility(abilityId)(_.modify(_.params.abilityChannelAnimationTimer).using(_.stop()))
-        .takeStaminaDamage(15f)
-        .modifyCreatureAbility(abilityId)(_.setDirVector(creature.params.dirVector))
-        .modifyCreatureAbility(abilityId)(_.updateHitbox(creature))
-    }
+    this
+      .pipe(
+        gameState => gameState.modify(_.events).setTo(AbilityCreateBodyEvent(creatureId, abilityId) :: gameState.events)
+      )
+      .modifyGameStateCreature(creatureId) { creature =>
+        creature
+          .modifyCreatureAbility(abilityId)(_.restartActiveTimers())
+          .modifyCreatureAbility(abilityId)(_.modify(_.params.channelTimer).using(_.stop()))
+          .modifyCreatureAbility(abilityId)(_.modify(_.params.abilityChannelAnimationTimer).using(_.stop()))
+          .takeStaminaDamage(15f)
+          .modifyCreatureAbility(abilityId)(_.setDirVector(creature.params.dirVector))
+          .modifyCreatureAbility(abilityId)(_.updateHitbox(creature))
+      }
   }
 
-  def onCreatureAbilityChannelingStart(creatureId: String, abilityId: String): GameState = {
-    this.modifyGameStateCreature(creatureId) { creature =>
-      creature
-        .modifyCreatureAbility(abilityId)(_.modify(_.params.channelTimer).using(_.restart()))
-        .modifyCreatureAbility(abilityId)(_.modify(_.params.abilityChannelAnimationTimer).using(_.restart()))
-        .modifyCreatureAbility(abilityId)(_.setDirVector(creature.params.dirVector))
-        .modifyCreatureAbility(abilityId)(_.updateHitbox(creature))
-    }
+  def onCreatureAbilityChannelStart(creatureId: String, abilityId: String): GameState = {
+    this
+      .modifyGameStateCreature(creatureId) { creature =>
+        creature
+          .modifyCreatureAbility(abilityId)(_.modify(_.params.channelTimer).using(_.restart()))
+          .modifyCreatureAbility(abilityId)(_.modify(_.params.abilityChannelAnimationTimer).using(_.restart()))
+          .modifyCreatureAbility(abilityId)(_.setDirVector(creature.params.dirVector))
+          .modifyCreatureAbility(abilityId)(_.updateHitbox(creature))
+      }
 
   }
 
   def onCreatureAbilityInactiveStart(creatureId: String, abilityId: String): GameState = {
-
-    this.modifyGameStateCreature(creatureId) { creature =>
-      creature
-        .modifyCreatureAbility(abilityId)(_.modify(_.params.activeTimer).using(_.stop()))
-        .modifyCreatureAbility(abilityId)(_.modify(_.params.abilityActiveAnimationTimer).using(_.stop()))
-    }
+    this
+      .pipe(
+        gameState =>
+          gameState.modify(_.events).setTo(AbilityDestroyBodyEvent(creatureId, abilityId) :: gameState.events)
+      )
+      .modifyGameStateCreature(creatureId) { creature =>
+        creature
+          .modifyCreatureAbility(abilityId)(_.modify(_.params.activeTimer).using(_.stop()))
+          .modifyCreatureAbility(abilityId)(_.modify(_.params.abilityActiveAnimationTimer).using(_.stop()))
+      }
   }
 
-  def onCreatureAbilityChannelingUpdate(creatureId: String, abilityId: String): GameState =
+  def onCreatureAbilityChannelUpdate(creatureId: String, abilityId: String): GameState =
     this.modifyGameStateCreature(creatureId)(
       creature => creature.modifyCreatureAbility(abilityId)(_.updateHitbox(creature))
     )
@@ -60,7 +70,7 @@ trait AbilityInteractions {
 
     import com.easternsauce.model.creature.ability.AbilityState._
     (ability.params.state match {
-      case Channeling =>
+      case Channel =>
         this
           .pipe {
             case state if channelTimer.time > ability.totalChannelTime =>
@@ -69,7 +79,7 @@ trait AbilityInteractions {
                 .onCreatureAbilityActiveStart(creatureId, abilityId)
             case state => state
           }
-          .onCreatureAbilityChannelingUpdate(creatureId, abilityId)
+          .onCreatureAbilityChannelUpdate(creatureId, abilityId)
       case Active =>
         this
           .pipe {
@@ -107,9 +117,9 @@ trait AbilityInteractions {
             .modify(_.params.channelTimer)
             .using(_.restart())
             .modify(_.params.state)
-            .setTo(AbilityState.Channeling)
+            .setTo(AbilityState.Channel)
         }
-        .onCreatureAbilityChannelingStart(creatureId, abilityId)
+        .onCreatureAbilityChannelStart(creatureId, abilityId)
         .modifyGameStateCreature(creatureId)(
           _.modify(_.params.staminaRegenerationDisabledTimer)
             .using(_.restart())

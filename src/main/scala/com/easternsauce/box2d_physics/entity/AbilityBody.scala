@@ -5,7 +5,7 @@ import com.badlogic.gdx.physics.box2d.{Body, World}
 import com.easternsauce.box2d_physics.terrain.Terrain
 import com.easternsauce.box2d_physics.{B2BodyFactory, PhysicsController}
 import com.easternsauce.model.GameState
-import com.easternsauce.model.creature.ability.AbilityState
+import com.easternsauce.model.events.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
 
 case class AbilityBody(creatureId: String, abilityId: String) {
   var b2Body: Body = _
@@ -50,7 +50,6 @@ case class AbilityBody(creatureId: String, abilityId: String) {
       vertices = vertices
     )
 
-    isActive = true
   }
 
   def update(gameState: GameState, physicsController: PhysicsController, areaId: String): Unit = {
@@ -58,16 +57,14 @@ case class AbilityBody(creatureId: String, abilityId: String) {
 
     val terrain: Terrain = physicsController.terrain(areaId)
 
-    if (ability.params.state == AbilityState.Active) {
-      if (!isActive) {
-        isActive = true
-        init(terrain.world, gameState)
-      }
-    } else if (ability.params.state == AbilityState.Inactive) {
-      if (isActive) {
-        isActive = false
-        destroy()
-      }
+    if (gameState.events.contains(AbilityCreateBodyEvent(creatureId, abilityId))) {
+      init(terrain.world, gameState)
+      isActive = true
+    }
+
+    if (gameState.events.contains(AbilityDestroyBodyEvent(creatureId, abilityId))) {
+      destroy()
+      isActive = false
     }
 
     if (isActive) {
@@ -77,7 +74,6 @@ case class AbilityBody(creatureId: String, abilityId: String) {
 
   def destroy(): Unit = {
     world.destroyBody(b2Body)
-    isActive = false
   }
 
 }
