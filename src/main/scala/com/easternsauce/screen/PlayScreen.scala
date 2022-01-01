@@ -264,7 +264,7 @@ class PlayScreen(
 
     hudBatch.begin()
 
-    gameView.renderHud(gameState, hudBatch)
+    gameView.renderHud(gameState, hudBatch, mousePosWindowScaled)
 
     hudBatch.end()
 
@@ -288,9 +288,9 @@ class PlayScreen(
     worldBatch.dispose()
   }
 
-  def mousePosWindowScaled: Vector3 = {
+  def mousePosWindowScaled: Vector2 = {
     val v = new Vector3(Gdx.input.getX.toFloat, Gdx.input.getY.toFloat, 0f)
     hudCamera.unproject(v)
-    v
+    new Vector2(v.x, v.y)
   }
 }

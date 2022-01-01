@@ -2,6 +2,7 @@ package com.easternsauce.model.creature
 
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.creature.ability.{Ability, RegularAttack}
+import com.easternsauce.model.item.{Item, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
 import com.easternsauce.util.Direction
 
@@ -26,5 +27,8 @@ case class CreatureParams(
   staminaDrainTimer: SimpleTimer = SimpleTimer(),
   isStaminaRegenerationDisabled: Boolean = false,
   staminaRegenerationDisabledTimer: SimpleTimer = SimpleTimer(),
-  totalArmor: Float = 0f
+  totalArmor: Float = 0f,
+  equipmentItems: Map[Int, Item] = Map(),
+  inventoryItems: Map[Int, Item] =
+    Map(2 -> Item(ItemTemplate.templates("leatherArmor"))) // TODO: test item present, remove after
 )

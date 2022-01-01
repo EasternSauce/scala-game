@@ -8,6 +8,7 @@ import com.easternsauce.model.GameState
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.{CreatureParams, Player, Skeleton}
 import com.easternsauce.screen.PlayScreen
+import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.GameView
 
@@ -32,6 +33,8 @@ class MyGdxGame extends Game {
   var physicsController: PhysicsController = _
 
   override def create(): Unit = {
+    Assets.loadAssets()
+
     worldBatch = RendererBatch()
     hudBatch = RendererBatch()
 
