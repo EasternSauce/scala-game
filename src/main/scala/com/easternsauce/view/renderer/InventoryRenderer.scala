@@ -1,16 +1,14 @@
 package com.easternsauce.view.renderer
 
-import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
-import com.badlogic.gdx.math.{Rectangle, Vector2, Vector3}
+import com.badlogic.gdx.math.{Vector2, Vector3}
 import com.badlogic.gdx.scenes.scene2d.ui.Image
+import com.easternsauce.inventory.InventoryData
 import com.easternsauce.model.GameState
 import com.easternsauce.system.Assets
 import com.easternsauce.system.Assets._
 import com.easternsauce.util.{InventoryMapping, RendererBatch}
-
-import scala.collection.mutable
 
 case class InventoryRenderer() {
 
@@ -22,84 +20,33 @@ case class InventoryRenderer() {
 
   val icons: Array[Array[TextureRegion]] = Assets.atlas.findRegion("nice_icons").split(32, 32)
 
-  private val backgroundRect: Rectangle = new Rectangle(
-    Gdx.graphics.getWidth * 0.2f,
-    Gdx.graphics.getHeight * 0.3f,
-    Gdx.graphics.getWidth * 0.6f,
-    Gdx.graphics.getHeight * 0.6f
-  )
-
-  private val backgroundOuterRect: Rectangle = new Rectangle(
-    backgroundRect.x - Gdx.graphics.getWidth * 0.1f,
-    backgroundRect.y - Gdx.graphics.getHeight * 0.1f,
-    backgroundRect.width + Gdx.graphics.getWidth * 0.2f,
-    backgroundRect.height + Gdx.graphics.getHeight * 0.2f
-  )
-
   backgroundImage.setBounds(
-    backgroundOuterRect.x,
-    backgroundOuterRect.y,
-    backgroundOuterRect.width,
-    backgroundOuterRect.height
+    InventoryData.backgroundOuterRect.x,
+    InventoryData.backgroundOuterRect.y,
+    InventoryData.backgroundOuterRect.width,
+    InventoryData.backgroundOuterRect.height
   )
 
-  private val totalRows = 5
-  private val totalColumns = 8
-  val inventoryTotalSlots: Int = totalRows * totalColumns
-  private val margin = 20
-  private val slotSize = 40f
-  private val spaceBetweenSlots = 12
-  private val spaceBeforeEquipment = 270
-
-  private val inventoryWidth = margin + (slotSize + spaceBetweenSlots) * totalColumns
-  private val inventoryHeight = margin + (slotSize + spaceBetweenSlots) * totalRows
-
-  private val inventoryRectangles: mutable.Map[Int, Rectangle] = mutable.Map()
-
-  private val equipmentTotalSlots = 8
-  private val equipmentRectangles: mutable.Map[Int, Rectangle] = mutable.Map()
-
-  defineSlotRectangles()
-
-  private def defineSlotRectangles(): Unit = {
-    for (i <- 0 until inventoryTotalSlots) {
-      inventoryRectangles += (i -> new Rectangle(
-        inventorySlotPositionX(i),
-        inventorySlotPositionY(i),
-        slotSize,
-        slotSize
-      ))
-    }
-
-    for (i <- 0 until equipmentTotalSlots) {
-      equipmentRectangles += (i -> new Rectangle(
-        equipmentSlotPositionX(i),
-        equipmentSlotPositionY(i),
-        slotSize,
-        slotSize
-      ))
-    }
-
-  }
+  private def defineSlotRectangles(): Unit = {}
 
   def render(gameState: GameState, batch: RendererBatch, mousePosition: Vector2): Unit = {
     if (visible) {
       backgroundImage.draw(batch.spriteBatch, 1.0f)
 
-      inventoryRectangles.values.foreach(rect => {
+      InventoryData.inventoryRectangles.values.foreach(rect => {
         batch.shapeDrawer.filledRectangle(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6, Color.BROWN)
         batch.shapeDrawer.filledRectangle(rect, Color.BLACK)
       })
 
-      equipmentRectangles.foreach {
+      InventoryData.equipmentRectangles.foreach {
         case (index, rect) =>
           batch.shapeDrawer.filledRectangle(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6, Color.BROWN)
           batch.shapeDrawer.filledRectangle(rect, Color.BLACK)
           Assets.defaultFont.draw(
             batch.spriteBatch,
             InventoryMapping.equipmentTypeNames(index) + ":",
-            rect.x - slotSize / 2 - 170,
-            rect.y + slotSize / 2 + 7,
+            rect.x - InventoryData.slotSize / 2 - 170,
+            rect.y + InventoryData.slotSize / 2 + 7,
             Color.DARK_GRAY
           )
       }
@@ -124,9 +71,9 @@ case class InventoryRenderer() {
         case (index, item) =>
           val (iconPosX, iconPosY) = item.template.iconPosition
           val textureRegion = icons(iconPosY)(iconPosX)
-          val x = inventorySlotPositionX(index)
-          val y = inventorySlotPositionY(index)
-          batch.spriteBatch.draw(textureRegion, x, y, slotSize, slotSize)
+          val x = InventoryData.inventorySlotPositionX(index)
+          val y = InventoryData.inventorySlotPositionY(index)
+          batch.spriteBatch.draw(textureRegion, x, y, InventoryData.slotSize, InventoryData.slotSize)
 
           if (item.quantity > 1) {
             Assets.defaultFont.draw(batch.spriteBatch, item.quantity.toString, x, y + 15, Color.WHITE)
@@ -141,9 +88,9 @@ case class InventoryRenderer() {
         case (index, item) =>
           val (iconPosX, iconPosY) = item.template.iconPosition
           val textureRegion = icons(iconPosY)(iconPosX)
-          val x = equipmentSlotPositionX(index)
-          val y = equipmentSlotPositionY(index)
-          batch.spriteBatch.draw(textureRegion, x, y, slotSize, slotSize)
+          val x = InventoryData.equipmentSlotPositionX(index)
+          val y = InventoryData.equipmentSlotPositionY(index)
+          batch.spriteBatch.draw(textureRegion, x, y, InventoryData.slotSize, InventoryData.slotSize)
 
           if (item.quantity > 1) {
             Assets.defaultFont.draw(batch.spriteBatch, item.quantity.toString, x, y + 15, Color.WHITE)
@@ -156,11 +103,23 @@ case class InventoryRenderer() {
     val (iconPosX, iconPosY) = items(inventoryItemBeingMoved.get).template.iconPosition
 
     if (inventoryItemBeingMoved.nonEmpty) {
-      batch.spriteBatch.draw(icons(iconPosY)(iconPosX), x - slotSize / 2, y - slotSize / 2, slotSize, slotSize)
+      batch.spriteBatch.draw(
+        icons(iconPosY)(iconPosX),
+        x - InventoryData.slotSize / 2,
+        y - InventoryData.slotSize / 2,
+        InventoryData.slotSize,
+        InventoryData.slotSize
+      )
     }
 
     if (equipmentItemBeingMoved.nonEmpty) {
-      batch.spriteBatch.draw(icons(iconPosY)(iconPosX), x - slotSize / 2, y - slotSize / 2, slotSize, slotSize)
+      batch.spriteBatch.draw(
+        icons(iconPosY)(iconPosX),
+        x - InventoryData.slotSize / 2,
+        y - InventoryData.slotSize / 2,
+        InventoryData.slotSize,
+        InventoryData.slotSize
+      )
     }
   }
 
@@ -173,11 +132,11 @@ case class InventoryRenderer() {
     var inventorySlotMousedOver: Option[Int] = None
     var equipmentSlotMousedOver: Option[Int] = None
 
-    inventoryRectangles
+    InventoryData.inventoryRectangles
       .filter { case (_, v) => v.contains(x, y) }
       .foreach { case (k, _) => inventorySlotMousedOver = Some(k) }
 
-    equipmentRectangles
+    InventoryData.equipmentRectangles
       .filter { case (_, v) => v.contains(x, y) }
       .foreach { case (k, _) => equipmentSlotMousedOver = Some(k) }
 
@@ -194,96 +153,79 @@ case class InventoryRenderer() {
       Assets.defaultFont.draw(
         batch.spriteBatch,
         item.get.template.name,
-        backgroundRect.x + margin,
-        backgroundRect.y + backgroundRect.height - (inventoryHeight + 5),
+        InventoryData.backgroundRect.x + InventoryData.margin,
+        InventoryData.backgroundRect.y + InventoryData.backgroundRect.height - (InventoryData.inventoryHeight + 5),
         Color.DARK_GRAY
       )
 
       Assets.defaultFont.draw(
         batch.spriteBatch,
         item.get.itemInformation(),
-        backgroundRect.x + margin,
-        backgroundRect.y + backgroundRect.height - (inventoryHeight + 35),
+        InventoryData.backgroundRect.x + InventoryData.margin,
+        InventoryData.backgroundRect.y + InventoryData.backgroundRect.height - (InventoryData.inventoryHeight + 35),
         Color.DARK_GRAY
       )
     }
 
   }
 
-  private def inventorySlotPositionX(index: Int): Float = {
-    val currentColumn = index % totalColumns
-    backgroundRect.x + margin + (slotSize + spaceBetweenSlots) * currentColumn
-  }
-
-  private def inventorySlotPositionY(index: Int): Float = {
-    val currentRow = index / totalColumns
-    backgroundRect.y + backgroundRect.height - (slotSize + margin + (slotSize + spaceBetweenSlots) * currentRow)
-  }
-
-  private def equipmentSlotPositionX(index: Int): Float = {
-    backgroundRect.x + inventoryWidth + margin + spaceBeforeEquipment
-  }
-
-  private def equipmentSlotPositionY(index: Int): Float = {
-    backgroundRect.y + backgroundRect.height - (slotSize + margin + (slotSize + spaceBetweenSlots) * index)
-  }
-
-  def moveItemClick(gameState: GameState, mousePosition: Vector2): Unit = {
-    val player = gameState.player
-
-    var inventorySlotClicked: Option[Int] = None
-    var equipmentSlotClicked: Option[Int] = None
-
-    val x: Float = mousePosition.x
-    val y: Float = mousePosition.y
-
-    if (backgroundOuterRect.contains(x, y)) {
-      inventoryRectangles
-        .filter { case (_, v) => v.contains(x, y) }
-        .foreach { case (k, _) => inventorySlotClicked = Some(k) }
-
-      equipmentRectangles
-        .filter { case (_, v) => v.contains(x, y) }
-        .foreach { case (k, _) => equipmentSlotClicked = Some(k) }
-
-      (inventoryItemBeingMoved, equipmentItemBeingMoved, inventorySlotClicked, equipmentSlotClicked) match {
-        case (Some(from), _, Some(to), _) => swapInventorySlotContent(gameState, from, to)
-        case (Some(from), _, _, Some(to)) => swapBetweenInventoryAndEquipment(gameState, from, to)
-        case (_, Some(from), Some(to), _) => swapBetweenInventoryAndEquipment(gameState, to, from)
-        case (_, Some(from), _, Some(to)) => swapEquipmentSlotContent(gameState, from, to)
-        case (_, _, Some(index), _) =>
-          if (player.params.inventoryItems.contains(index)) inventoryItemBeingMoved = Some(index)
-        case (_, _, _, Some(index)) =>
-          if (player.params.equipmentItems.contains(index)) equipmentItemBeingMoved = Some(index)
-        case _ =>
-          inventoryItemBeingMoved = None
-          equipmentItemBeingMoved = None
-      }
-    } else {
-      if (inventoryItemBeingMoved.nonEmpty) {
-        val item = player.params.inventoryItems(inventoryItemBeingMoved.get)
-        //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item)  TODO: spawn lootpile
-
-        //player.params.inventoryItems.remove(inventoryItemBeingMoved.get) TODO: remove item
-
-        Assets.sound("coinBag").play(0.3f)
-
-        inventoryItemBeingMoved = None
-      }
-      if (equipmentItemBeingMoved.nonEmpty) {
-        val item = player.params.inventoryItems(equipmentItemBeingMoved.get)
-        //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item) TODO: spawn lootpile
-
-        //player.params.equipmentItems.remove(equipmentItemBeingMoved.get) TODO: remove item
-
-        Assets.sound("coinBag").play(0.3f)
-
-        equipmentItemBeingMoved = None
-      }
-      //player.promoteSecondaryToPrimaryWeapon() TODO: promote weapon
-    }
-
-  }
+//
+//  def moveItemClick(gameState: GameState, mousePosition: Vector2): Unit = {
+//    val player = gameState.player
+//
+//    var inventorySlotClicked: Option[Int] = None
+//    var equipmentSlotClicked: Option[Int] = None
+//
+//    val x: Float = mousePosition.x
+//    val y: Float = mousePosition.y
+//
+//    if (backgroundOuterRect.contains(x, y)) {
+//      inventoryRectangles
+//        .filter { case (_, v) => v.contains(x, y) }
+//        .foreach { case (k, _) => inventorySlotClicked = Some(k) }
+//
+//      equipmentRectangles
+//        .filter { case (_, v) => v.contains(x, y) }
+//        .foreach { case (k, _) => equipmentSlotClicked = Some(k) }
+//
+//      (inventoryItemBeingMoved, equipmentItemBeingMoved, inventorySlotClicked, equipmentSlotClicked) match {
+//        case (Some(from), _, Some(to), _) => swapInventorySlotContent(gameState, from, to)
+//        case (Some(from), _, _, Some(to)) => swapBetweenInventoryAndEquipment(gameState, from, to)
+//        case (_, Some(from), Some(to), _) => swapBetweenInventoryAndEquipment(gameState, to, from)
+//        case (_, Some(from), _, Some(to)) => swapEquipmentSlotContent(gameState, from, to)
+//        case (_, _, Some(index), _) =>
+//          if (player.params.inventoryItems.contains(index)) inventoryItemBeingMoved = Some(index)
+//        case (_, _, _, Some(index)) =>
+//          if (player.params.equipmentItems.contains(index)) equipmentItemBeingMoved = Some(index)
+//        case _ =>
+//          inventoryItemBeingMoved = None
+//          equipmentItemBeingMoved = None
+//      }
+//    } else {
+//      if (inventoryItemBeingMoved.nonEmpty) {
+//        val item = player.params.inventoryItems(inventoryItemBeingMoved.get)
+//        //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item)  TODO: spawn lootpile
+//
+//        //player.params.inventoryItems.remove(inventoryItemBeingMoved.get) TODO: remove item
+//
+//        Assets.sound("coinBag").play(0.3f)
+//
+//        inventoryItemBeingMoved = None
+//      }
+//      if (equipmentItemBeingMoved.nonEmpty) {
+//        val item = player.params.inventoryItems(equipmentItemBeingMoved.get)
+//        //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item) TODO: spawn lootpile
+//
+//        //player.params.equipmentItems.remove(equipmentItemBeingMoved.get) TODO: remove item
+//
+//        Assets.sound("coinBag").play(0.3f)
+//
+//        equipmentItemBeingMoved = None
+//      }
+//      //player.promoteSecondaryToPrimaryWeapon() TODO: promote weapon
+//    }
+//
+//  }
 
   def swapInventorySlotContent(gameState: GameState, fromIndex: Int, toIndex: Int): Unit = {
     val player = gameState.player
@@ -364,11 +306,11 @@ case class InventoryRenderer() {
     var inventorySlotHovered: Option[Int] = None
     var equipmentSlotHovered: Option[Int] = None
 
-    inventoryRectangles
+    InventoryData.inventoryRectangles
       .filter { case (_, v) => v.contains(x, y) }
       .foreach { case (k, _) => inventorySlotHovered = Some(k) }
 
-    equipmentRectangles
+    InventoryData.equipmentRectangles
       .filter { case (_, v) => v.contains(x, y) }
       .foreach { case (k, _) => equipmentSlotHovered = Some(k) }
 
@@ -401,11 +343,11 @@ case class InventoryRenderer() {
     var inventorySlotHovered: Option[Int] = None
     var equipmentSlotHovered: Option[Int] = None
 
-    inventoryRectangles
+    InventoryData.inventoryRectangles
       .filter { case (_, v) => v.contains(x, y) }
       .foreach { case (k, _) => inventorySlotHovered = Some(k) }
 
-    equipmentRectangles
+    InventoryData.equipmentRectangles
       .filter { case (_, v) => v.contains(x, y) }
       .foreach { case (k, _) => equipmentSlotHovered = Some(k) }
 

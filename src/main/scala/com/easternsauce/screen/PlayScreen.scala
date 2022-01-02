@@ -7,8 +7,10 @@ import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.easternsauce.box2d_physics.PhysicsController
 import com.easternsauce.event.{AreaChangeEvent, CollisionEvent}
+import com.easternsauce.inventory.InventoryData
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
+import com.easternsauce.system.Assets
 import com.easternsauce.util.{Constants, Direction, RendererBatch}
 import com.easternsauce.view.GameView
 import com.softwaremill.quicklens._
@@ -105,6 +107,7 @@ class PlayScreen(
     gameState = gameState
       .pipe(_.clearEventsQueue())
       .pipe(processPlayerMovement)
+      .pipe(processInventoryActions)
       .pipe(updateCreatures(physicsController, delta))
       .pipe(_.processCreatureAreaChanges(areaChangeQueue))
       .pipe(_.processCollisions(collisionQueue))
@@ -230,6 +233,96 @@ class PlayScreen(
       .using(startMovingAction)
       .pipe(leftClickInput)
 
+  }
+
+  def processInventoryActions(gameState: GameState): GameState = {
+
+    def moveItemClick(gameState: GameState): GameState = {
+      val player = gameState.player
+
+      var inventorySlotClicked: Option[Int] = None
+      var equipmentSlotClicked: Option[Int] = None
+
+      val x: Float = mousePosWindowScaled.x
+      val y: Float = mousePosWindowScaled.y
+
+      if (InventoryData.backgroundOuterRect.contains(x, y)) {
+        InventoryData.inventoryRectangles
+          .filter { case (_, v) => v.contains(x, y) }
+          .foreach { case (k, _) => inventorySlotClicked = Some(k) }
+
+        InventoryData.equipmentRectangles
+          .filter { case (_, v) => v.contains(x, y) }
+          .foreach { case (k, _) => equipmentSlotClicked = Some(k) }
+
+        (
+          gameState.inventoryState.inventoryItemBeingMoved,
+          gameState.inventoryState.equipmentItemBeingMoved,
+          inventorySlotClicked,
+          equipmentSlotClicked
+        ) match {
+          case (Some(from), _, Some(to), _) => swapInventorySlotContent(gameState, from, to)
+          case (Some(from), _, _, Some(to)) => swapBetweenInventoryAndEquipment(gameState, from, to)
+          case (_, Some(from), Some(to), _) => swapBetweenInventoryAndEquipment(gameState, to, from)
+          case (_, Some(from), _, Some(to)) => swapEquipmentSlotContent(gameState, from, to)
+          case (_, _, Some(index), _) =>
+            gameState
+              .modify(_.inventoryState.inventoryItemBeingMoved)
+              .setToIf(player.params.inventoryItems.contains(index))(Some(index))
+          case (_, _, _, Some(index)) =>
+            gameState
+              .modify(_.inventoryState.equipmentItemBeingMoved)
+              .setToIf(player.params.equipmentItems.contains(index))(Some(index))
+          case _ =>
+            gameState
+              .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)
+              .setTo(None)
+        }
+      } else {
+        gameState
+          .pipe(
+            gameState =>
+              if (gameState.inventoryState.inventoryItemBeingMoved.nonEmpty) {
+                val item = player.params.inventoryItems(gameState.inventoryState.inventoryItemBeingMoved.get)
+                //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item)  TODO: spawn lootpile
+
+                //player.params.inventoryItems.remove(inventoryItemBeingMoved.get) TODO: remove item
+
+                Assets.sound("coinBag").play(0.3f)
+
+                gameState.modify(_.inventoryState.inventoryItemBeingMoved).setTo(None)
+              } else gameState
+          )
+          .pipe(
+            gameState =>
+              if (gameState.inventoryState.equipmentItemBeingMoved.nonEmpty) {
+                val item = player.params.inventoryItems(gameState.inventoryState.equipmentItemBeingMoved.get)
+                //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item) TODO: spawn lootpile
+
+                //player.params.equipmentItems.remove(equipmentItemBeingMoved.get) TODO: remove item
+
+                Assets.sound("coinBag").play(0.3f)
+
+                gameState.modify(_.inventoryState.equipmentItemBeingMoved).setTo(None)
+              } else gameState
+          )
+        //player.promoteSecondaryToPrimaryWeapon() TODO: promote weapon
+      }
+    }
+
+    def swapInventorySlotContent(gameState: GameState, fromIndex: Int, toIndex: Int): GameState = {
+      gameState
+    }
+
+    def swapBetweenInventoryAndEquipment(gameState: GameState, fromIndex: Int, toIndex: Int): GameState = {
+      gameState
+    }
+
+    def swapEquipmentSlotContent(gameState: GameState, fromIndex: Int, toIndex: Int): GameState = {
+      gameState
+    }
+
+    gameState.pipe(gameState => if (gameState.inventoryState.inventoryOpen) moveItemClick(gameState) else gameState)
   }
 
   override def render(delta: Float): Unit = {

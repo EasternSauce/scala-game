@@ -15,8 +15,10 @@ case class GameState(
   nonPlayers: Map[String, Creature] = Map(),
   areas: Map[String, Area],
   currentAreaId: String,
-  events: List[UpdateEvent] = List()
-) extends AbilityInteractions {
+  events: List[UpdateEvent] = List(),
+  inventoryState: InventoryState = InventoryState()
+) extends AbilityInteractions
+    with InventoryActions {
 
   def creatures: Map[String, Creature] = nonPlayers + (player.params.id -> player)
 
