@@ -247,12 +247,12 @@ class PlayScreen(
 
   def processInventoryActions(gameState: GameState): GameState = {
 
-    gameState.pipe(
-      gameState =>
-        if (Gdx.input.isButtonJustPressed(Buttons.LEFT) && gameState.inventoryState.inventoryOpen)
-          gameState.moveItemClick(mousePosWindowScaled)
-        else gameState
-    )
+    if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
+      gameState.pipe(
+        gameState =>
+          if (gameState.inventoryState.inventoryOpen) gameState.moveItemClick(mousePosWindowScaled) else gameState
+      )
+    } else gameState
   }
 
   override def render(delta: Float): Unit = {
