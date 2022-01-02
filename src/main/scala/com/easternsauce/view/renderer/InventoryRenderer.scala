@@ -67,7 +67,7 @@ case class InventoryRenderer() {
       .foreach {
         case (index, item) =>
           val (iconPosX, iconPosY) = item.template.iconPosition
-          val textureRegion = icons(iconPosY)(iconPosX)
+          val textureRegion = icons(iconPosX)(iconPosY)
           val x = InventoryData.inventorySlotPositionX(index)
           val y = InventoryData.inventorySlotPositionY(index)
           batch.spriteBatch.draw(textureRegion, x, y, InventoryData.slotSize, InventoryData.slotSize)
@@ -87,7 +87,7 @@ case class InventoryRenderer() {
       .foreach {
         case (index, item) =>
           val (iconPosX, iconPosY) = item.template.iconPosition
-          val textureRegion = icons(iconPosY)(iconPosX)
+          val textureRegion = icons(iconPosX)(iconPosY)
           val x = InventoryData.equipmentSlotPositionX(index)
           val y = InventoryData.equipmentSlotPositionY(index)
           batch.spriteBatch.draw(textureRegion, x, y, InventoryData.slotSize, InventoryData.slotSize)
@@ -97,28 +97,30 @@ case class InventoryRenderer() {
           }
       }
 
-    val x: Float = mousePosition.x
-    val y: Float = mousePosition.y
+    // render moved item on cursor
 
     if (gameState.inventoryState.inventoryItemBeingMoved.nonEmpty) {
+      println("rendering 1 " + gameState.inventoryState.inventoryItemBeingMoved)
       val (iconPosX, iconPosY) = items(gameState.inventoryState.inventoryItemBeingMoved.get).template.iconPosition
 
       batch.spriteBatch.draw(
-        icons(iconPosY)(iconPosX),
-        x - InventoryData.slotSize / 2,
-        y - InventoryData.slotSize / 2,
+        icons(iconPosX)(iconPosY),
+        mousePosition.x - InventoryData.slotSize / 2,
+        mousePosition.y - InventoryData.slotSize / 2,
         InventoryData.slotSize,
         InventoryData.slotSize
       )
     }
 
     if (gameState.inventoryState.equipmentItemBeingMoved.nonEmpty) {
+      println("rendering 2")
+
       val (iconPosX, iconPosY) = items(gameState.inventoryState.equipmentItemBeingMoved.get).template.iconPosition
 
       batch.spriteBatch.draw(
-        icons(iconPosY)(iconPosX),
-        x - InventoryData.slotSize / 2,
-        y - InventoryData.slotSize / 2,
+        icons(iconPosX)(iconPosY),
+        mousePosition.x - InventoryData.slotSize / 2,
+        mousePosition.y - InventoryData.slotSize / 2,
         InventoryData.slotSize,
         InventoryData.slotSize
       )

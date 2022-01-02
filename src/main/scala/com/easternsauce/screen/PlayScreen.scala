@@ -1,5 +1,6 @@
 package com.easternsauce.screen
 
+import com.badlogic.gdx.Input.Buttons
 import com.badlogic.gdx.graphics.{GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{Vector2, Vector3}
 import com.badlogic.gdx.physics.box2d._
@@ -28,7 +29,7 @@ class PlayScreen(
 
   val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
-  val debugRenderEnabled = true
+  val debugRenderEnabled = false
 
   val worldCamera: OrthographicCamera = new OrthographicCamera()
   val hudCamera: OrthographicCamera = {
@@ -143,7 +144,6 @@ class PlayScreen(
       val inventoryOpen = gameState.inventoryState.inventoryOpen
       if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
         if (!inventoryOpen) {
-          println("here")
           gameState.modify(_.inventoryState.inventoryOpen).setTo(true)
         } else { gameState.modify(_.inventoryState.inventoryOpen).setTo(false) }
 
@@ -478,7 +478,12 @@ class PlayScreen(
     //      }
     //    }
 
-    gameState.pipe(gameState => if (gameState.inventoryState.inventoryOpen) moveItemClick(gameState) else gameState)
+    gameState.pipe(
+      gameState =>
+        if (Gdx.input.isButtonJustPressed(Buttons.LEFT) && gameState.inventoryState.inventoryOpen)
+          moveItemClick(gameState)
+        else gameState
+    )
   }
 
   override def render(delta: Float): Unit = {

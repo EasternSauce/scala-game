@@ -39,7 +39,6 @@ case class GameView(atlas: TextureAtlas) {
   }
 
   def renderHud(gameState: GameState, batch: RendererBatch, mousePosition: Vector2): Unit = {
-
     def renderLifeAndStamina(): Unit = {
       val player = gameState.player
 
