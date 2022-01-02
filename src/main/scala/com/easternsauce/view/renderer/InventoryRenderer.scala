@@ -58,11 +58,11 @@ case class InventoryRenderer() {
     val equipment = player.params.equipmentItems
 
     items
-      .filterNot {
+      .filter {
         case (index, _) =>
           if (gameState.inventoryState.inventoryItemBeingMoved.nonEmpty)
-            gameState.inventoryState.inventoryItemBeingMoved.get == index
-          else false
+            gameState.inventoryState.inventoryItemBeingMoved.get != index
+          else true
       }
       .foreach {
         case (index, item) =>
@@ -78,11 +78,11 @@ case class InventoryRenderer() {
       }
 
     equipment
-      .filterNot {
+      .filter {
         case (index, _) =>
           if (gameState.inventoryState.equipmentItemBeingMoved.nonEmpty)
-            gameState.inventoryState.equipmentItemBeingMoved.get == index
-          else false
+            gameState.inventoryState.equipmentItemBeingMoved.get != index
+          else true
       }
       .foreach {
         case (index, item) =>
@@ -100,7 +100,6 @@ case class InventoryRenderer() {
     // render moved item on cursor
 
     if (gameState.inventoryState.inventoryItemBeingMoved.nonEmpty) {
-      println("rendering 1 " + gameState.inventoryState.inventoryItemBeingMoved)
       val (iconPosX, iconPosY) = items(gameState.inventoryState.inventoryItemBeingMoved.get).template.iconPosition
 
       batch.spriteBatch.draw(
@@ -113,8 +112,6 @@ case class InventoryRenderer() {
     }
 
     if (gameState.inventoryState.equipmentItemBeingMoved.nonEmpty) {
-      println("rendering 2")
-
       val (iconPosX, iconPosY) = items(gameState.inventoryState.equipmentItemBeingMoved.get).template.iconPosition
 
       batch.spriteBatch.draw(
