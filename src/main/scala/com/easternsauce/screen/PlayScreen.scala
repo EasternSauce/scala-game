@@ -106,7 +106,7 @@ class PlayScreen(
     // --- update model (can update based on player input or physical world state)
     gameState = gameState
       .pipe(_.clearEventsQueue())
-      .pipe(processPlayerMovement)
+      .pipe(processPlayerInput)
       .pipe(processInventoryActions)
       .pipe(updateCreatures(physicsController, delta))
       .pipe(_.processCreatureAreaChanges(areaChangeQueue))
@@ -129,7 +129,7 @@ class PlayScreen(
     updateCamera(gameState.player)
   }
 
-  private def processPlayerMovement(gameState: GameState): GameState = {
+  private def processPlayerInput(gameState: GameState): GameState = {
     // TODO: temporarily simulate creature changing areas on SPACE
     if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
       if (gameState.currentAreaId == "area1") {
@@ -137,6 +137,17 @@ class PlayScreen(
       } else {
         areaChangeQueue.prepend(AreaChangeEvent("player", "area2", "area1"))
       }
+    }
+
+    val handleInventoryOpen: GameState => GameState = gameState => {
+      val inventoryOpen = gameState.inventoryState.inventoryOpen
+      if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
+        if (!inventoryOpen) {
+          println("here")
+          gameState.modify(_.inventoryState.inventoryOpen).setTo(true)
+        } else { gameState.modify(_.inventoryState.inventoryOpen).setTo(false) }
+
+      } else gameState
     }
 
     val leftClickInput: GameState => GameState =
@@ -232,6 +243,7 @@ class PlayScreen(
       .modify(_.player)
       .using(startMovingAction)
       .pipe(leftClickInput)
+      .pipe(handleInventoryOpen)
 
   }
 
@@ -283,27 +295,31 @@ class PlayScreen(
           .pipe(
             gameState =>
               if (gameState.inventoryState.inventoryItemBeingMoved.nonEmpty) {
-                val item = player.params.inventoryItems(gameState.inventoryState.inventoryItemBeingMoved.get)
+                //val item = player.params.inventoryItems(gameState.inventoryState.inventoryItemBeingMoved.get)
                 //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item)  TODO: spawn lootpile
-
-                //player.params.inventoryItems.remove(inventoryItemBeingMoved.get) TODO: remove item
 
                 Assets.sound("coinBag").play(0.3f)
 
-                gameState.modify(_.inventoryState.inventoryItemBeingMoved).setTo(None)
+                gameState
+                  .modify(_.player.params.inventoryItems)
+                  .using(_.removed(gameState.inventoryState.inventoryItemBeingMoved.get))
+                  .modify(_.inventoryState.inventoryItemBeingMoved)
+                  .setTo(None)
               } else gameState
           )
           .pipe(
             gameState =>
               if (gameState.inventoryState.equipmentItemBeingMoved.nonEmpty) {
-                val item = player.params.inventoryItems(gameState.inventoryState.equipmentItemBeingMoved.get)
+                //val item = player.params.inventoryItems(gameState.inventoryState.equipmentItemBeingMoved.get)
                 //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item) TODO: spawn lootpile
-
-                //player.params.equipmentItems.remove(equipmentItemBeingMoved.get) TODO: remove item
 
                 Assets.sound("coinBag").play(0.3f)
 
-                gameState.modify(_.inventoryState.equipmentItemBeingMoved).setTo(None)
+                gameState
+                  .modify(_.player.params.equipmentItems)
+                  .using(_.removed(gameState.inventoryState.equipmentItemBeingMoved.get))
+                  .modify(_.inventoryState.equipmentItemBeingMoved)
+                  .setTo(None)
               } else gameState
           )
         //player.promoteSecondaryToPrimaryWeapon() TODO: promote weapon
@@ -334,12 +350,133 @@ class PlayScreen(
     }
 
     def swapBetweenInventoryAndEquipment(gameState: GameState, fromIndex: Int, toIndex: Int): GameState = {
+
+//      val player = gameState.player
+//
+//      val inventoryItem = player.params.inventoryItems.get(inventoryIndex)
+//      val equipmentItem = player.params.equipmentItems.get(equipmentIndex)
+//
+//      val temp = equipmentItem
+//
+//      val equipmentTypeMatches =
+//        inventoryItem.nonEmpty && inventoryItem.get.template
+//          .parameters("equipableType")
+//          .stringValue
+//          .get == InventoryMapping.equipmentTypes(equipmentIndex)
+//
+//      if (inventoryItem.isEmpty || equipmentTypeMatches) { TODO
+//        if (temp.nonEmpty) player.inventoryItems(inventoryIndex) = temp.get
+//        else player.params.inventoryItems.remove(inventoryIndex)
+//        if (inventoryItem.nonEmpty) player.equipmentItems(equipmentIndex) = inventoryItem.get
+//        else player.params.equipmentItems.remove(equipmentIndex)
+//      }
+//
+//      player.promoteSecondaryToPrimaryWeapon()
+//
+//      inventoryItemBeingMoved = None
+//      equipmentItemBeingMoved = None
       gameState
     }
 
     def swapEquipmentSlotContent(gameState: GameState, fromIndex: Int, toIndex: Int): GameState = {
+//      val player = gameState.player
+//
+//      val itemFrom = player.params.equipmentItems.get(fromIndex)
+//      val itemTo = player.params.equipmentItems.get(toIndex)
+//
+//      val temp = itemTo
+//
+//      val fromEquipmentTypeMatches =
+//        itemFrom.nonEmpty && itemFrom.get.template.parameters("equipableType").stringValue.get == InventoryMapping
+//          .equipmentTypes(toIndex)
+//      val toEquipmentTypeMatches =
+//        itemTo.nonEmpty && itemTo.get.template.parameters("equipableType").stringValue.get == InventoryMapping
+//          .equipmentTypes(fromIndex)
+//
+//      if (fromEquipmentTypeMatches && toEquipmentTypeMatches) { TODO
+//        if (itemFrom.nonEmpty) player.params.equipmentItems(toIndex) = itemFrom.get
+//        else player.params.equipmentItems.remove(toIndex)
+//        if (temp.nonEmpty) player.params.equipmentItems(fromIndex) = temp.get
+//        else player.params.equipmentItems.remove(fromIndex)
+//      }
+//
+//      inventoryItemBeingMoved = None
+//      equipmentItemBeingMoved = None
+
       gameState
     }
+
+//    def dropSelectedItem(gameState: GameState, mousePosition: Vector3): Unit = {
+//      val player = gameState.player
+//
+//      val x: Float = mousePosition.x
+//      val y: Float = mousePosition.y
+//
+//      var inventorySlotHovered: Option[Int] = None
+//      var equipmentSlotHovered: Option[Int] = None
+//
+//      InventoryData.inventoryRectangles
+//        .filter { case (_, v) => v.contains(x, y) }
+//        .foreach { case (k, _) => inventorySlotHovered = Some(k) }
+//
+//      InventoryData.equipmentRectangles
+//        .filter { case (_, v) => v.contains(x, y) }
+//        .foreach { case (k, _) => equipmentSlotHovered = Some(k) }
+//
+//      if (inventorySlotHovered.nonEmpty && player.params.inventoryItems.contains(inventorySlotHovered.get)) { TODO
+//        areaMap(currentAreaId.get)
+//          .spawnLootPile(player.pos.x, player.pos.y, player.params.inventoryItems(inventorySlotHovered.get))
+//        player.params.inventoryItems.remove(inventorySlotHovered.get)
+//
+//        Assets.sound("coinBag").play(0.3f)
+//
+//        player.promoteSecondaryToPrimaryWeapon()
+//
+//      }
+//
+//      if (equipmentSlotHovered.nonEmpty && player.params.equipmentItems.contains(inventorySlotHovered.get)) {
+//        areaMap(currentAreaId.get) TODO
+//        .spawnLootPile(player.pos.x, player.pos.y, player.params.equipmentItems(equipmentSlotHovered.get))
+//        player.equipmentItems.remove(equipmentSlotHovered.get)
+//
+//        Assets.sound("coinBag").play(0.3f)
+//      }
+//    }
+
+    //  def useItemClick(gameState: GameState, mousePosition: Vector3): Unit = {
+    //    val player = gameState.player
+    //
+    //    val x: Float = mousePosition.x
+    //    val y: Float = mousePosition.y
+    //
+    //    var inventorySlotHovered: Option[Int] = None
+    //    var equipmentSlotHovered: Option[Int] = None
+    //
+    //    InventoryData.inventoryRectangles
+    //      .filter { case (_, v) => v.contains(x, y) }
+    //      .foreach { case (k, _) => inventorySlotHovered = Some(k) }
+    //
+    //    InventoryData.equipmentRectangles
+    //      .filter { case (_, v) => v.contains(x, y) }
+    //      .foreach { case (k, _) => equipmentSlotHovered = Some(k) }
+    //
+    //    if (inventorySlotHovered.nonEmpty && player.params.inventoryItems.contains(inventorySlotHovered.get)) {
+    //      val item = player.params.inventoryItems.get(inventorySlotHovered.get)
+    //      if (item.nonEmpty && item.get.template.consumable.get) { TODO
+    //        player.useItem(item.get)
+    //        if (item.get.quantity <= 1) player.params.inventoryItems.remove(inventorySlotHovered.get)
+    //        else item.get.quantity = item.get.quantity - 1
+    //      }
+    //    }
+    //
+    //    if (equipmentSlotHovered.nonEmpty && player.params.equipmentItems.contains(equipmentSlotHovered.get)) {
+    //      val item = player.params.equipmentItems.get(equipmentSlotHovered.get)
+    //      if (item.nonEmpty && item.get.template.consumable.get) { TODO
+    //        player.useItem(item.get)
+    //        if (item.get.quantity <= 1) player.params.equipmentItems.remove(equipmentSlotHovered.get)
+    //        else item.get.quantity = item.get.quantity - 1
+    //      }
+    //    }
 
     gameState.pipe(gameState => if (gameState.inventoryState.inventoryOpen) moveItemClick(gameState) else gameState)
   }
