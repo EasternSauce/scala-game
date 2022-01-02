@@ -311,7 +311,26 @@ class PlayScreen(
     }
 
     def swapInventorySlotContent(gameState: GameState, fromIndex: Int, toIndex: Int): GameState = {
+      val player = gameState.player
+
+      val itemFrom = player.params.inventoryItems.get(fromIndex)
+      val itemTo = player.params.inventoryItems.get(toIndex)
+
+      val temp = itemTo
+
       gameState
+        .pipe(
+          gameState =>
+            if (itemFrom.nonEmpty) gameState.modify(_.player.params.inventoryItems.at(toIndex)).setTo(itemFrom.get)
+            else gameState.modify(_.player.params.inventoryItems).using(_.removed(toIndex))
+        )
+        .pipe(
+          gameState =>
+            if (temp.nonEmpty) gameState.modify(_.player.params.inventoryItems.at(fromIndex)).setTo(temp.get)
+            else gameState.modify(_.player.params.inventoryItems).using(_.removed(fromIndex))
+        )
+        .modifyAll(_.inventoryState.inventoryItemBeingMoved)
+        .setTo(None)
     }
 
     def swapBetweenInventoryAndEquipment(gameState: GameState, fromIndex: Int, toIndex: Int): GameState = {

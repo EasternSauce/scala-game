@@ -27,8 +27,6 @@ case class InventoryRenderer() {
     InventoryData.backgroundOuterRect.height
   )
 
-  private def defineSlotRectangles(): Unit = {}
-
   def render(gameState: GameState, batch: RendererBatch, mousePosition: Vector2): Unit = {
     if (visible) {
       backgroundImage.draw(batch.spriteBatch, 1.0f)
