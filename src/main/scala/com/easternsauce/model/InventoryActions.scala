@@ -3,6 +3,7 @@ package com.easternsauce.model
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.inventory.InventoryData
 import com.easternsauce.system.Assets
+import com.easternsauce.util.InventoryMapping
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -102,37 +103,37 @@ trait InventoryActions {
           if (temp.nonEmpty) gameState.modify(_.player.params.inventoryItems.at(fromIndex)).setTo(temp.get)
           else gameState.modify(_.player.params.inventoryItems).using(_.removed(fromIndex))
       )
-      .modifyAll(_.inventoryState.inventoryItemBeingMoved)
+      .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)
       .setTo(None)
   }
 
-  def swapBetweenInventoryAndEquipment(fromIndex: Int, toIndex: Int): GameState = {
+  def swapBetweenInventoryAndEquipment(inventoryIndex: Int, equipmentIndex: Int): GameState = {
 
-    //      val player = gameState.player
-    //
-    //      val inventoryItem = player.params.inventoryItems.get(inventoryIndex)
-    //      val equipmentItem = player.params.equipmentItems.get(equipmentIndex)
-    //
-    //      val temp = equipmentItem
-    //
-    //      val equipmentTypeMatches =
-    //        inventoryItem.nonEmpty && inventoryItem.get.template
-    //          .parameters("equipableType")
-    //          .stringValue
-    //          .get == InventoryMapping.equipmentTypes(equipmentIndex)
-    //
-    //      if (inventoryItem.isEmpty || equipmentTypeMatches) { TODO
-    //        if (temp.nonEmpty) player.inventoryItems(inventoryIndex) = temp.get
-    //        else player.params.inventoryItems.remove(inventoryIndex)
-    //        if (inventoryItem.nonEmpty) player.equipmentItems(equipmentIndex) = inventoryItem.get
-    //        else player.params.equipmentItems.remove(equipmentIndex)
-    //      }
-    //
-    //      player.promoteSecondaryToPrimaryWeapon()
-    //
-    //      inventoryItemBeingMoved = None
-    //      equipmentItemBeingMoved = None
+    val inventoryItem = player.params.inventoryItems.get(inventoryIndex)
+    val equipmentItem = player.params.equipmentItems.get(equipmentIndex)
+
+    val temp = equipmentItem
+
+    val equipmentTypeMatches =
+      inventoryItem.nonEmpty && inventoryItem.get.template
+        .parameters("equipableType")
+        .stringValue
+        .get == InventoryMapping.equipmentTypes(equipmentIndex)
+
     this
+      .pipe(
+        gameState =>
+          if (inventoryItem.isEmpty || equipmentTypeMatches) {
+            if (temp.nonEmpty) gameState.modify(_.player.params.inventoryItems.at(inventoryIndex)).setTo(temp.get)
+            else gameState.modify(_.player.params.inventoryItems).using(_.removed(inventoryIndex))
+            if (inventoryItem.nonEmpty)
+              gameState.modify(_.player.params.equipmentItems.at(equipmentIndex)).setTo(inventoryItem.get)
+            else gameState.modify(_.player.params.equipmentItems).using(_.removed(equipmentIndex))
+          } else gameState
+      )
+      //player.promoteSecondaryToPrimaryWeapon() TODO
+      .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)
+      .setTo(None)
   }
 
   def swapEquipmentSlotContent(fromIndex: Int, toIndex: Int): GameState = {
