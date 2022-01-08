@@ -125,11 +125,20 @@ trait InventoryActions {
       .pipe(
         gameState =>
           if (inventoryItem.isEmpty || equipmentTypeMatches) {
-            if (temp.nonEmpty) gameState.modify(_.player.params.inventoryItems).using(_ + (inventoryIndex -> temp.get))
-            else gameState.modify(_.player.params.inventoryItems).using(_.removed(inventoryIndex))
-            if (inventoryItem.nonEmpty)
-              gameState.modify(_.player.params.equipmentItems).using(_ + (equipmentIndex -> inventoryItem.get))
-            else gameState.modify(_.player.params.equipmentItems).using(_.removed(equipmentIndex))
+            gameState
+              .pipe(
+                gameState =>
+                  if (temp.nonEmpty)
+                    gameState.modify(_.player.params.inventoryItems).using(_ + (inventoryIndex -> temp.get))
+                  else gameState.modify(_.player.params.inventoryItems).using(_.removed(inventoryIndex))
+              )
+              .pipe(
+                gameState =>
+                  if (inventoryItem.nonEmpty)
+                    gameState.modify(_.player.params.equipmentItems).using(_ + (equipmentIndex -> inventoryItem.get))
+                  else gameState.modify(_.player.params.equipmentItems).using(_.removed(equipmentIndex))
+              )
+
           } else gameState
       )
       //player.promoteSecondaryToPrimaryWeapon() TODO
@@ -155,10 +164,18 @@ trait InventoryActions {
       .pipe(
         gameState =>
           if (fromEquipmentTypeMatches && toEquipmentTypeMatches) {
-            if (itemFrom.nonEmpty) gameState.modify(_.player.params.equipmentItems).using(_ + (toIndex -> itemFrom.get))
-            else gameState.modify(_.player.params.equipmentItems).using(_.removed(toIndex))
-            if (temp.nonEmpty) gameState.modify(_.player.params.equipmentItems).using(_ + (fromIndex -> temp.get))
-            else gameState.modify(_.player.params.equipmentItems).using(_.removed(fromIndex))
+            gameState
+              .pipe(
+                gameState =>
+                  if (itemFrom.nonEmpty)
+                    gameState.modify(_.player.params.equipmentItems).using(_ + (toIndex -> itemFrom.get))
+                  else gameState.modify(_.player.params.equipmentItems).using(_.removed(toIndex))
+              )
+              .pipe(
+                gameState =>
+                  if (temp.nonEmpty) gameState.modify(_.player.params.equipmentItems).using(_ + (fromIndex -> temp.get))
+                  else gameState.modify(_.player.params.equipmentItems).using(_.removed(fromIndex))
+              )
           } else gameState
       )
       .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)

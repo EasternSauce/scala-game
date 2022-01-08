@@ -54,10 +54,10 @@ case class InventoryRenderer() {
   def renderPlayerItems(gameState: GameState, batch: RendererBatch, mousePosition: Vector2): Unit = {
     val player = gameState.player
 
-    val items = player.params.inventoryItems
+    val inventory = player.params.inventoryItems
     val equipment = player.params.equipmentItems
 
-    items
+    inventory
       .filter {
         case (index, _) =>
           if (gameState.inventoryState.inventoryItemBeingMoved.nonEmpty)
@@ -100,7 +100,7 @@ case class InventoryRenderer() {
     // render moved item on cursor
 
     if (gameState.inventoryState.inventoryItemBeingMoved.nonEmpty) {
-      val (iconPosX, iconPosY) = items(gameState.inventoryState.inventoryItemBeingMoved.get).template.iconPosition
+      val (iconPosX, iconPosY) = inventory(gameState.inventoryState.inventoryItemBeingMoved.get).template.iconPosition
 
       batch.spriteBatch.draw(
         icons(iconPosX)(iconPosY),
@@ -112,7 +112,7 @@ case class InventoryRenderer() {
     }
 
     if (gameState.inventoryState.equipmentItemBeingMoved.nonEmpty) {
-      val (iconPosX, iconPosY) = items(gameState.inventoryState.equipmentItemBeingMoved.get).template.iconPosition
+      val (iconPosX, iconPosY) = equipment(gameState.inventoryState.equipmentItemBeingMoved.get).template.iconPosition
 
       batch.spriteBatch.draw(
         icons(iconPosX)(iconPosY),
