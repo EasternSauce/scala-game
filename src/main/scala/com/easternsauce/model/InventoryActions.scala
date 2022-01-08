@@ -95,12 +95,13 @@ trait InventoryActions {
     this
       .pipe(
         gameState =>
-          if (itemFrom.nonEmpty) gameState.modify(_.player.params.inventoryItems.at(toIndex)).setTo(itemFrom.get)
+          if (itemFrom.nonEmpty)
+            gameState.modify(_.player.params.inventoryItems).using(_ + (toIndex -> itemFrom.get)) //toIndex
           else gameState.modify(_.player.params.inventoryItems).using(_.removed(toIndex))
       )
       .pipe(
         gameState =>
-          if (temp.nonEmpty) gameState.modify(_.player.params.inventoryItems.at(fromIndex)).setTo(temp.get)
+          if (temp.nonEmpty) gameState.modify(_.player.params.inventoryItems).using(_ + (fromIndex -> temp.get))
           else gameState.modify(_.player.params.inventoryItems).using(_.removed(fromIndex))
       )
       .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)
@@ -124,10 +125,10 @@ trait InventoryActions {
       .pipe(
         gameState =>
           if (inventoryItem.isEmpty || equipmentTypeMatches) {
-            if (temp.nonEmpty) gameState.modify(_.player.params.inventoryItems.at(inventoryIndex)).setTo(temp.get)
+            if (temp.nonEmpty) gameState.modify(_.player.params.inventoryItems).using(_ + (inventoryIndex -> temp.get))
             else gameState.modify(_.player.params.inventoryItems).using(_.removed(inventoryIndex))
             if (inventoryItem.nonEmpty)
-              gameState.modify(_.player.params.equipmentItems.at(equipmentIndex)).setTo(inventoryItem.get)
+              gameState.modify(_.player.params.equipmentItems).using(_ + (equipmentIndex -> inventoryItem.get))
             else gameState.modify(_.player.params.equipmentItems).using(_.removed(equipmentIndex))
           } else gameState
       )
@@ -137,31 +138,31 @@ trait InventoryActions {
   }
 
   def swapEquipmentSlotContent(fromIndex: Int, toIndex: Int): GameState = {
-    //      val player = gameState.player
-    //
-    //      val itemFrom = player.params.equipmentItems.get(fromIndex)
-    //      val itemTo = player.params.equipmentItems.get(toIndex)
-    //
-    //      val temp = itemTo
-    //
-    //      val fromEquipmentTypeMatches =
-    //        itemFrom.nonEmpty && itemFrom.get.template.parameters("equipableType").stringValue.get == InventoryMapping
-    //          .equipmentTypes(toIndex)
-    //      val toEquipmentTypeMatches =
-    //        itemTo.nonEmpty && itemTo.get.template.parameters("equipableType").stringValue.get == InventoryMapping
-    //          .equipmentTypes(fromIndex)
-    //
-    //      if (fromEquipmentTypeMatches && toEquipmentTypeMatches) { TODO
-    //        if (itemFrom.nonEmpty) player.params.equipmentItems(toIndex) = itemFrom.get
-    //        else player.params.equipmentItems.remove(toIndex)
-    //        if (temp.nonEmpty) player.params.equipmentItems(fromIndex) = temp.get
-    //        else player.params.equipmentItems.remove(fromIndex)
-    //      }
-    //
-    //      inventoryItemBeingMoved = None
-    //      equipmentItemBeingMoved = None
+
+    val itemFrom = player.params.equipmentItems.get(fromIndex)
+    val itemTo = player.params.equipmentItems.get(toIndex)
+
+    val temp = itemTo
+
+    val fromEquipmentTypeMatches =
+      itemFrom.nonEmpty && itemFrom.get.template.parameters("equipableType").stringValue.get == InventoryMapping
+        .equipmentTypes(toIndex)
+    val toEquipmentTypeMatches =
+      itemTo.nonEmpty && itemTo.get.template.parameters("equipableType").stringValue.get == InventoryMapping
+        .equipmentTypes(fromIndex)
 
     this
+      .pipe(
+        gameState =>
+          if (fromEquipmentTypeMatches && toEquipmentTypeMatches) {
+            if (itemFrom.nonEmpty) gameState.modify(_.player.params.equipmentItems).using(_ + (toIndex -> itemFrom.get))
+            else gameState.modify(_.player.params.equipmentItems).using(_.removed(toIndex))
+            if (temp.nonEmpty) gameState.modify(_.player.params.equipmentItems).using(_ + (fromIndex -> temp.get))
+            else gameState.modify(_.player.params.equipmentItems).using(_.removed(fromIndex))
+          } else gameState
+      )
+      .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)
+      .setTo(None)
   }
 
   //    def dropSelectedItem(gameState: GameState, mousePosition: Vector3): Unit = {
