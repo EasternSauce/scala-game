@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d._
 import com.badlogic.gdx.math.Rectangle
 import com.easternsauce.model.GameState
+import com.easternsauce.util.Direction.Direction
 import com.easternsauce.util.{Direction, RendererBatch}
 import com.easternsauce.view.{GameView, renderer}
 
@@ -55,14 +56,14 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
 
   }
 
-  def runningAnimation(gameState: GameState, currentDirection: Direction.Value): TextureRegion = {
+  def runningAnimation(gameState: GameState, currentDirection: Direction): TextureRegion = {
     val creature = gameState.creatures(creatureId)
 
     runningAnimations(creature.dirMap(currentDirection))
       .getKeyFrame(gameState.player.params.animationTimer.time, true)
   }
 
-  def facingTexture(gameState: GameState, currentDirection: Direction.Value): TextureRegion = {
+  def facingTexture(gameState: GameState, currentDirection: Direction): TextureRegion = {
     val creature = gameState.creatures(creatureId)
 
     facingTextures(creature.dirMap(currentDirection))

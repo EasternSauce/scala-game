@@ -4,13 +4,14 @@ import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.creature.ability.{Ability, RegularAttack}
 import com.easternsauce.model.item.{Item, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
-import com.easternsauce.util.Direction
+import com.easternsauce.util.Direction.Direction
+import com.easternsauce.util.{Direction, Vector2Wrapper}
 
 case class CreatureParams(
   id: String,
   posX: Float,
   posY: Float,
-  facingDirection: Direction.Value = Direction.Down,
+  facingDirection: Direction = Direction.Down,
   animationTimer: SimpleTimer = SimpleTimer(),
   isMoving: Boolean = false,
   areaId: String,
@@ -19,7 +20,7 @@ case class CreatureParams(
   stamina: Float,
   maxStamina: Float,
   abilities: Map[String, Ability] = Map("regularAttack" -> RegularAttack()),
-  dirVector: Vector2 = new Vector2(0, 0),
+  dirVector: Vector2Wrapper = Vector2Wrapper(0, 0),
   staminaOveruse: Boolean = false,
   staminaOveruseTimer: SimpleTimer = SimpleTimer(),
   staminaRegenerationTimer: SimpleTimer = SimpleTimer(isRunning = true),

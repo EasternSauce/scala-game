@@ -2,24 +2,24 @@ package com.easternsauce.model.creature
 
 import com.easternsauce.model.creature.ability.Ability
 import com.easternsauce.util.Direction
+import com.easternsauce.util.Direction.Direction
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
 
-abstract class Creature {
+case class Creature(params: CreatureParams) {
 
   val isPlayer = false
 
-  val params: CreatureParams
-  val spriteType: String
-  val textureWidth: Int
-  val textureHeight: Int
-  val width: Float
-  val height: Float
-  val frameDuration: Float
-  val frameCount: Int
-  val neutralStanceFrame: Int
-  val dirMap: Map[Direction.Value, Int]
+  val spriteType: String = ""
+  val textureWidth: Int = 0
+  val textureHeight: Int = 0
+  val width: Float = 0
+  val height: Float = 0
+  val frameDuration: Float = 0
+  val frameCount: Int = 0
+  val neutralStanceFrame: Int = 0
+  val dirMap: Map[Direction, Int] = Map()
 
   protected val staminaRegenerationTickTime = 0.005f
   protected val staminaRegeneration = 0.8f
@@ -117,7 +117,5 @@ abstract class Creature {
   }
 
   def isAlive: Boolean = params.life > 0f
-
-  def copy(params: CreatureParams = params): Creature
 
 }

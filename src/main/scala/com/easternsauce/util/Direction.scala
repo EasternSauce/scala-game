@@ -4,7 +4,7 @@ import scala.util.Random
 
 object Direction extends Enumeration {
 
-  def isHorizontal(value: Direction.Value): Boolean = {
+  def isHorizontal(value: Direction): Boolean = {
     value match {
       case Left  => true
       case Right => true
@@ -12,7 +12,7 @@ object Direction extends Enumeration {
     }
   }
 
-  def isVertical(value: Direction.Value): Boolean = {
+  def isVertical(value: Direction): Boolean = {
     value match {
       case Up   => true
       case Down => true

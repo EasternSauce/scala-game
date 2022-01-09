@@ -3,11 +3,10 @@ package com.easternsauce.model.creature.ability
 import com.badlogic.gdx.graphics.g2d.{Animation, TextureRegion}
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.creature.Creature
-import com.easternsauce.util.Constants
+import com.easternsauce.util.{Constants, Vector2Wrapper}
 import com.softwaremill.quicklens.ModifyPimp
 
-abstract class Ability(val params: AbilityParams) {
-
+case class Ability(params: AbilityParams) {
   val activeAnimation: Option[Animation[TextureRegion]] = None
   val channelAnimation: Option[Animation[TextureRegion]] = None
 
@@ -23,12 +22,12 @@ abstract class Ability(val params: AbilityParams) {
 
   val damage = 0f
 
-  val channelSpriteType: String
-  val activeSpriteType: String
-  val channelFrameCount: Int
-  val activeFrameCount: Int
-  val channelFrameDuration: Float
-  val activeFrameDuration: Float
+  val channelSpriteType: String = ""
+  val activeSpriteType: String = ""
+  val channelFrameCount: Int = 0
+  val activeFrameCount: Int = 0
+  val channelFrameDuration: Float = 0
+  val activeFrameDuration: Float = 0
 
   protected def width: Float = textureWidth.toFloat / Constants.PPM
 
@@ -50,7 +49,7 @@ abstract class Ability(val params: AbilityParams) {
 
   def setNotOnCooldown(): Ability = this.modify(_.params.onCooldown).setTo(false)
 
-  def setDirVector(dirVector: Vector2): Ability = this.modify(_.params.dirVector).setTo(dirVector)
+  def setDirVector(dirVector: Vector2Wrapper): Ability = this.modify(_.params.dirVector).setTo(dirVector)
 
   def updateHitbox(creature: Creature): Ability = this
 
@@ -73,6 +72,5 @@ abstract class Ability(val params: AbilityParams) {
       .using(_.update(delta))
   }
 
-  def copy(params: AbilityParams = params): Ability
-
 }
+
