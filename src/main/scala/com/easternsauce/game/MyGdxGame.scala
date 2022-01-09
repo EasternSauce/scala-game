@@ -11,6 +11,7 @@ import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.GameView
+import io.circe.parser.decode
 
 class MyGdxGame extends Game {
 
@@ -19,7 +20,6 @@ class MyGdxGame extends Game {
 
   var atlas: TextureAtlas = _
 
-  var gameState: GameState = _
   var gameView: GameView = _
 
   private val mapScale = 4.0f
@@ -31,6 +31,8 @@ class MyGdxGame extends Game {
   var maps: Map[String, TiledMap] = _
 
   var physicsController: PhysicsController = _
+
+  var playScreen: PlayScreen = _
 
   override def create(): Unit = {
     Assets.loadAssets()
@@ -72,16 +74,27 @@ class MyGdxGame extends Game {
 
     val areas = maps.map { case (key, _) => (key, Area()) }
 
-    gameState = GameState(
-      player = player,
-      nonPlayers = Map(skeleton.params.id -> skeleton),
-      currentAreaId = "area1",
-      areas = areas
+    val source = scala.io.Source.fromFile("saves/savefile.txt")
+    val lines =
+      try source.mkString
+      finally source.close()
+
+    import com.easternsauce.screen.PlayScreen._
+    val decoded = decode[GameState](lines)
+
+    val gameState = decoded.getOrElse(
+      GameState(
+        player = player,
+        nonPlayers = Map(skeleton.params.id -> skeleton),
+        currentAreaId = "area1",
+        areas = areas
+      )
     )
+
     gameView = GameView(atlas)
     physicsController = PhysicsController()
 
-    val playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController)
+    playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController)
 
     gameView.init(gameState, maps, mapScale)
     physicsController.init(gameState, maps, mapScale)
@@ -94,5 +107,6 @@ class MyGdxGame extends Game {
     hudBatch.dispose()
     gameView.dispose()
     physicsController.dispose()
+    playScreen.dispose()
   }
 }

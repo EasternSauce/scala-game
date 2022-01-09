@@ -1,7 +1,7 @@
 package com.easternsauce.model.creature
 
 import com.easternsauce.model.creature.ability.Ability
-import com.easternsauce.util.Direction
+import com.easternsauce.util.Direction.Direction
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -19,7 +19,7 @@ abstract class Creature {
   val frameDuration: Float
   val frameCount: Int
   val neutralStanceFrame: Int
-  val dirMap: Map[Direction.Value, Int]
+  val dirMap: Map[Direction, Int]
 
   protected val staminaRegenerationTickTime = 0.005f
   protected val staminaRegeneration = 0.8f

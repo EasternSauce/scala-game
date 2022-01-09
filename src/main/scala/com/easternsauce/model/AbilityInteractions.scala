@@ -2,6 +2,7 @@ package com.easternsauce.model
 
 import com.easternsauce.model.creature.ability.AbilityState
 import com.easternsauce.model.event.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
+import com.easternsauce.util.Vector2Wrapper
 import com.softwaremill.quicklens.ModifyPimp
 
 import scala.util.chaining._
@@ -21,7 +22,9 @@ trait AbilityInteractions {
           .modifyCreatureAbility(abilityId)(_.modify(_.params.channelTimer).using(_.stop()))
           .modifyCreatureAbility(abilityId)(_.modify(_.params.abilityChannelAnimationTimer).using(_.stop()))
           .takeStaminaDamage(15f)
-          .modifyCreatureAbility(abilityId)(_.setDirVector(creature.params.dirVector))
+          .modifyCreatureAbility(abilityId)(
+            _.setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y))
+          )
           .modifyCreatureAbility(abilityId)(_.updateHitbox(creature))
       }
   }
@@ -32,7 +35,9 @@ trait AbilityInteractions {
         creature
           .modifyCreatureAbility(abilityId)(_.modify(_.params.channelTimer).using(_.restart()))
           .modifyCreatureAbility(abilityId)(_.modify(_.params.abilityChannelAnimationTimer).using(_.restart()))
-          .modifyCreatureAbility(abilityId)(_.setDirVector(creature.params.dirVector))
+          .modifyCreatureAbility(abilityId)(
+            _.setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y))
+          )
           .modifyCreatureAbility(abilityId)(_.updateHitbox(creature))
       }
 

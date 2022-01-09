@@ -1,6 +1,7 @@
 package com.easternsauce.model.creature
 
 import com.easternsauce.util.Direction
+import com.easternsauce.util.Direction.Direction
 
 case class Player(override val params: CreatureParams) extends Creature {
 
@@ -12,7 +13,7 @@ case class Player(override val params: CreatureParams) extends Creature {
   override val frameDuration: Float = 0.1f
   override val frameCount: Int = 3
   override val neutralStanceFrame: Int = 1
-  override val dirMap: Map[Direction.Value, Int] =
+  override val dirMap: Map[Direction, Int] =
     Map(Direction.Up -> 3, Direction.Down -> 0, Direction.Left -> 1, Direction.Right -> 2)
 
   override val isPlayer = true
