@@ -66,6 +66,8 @@ class PlayScreen(
 
   physicsController.setCollisionQueue(collisionQueue)
 
+  var justStarted = true
+
   def updateCamera(player: Creature): Unit = {
 
     val camPosition = worldCamera.position
@@ -128,7 +130,7 @@ class PlayScreen(
     // ---
 
     // --- update libGDX view
-    gameView.update(gameState, currentTerrain.world)
+    gameView.update(gameState)
     // ---
 
     // --- update physics
@@ -273,6 +275,11 @@ class PlayScreen(
   override def render(delta: Float): Unit = {
     update(delta)
 
+    if (justStarted) { // delay rendering by one frame
+      justStarted = false
+      return
+    }
+
     worldBatch.spriteBatch.setProjectionMatrix(worldCamera.combined)
     hudBatch.spriteBatch.setProjectionMatrix(hudCamera.combined)
 
@@ -331,7 +338,7 @@ class PlayScreen(
     val writer = new PrintWriter(new File(saveFilePath + "/savefile.txt"))
 
     writer.write(gameState.asJson.toString())
-    
+
     writer.close()
   }
 
@@ -345,8 +352,6 @@ class PlayScreen(
 object PlayScreen {
   implicit val decodeGameState: Decoder[GameState] = deriveDecoder
   implicit val encodeGameState: Encoder[GameState] = deriveEncoder
-  //  implicit val decodeCreature: Decoder[Creature] = deriveDecoder
-  //  implicit val encodeCreature: Encoder[Creature] = deriveEncoder
   implicit val decodeArea: Decoder[Area] = deriveDecoder
   implicit val encodeArea: Encoder[Area] = deriveEncoder
   implicit val decodeUpdateEvent: Decoder[UpdateEvent] = deriveDecoder
@@ -373,8 +378,6 @@ object PlayScreen {
   implicit val encodeVector2Wrapper: Encoder[Vector2Wrapper] = deriveEncoder
   implicit val decodeDirection: Decoder[Direction] = Decoder.decodeEnumeration(Direction)
   implicit val encodeDirection: Encoder[Direction] = Encoder.encodeEnumeration(Direction)
-  //  implicit val decodeAbility: Decoder[Ability] = deriveDecoder
-  //  implicit val encodeAbility: Encoder[Ability] = deriveEncoder
   implicit val decodeSkeleton: Decoder[Skeleton] = deriveDecoder
   implicit val encodeSkeleton: Encoder[Skeleton] = deriveEncoder
   implicit val decodePlayer: Decoder[Player] = deriveDecoder

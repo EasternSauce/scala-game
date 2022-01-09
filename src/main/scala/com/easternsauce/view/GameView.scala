@@ -31,7 +31,7 @@ case class GameView(atlas: TextureAtlas) {
 
   }
 
-  def update(gameState: GameState, world: World): Unit = {
+  def update(gameState: GameState): Unit = {
     gameState.creatures.keys.foreach { creatureId =>
       entityRenderers(creatureId).update(gameState)
     }
