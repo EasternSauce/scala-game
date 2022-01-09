@@ -79,7 +79,7 @@ class MyGdxGame extends Game {
       try source.mkString
       finally source.close()
 
-    import com.easternsauce.screen.PlayScreen._
+    import com.easternsauce.json.JsonCodecs._
     val decoded = decode[GameState](lines)
 
     val gameState = decoded.getOrElse(
