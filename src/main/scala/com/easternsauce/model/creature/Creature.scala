@@ -20,6 +20,7 @@ abstract class Creature {
   val frameCount: Int
   val neutralStanceFrame: Int
   val dirMap: Map[Direction, Int]
+  val baseLife: Float
 
   protected val staminaRegenerationTickTime = 0.005f
   protected val staminaRegeneration = 0.8f

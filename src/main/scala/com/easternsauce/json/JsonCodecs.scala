@@ -1,18 +1,18 @@
 package com.easternsauce.json
 
-import com.easternsauce.model.{GameState, InventoryState}
 import com.easternsauce.model.area.Area
-import com.easternsauce.model.creature.{Creature, CreatureParams, Player, Skeleton}
 import com.easternsauce.model.creature.ability.AbilityState.AbilityState
-import com.easternsauce.model.creature.ability.{Ability, AbilityHitbox, AbilityParams, AbilityState, RegularAttack}
+import com.easternsauce.model.creature.ability._
+import com.easternsauce.model.creature._
 import com.easternsauce.model.event.UpdateEvent
 import com.easternsauce.model.item.{Item, ItemParameterValue, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
+import com.easternsauce.model.{GameState, InventoryState}
 import com.easternsauce.util.Direction.Direction
 import com.easternsauce.util.{Direction, Vector2Wrapper}
-import io.circe.{Decoder, Encoder}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.syntax.EncoderOps
+import io.circe.{Decoder, Encoder}
 
 object JsonCodecs {
   implicit val decodeGameState: Decoder[GameState] = deriveDecoder
@@ -45,39 +45,63 @@ object JsonCodecs {
   implicit val encodeDirection: Encoder[Direction] = Encoder.encodeEnumeration(Direction)
   implicit val decodeSkeleton: Decoder[Skeleton] = deriveDecoder
   implicit val encodeSkeleton: Encoder[Skeleton] = deriveEncoder
+  implicit val decodeWolf: Decoder[Wolf] = deriveDecoder
+  implicit val encodeWolf: Encoder[Wolf] = deriveEncoder
+  implicit val decodeFireDemon: Decoder[FireDemon] = deriveDecoder
+  implicit val encodeFireDemon: Encoder[FireDemon] = deriveEncoder
+  implicit val decodeGhost: Decoder[Ghost] = deriveDecoder
+  implicit val encodeGhost: Encoder[Ghost] = deriveEncoder
+  implicit val decodeGoblin: Decoder[Goblin] = deriveDecoder
+  implicit val encodeGoblin: Encoder[Goblin] = deriveEncoder
+  implicit val decodeSerpent: Decoder[Serpent] = deriveDecoder
+  implicit val encodeSerpent: Encoder[Serpent] = deriveEncoder
   implicit val decodePlayer: Decoder[Player] = deriveDecoder
   implicit val encodePlayer: Encoder[Player] = deriveEncoder
   implicit val decodeRegularAttack: Decoder[RegularAttack] = deriveDecoder
   implicit val encodeRegularAttack: Encoder[RegularAttack] = deriveEncoder
 
   implicit val encodeCreature: Encoder[Creature] = Encoder.instance { c =>
-  {
-    c match {
-      case v: Skeleton =>
-        Map("Skeleton" -> v).asJson
-      case v: Player =>
-        Map("Player" -> v).asJson
-
+    {
+      c match {
+        case v: Skeleton =>
+          Map("Skeleton" -> v).asJson
+        case v: Wolf =>
+          Map("Wolf" -> v).asJson
+        case v: FireDemon =>
+          Map("FireDemon" -> v).asJson
+        case v: Player =>
+          Map("Player" -> v).asJson
+        case v: Ghost =>
+          Map("Ghost" -> v).asJson
+        case v: Goblin =>
+          Map("Goblin" -> v).asJson
+        case v: Serpent =>
+          Map("Serpent" -> v).asJson
+      }
     }
-  }
   }
 
   implicit val decodeCreature: Decoder[Creature] = Decoder.instance(c => {
     val fname = c.keys.flatMap(_.headOption).toSeq.head
     fname match {
-      case "Skeleton" => c.downField(fname).as[Skeleton]
-      case "Player"   => c.downField(fname).as[Player]
+      case "Skeleton"  => c.downField(fname).as[Skeleton]
+      case "Wolf"      => c.downField(fname).as[Wolf]
+      case "FireDemon" => c.downField(fname).as[FireDemon]
+      case "Player"    => c.downField(fname).as[Player]
+      case "Ghost"     => c.downField(fname).as[Ghost]
+      case "Goblin"    => c.downField(fname).as[Goblin]
+      case "Serpent"   => c.downField(fname).as[Serpent]
     }
   })
 
   implicit val encodeAbility: Encoder[Ability] = Encoder.instance { c =>
-  {
-    c match {
-      case v: RegularAttack =>
-        Map("RegularAttack" -> v).asJson
+    {
+      c match {
+        case v: RegularAttack =>
+          Map("RegularAttack" -> v).asJson
 
+      }
     }
-  }
   }
 
   implicit val decodeAbility: Decoder[Ability] = Decoder.instance(c => {

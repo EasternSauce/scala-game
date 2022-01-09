@@ -8,21 +8,12 @@ import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.easternsauce.box2d_physics.PhysicsController
 import com.easternsauce.event.{AreaChangeEvent, CollisionEvent}
-import com.easternsauce.model.area.Area
-import com.easternsauce.model.creature.ability.AbilityState.AbilityState
-import com.easternsauce.model.creature.ability._
-import com.easternsauce.model.creature.{Creature, CreatureParams, Player, Skeleton}
-import com.easternsauce.model.event.UpdateEvent
-import com.easternsauce.model.item.{Item, ItemParameterValue, ItemTemplate}
-import com.easternsauce.model.util.SimpleTimer
-import com.easternsauce.model.{GameState, InventoryState}
-import com.easternsauce.util.Direction.Direction
+import com.easternsauce.model.GameState
+import com.easternsauce.model.creature.Creature
 import com.easternsauce.util.{Constants, Direction, RendererBatch, Vector2Wrapper}
 import com.easternsauce.view.GameView
 import com.softwaremill.quicklens._
-import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.syntax.EncoderOps
-import io.circe.{Decoder, Encoder}
 
 import java.io.{File, PrintWriter}
 import scala.collection.mutable.ListBuffer
@@ -349,4 +340,3 @@ class PlayScreen(
     new Vector2(v.x, v.y)
   }
 }
-

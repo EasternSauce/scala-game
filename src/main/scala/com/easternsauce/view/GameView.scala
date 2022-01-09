@@ -4,7 +4,6 @@ import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.{Rectangle, Vector2}
-import com.badlogic.gdx.physics.box2d.World
 import com.easternsauce.model.GameState
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.renderer.{AreaRenderer, EntityRenderer, InventoryRenderer}

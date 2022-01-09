@@ -6,12 +6,14 @@ import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import com.easternsauce.box2d_physics.PhysicsController
 import com.easternsauce.model.GameState
 import com.easternsauce.model.area.Area
-import com.easternsauce.model.creature.{CreatureParams, Player, Skeleton}
+import com.easternsauce.model.creature.{CreatureParams, Player, Serpent, Skeleton}
 import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.GameView
 import io.circe.parser.decode
+
+import java.io.FileNotFoundException
 
 class MyGdxGame extends Game {
 
@@ -68,28 +70,45 @@ class MyGdxGame extends Game {
       )
     )
 
+    val wolf: Serpent = Serpent(
+      CreatureParams(
+        id = "zzzzzz",
+        posX = 15,
+        posY = 10,
+        areaId = "area1",
+        life = 100f,
+        maxLife = 100f,
+        stamina = 100f,
+        maxStamina = 100f
+      )
+    )
+
     maps = mapsToLoad.map {
       case (areaId, directory) => areaId -> mapLoader.load(directory + "/tile_map.tmx")
     }
 
     val areas = maps.map { case (key, _) => (key, Area()) }
 
-    val source = scala.io.Source.fromFile("saves/savefile.txt")
-    val lines =
-      try source.mkString
-      finally source.close()
+    val gameState =
+      try {
+        val source = scala.io.Source.fromFile("saves/savefile.txt")
+        val lines =
+          try source.mkString
+          finally source.close()
 
-    import com.easternsauce.json.JsonCodecs._
-    val decoded = decode[GameState](lines)
+        import com.easternsauce.json.JsonCodecs._
+        decode[GameState](lines).getOrElse(throw new RuntimeException("error decoding save file"))
+      } catch {
+        case _: FileNotFoundException =>
+          println("save file not found");
+          GameState(
+            player = player,
+            nonPlayers = Map(skeleton.params.id -> skeleton, wolf.params.id -> wolf),
+            currentAreaId = "area1",
+            areas = areas
+          )
 
-    val gameState = decoded.getOrElse(
-      GameState(
-        player = player,
-        nonPlayers = Map(skeleton.params.id -> skeleton),
-        currentAreaId = "area1",
-        areas = areas
-      )
-    )
+      }
 
     gameView = GameView(atlas)
     physicsController = PhysicsController()

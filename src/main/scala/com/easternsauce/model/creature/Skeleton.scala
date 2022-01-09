@@ -15,6 +15,7 @@ case class Skeleton(override val params: CreatureParams) extends Creature {
   override val neutralStanceFrame: Int = 1
   override val dirMap: Map[Direction, Int] =
     Map(Direction.Up -> 0, Direction.Down -> 2, Direction.Left -> 1, Direction.Right -> 3)
+  override val baseLife: Float = 200f
 
   override def update(delta: Float): Skeleton = {
     super.update(delta).asInstanceOf[Skeleton]
