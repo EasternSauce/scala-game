@@ -28,20 +28,25 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
   def setNotOnCooldown(): Ability = this.modify(_.params.onCooldown).setTo(false)
 
   def updateHitbox(creature: Creature): Ability = {
-    components.keys.foldLeft(this)((ability, componentId) => ability.updateComponentHitbox(componentId, creature))
+    components.keys.foldLeft(this)(
+      (ability, componentId) =>
+        ability
+          .modify(_.components.at(componentId))
+          .using(updateComponentHitbox(creature, _))
+    )
   }
 
-  def updateComponentHitbox(componentId: String, creature: Creature): Ability = this
+  def updateComponentHitbox(creature: Creature, component: AbilityComponent): AbilityComponent = component
 
-  def updateComponentTimers(componentId: String, delta: Float): Ability = {
-    this
-      .modify(_.components.at(componentId).params.activeTimer)
+  def updateComponentTimers(component: AbilityComponent, delta: Float): AbilityComponent = {
+    component
+      .modify(_.params.activeTimer)
       .using(_.update(delta))
-      .modify(_.components.at(componentId).params.channelTimer)
+      .modify(_.params.channelTimer)
       .using(_.update(delta))
-      .modify(_.components.at(componentId).params.abilityChannelAnimationTimer)
+      .modify(_.params.abilityChannelAnimationTimer)
       .using(_.update(delta))
-      .modify(_.components.at(componentId).params.abilityActiveAnimationTimer)
+      .modify(_.params.abilityActiveAnimationTimer)
       .using(_.update(delta))
   }
 

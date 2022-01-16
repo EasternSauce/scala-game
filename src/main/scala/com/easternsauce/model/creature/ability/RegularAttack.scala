@@ -38,9 +38,7 @@ case class RegularAttack(
 //      .setTo(components)
 //  }
 
-  override def updateComponentHitbox(componentId: String, creature: Creature): Ability = {
-
-    val component = components(componentId)
+  override def updateComponentHitbox(creature: Creature, component: AbilityComponent): AbilityComponent = {
 
     val theta = new Vector2(component.params.dirVector.x, component.params.dirVector.y).angleDeg()
 
@@ -50,7 +48,7 @@ case class RegularAttack(
     val attackRectX = attackShiftX + creature.params.posX
     val attackRectY = attackShiftY + creature.params.posY
 
-    val updatedComponent = component
+    component
       .modify(_.params.abilityHitbox)
       .setTo(
         AbilityHitbox(
@@ -63,7 +61,6 @@ case class RegularAttack(
         )
       )
 
-    this.modify(_.components.at(componentId)).setTo(updatedComponent)
   }
 
   def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): RegularAttack =

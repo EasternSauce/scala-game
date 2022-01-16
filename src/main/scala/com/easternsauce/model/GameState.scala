@@ -3,7 +3,7 @@ package com.easternsauce.model
 import com.easternsauce.event.{AbilityComponentCollision, AreaChangeEvent, CollisionEvent}
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.Creature
-import com.easternsauce.model.creature.ability.Ability
+import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.model.event.{CreatureDeathEvent, UpdateEvent}
 import com.softwaremill.quicklens._
 
@@ -87,6 +87,21 @@ case class GameState(
       this
         .modify(_.nonPlayers.at(creatureId))
         .using(_.modifyAbility(abilityId)(operation(_)))
+    }
+
+  }
+
+  def modifyGameStateAbilityComponent(creatureId: String, abilityId: String, componentId: String)(
+    operation: AbilityComponent => AbilityComponent
+  ): GameState = {
+    if (creatureId == player.params.id) {
+      this
+        .modify(_.player)
+        .using(_.modifyAbilityComponent(abilityId, componentId)(operation(_)))
+    } else {
+      this
+        .modify(_.nonPlayers.at(creatureId))
+        .using(_.modifyAbilityComponent(abilityId, componentId)(operation(_)))
     }
 
   }
