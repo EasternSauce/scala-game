@@ -11,7 +11,7 @@ case class EntityBody(creatureId: String) {
 
   var b2Body: Body = _
 
-  var abilityBodies: Map[String, AbilityBody] = Map()
+  var abilityComponentBodies: Map[(String, String), AbilityComponentBody] = Map()
 
   var currentAreaId: String = _
 
@@ -22,8 +22,13 @@ case class EntityBody(creatureId: String) {
 
     b2Body = B2BodyFactory.createCreatureB2body(world = terrain.world, entityBody = this, creature = creature)
 
-    abilityBodies = creature.params.abilities.map {
-      case abilityId -> _ => abilityId -> AbilityBody(creatureId, abilityId)
+    abilityComponentBodies = creature.params.abilities.flatMap {
+      case abilityId -> _ =>
+        val components = gameState.abilities(creatureId, abilityId).components
+
+        components.keys.map(
+          componentId => (abilityId, componentId) -> AbilityComponentBody(creatureId, abilityId, componentId)
+        )
     }
 
     currentAreaId = areaId
@@ -34,7 +39,7 @@ case class EntityBody(creatureId: String) {
       b2Body.getFixtureList.get(0).setSensor(true)
     }
 
-    abilityBodies.values.foreach(_.update(gameState, physicsController, currentAreaId))
+    abilityComponentBodies.values.foreach(_.update(gameState, physicsController, currentAreaId))
   }
 
   def pos: Vector2 = b2Body.getWorldCenter

@@ -2,7 +2,7 @@ package com.easternsauce.box2d_physics
 
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.box2d_physics.entity.{AbilityBody, EntityBody}
+import com.easternsauce.box2d_physics.entity.{AbilityComponentBody, EntityBody}
 import com.easternsauce.box2d_physics.terrain.TerrainTileBody
 import com.easternsauce.model.creature.Creature
 
@@ -76,9 +76,9 @@ object B2BodyFactory {
     )
   }
 
-  def createAbilityB2body(
+  def createAbilityComponentB2body(
     world: World,
-    abilityBody: AbilityBody,
+    abilityBody: AbilityComponentBody,
     posX: Float,
     posY: Float,
     vertices: Array[Float]

@@ -4,8 +4,8 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.box2d_physics.entity.{AbilityBody, EntityBody}
-import com.easternsauce.event.{CollisionEvent, EntityAbilityCollision}
+import com.easternsauce.box2d_physics.entity.{AbilityComponentBody, EntityBody}
+import com.easternsauce.event.{AbilityComponentCollision, CollisionEvent}
 import com.easternsauce.util.Constants
 
 import scala.collection.mutable.ListBuffer
@@ -143,9 +143,15 @@ case class Terrain(map: TiledMap, mapScale: Float) {
 
         def onContactStart(pair: (AnyRef, AnyRef)): Unit = {
           pair match { // will run onContact twice for same type objects!
-            case (entityBody: EntityBody, abilityBody: AbilityBody) =>
-              if (entityBody.creatureId != abilityBody.creatureId) {
-                collisionQueue.prepend(EntityAbilityCollision(entityBody.creatureId, abilityBody.abilityId))
+            case (entityBody: EntityBody, abilityComponentBody: AbilityComponentBody) =>
+              if (entityBody.creatureId != abilityComponentBody.creatureId) {
+                collisionQueue.prepend(
+                  AbilityComponentCollision(
+                    entityBody.creatureId,
+                    abilityComponentBody.abilityId,
+                    abilityComponentBody.componentId
+                  )
+                )
               }
             case _ =>
           }

@@ -1,37 +1,21 @@
 package com.easternsauce.model.creature.ability
 
-import com.badlogic.gdx.graphics.g2d.{Animation, TextureRegion}
 import com.easternsauce.model.creature.Creature
-import com.easternsauce.util.{Constants, Vector2Wrapper}
-import com.softwaremill.quicklens.ModifyPimp
+import com.easternsauce.util.Vector2Wrapper
+import com.softwaremill.quicklens._
 
-abstract class Ability(val params: AbilityParams) {
+abstract class Ability(val params: AbilityParams, val components: Map[String, AbilityComponent]) {
 
-  val activeAnimation: Option[Animation[TextureRegion]] = None
-  val channelAnimation: Option[Animation[TextureRegion]] = None
+  val numOfComponents = 1
 
-  val textureWidth: Int = 0
-  val textureHeight: Int = 0
+  def init(): Ability = {
+    val components = (for (i <- 0 until numOfComponents)
+      yield (i.toString, AbilityComponent(AbilityComponentParams(componentId = i.toString)))).toMap
 
-  val totalActiveTime: Float = 0f
-  val totalChannelTime: Float = 0f
-
-  val cooldownTime: Float = 0f
-
-  val isAttack = false
-
-  val damage = 0f
-
-  val channelSpriteType: String
-  val activeSpriteType: String
-  val channelFrameCount: Int
-  val activeFrameCount: Int
-  val channelFrameDuration: Float
-  val activeFrameDuration: Float
-
-  protected def width: Float = textureWidth.toFloat / Constants.PPM
-
-  protected def height: Float = textureHeight.toFloat / Constants.PPM
+    this
+      .modify(_.components)
+      .setTo(components)
+  }
 
   def scale: Float = {
     //if (creature.isWeaponEquipped) creature.currentWeapon.template.attackScale.get
@@ -43,35 +27,50 @@ abstract class Ability(val params: AbilityParams) {
     this // TODO?
   }
 
-  def makeInactive(): Ability = this.modify(_.params.state).setTo(AbilityState.Inactive)
-
-  def makeActive(): Ability = this.modify(_.params.state).setTo(AbilityState.Active)
-
   def setNotOnCooldown(): Ability = this.modify(_.params.onCooldown).setTo(false)
 
-  def setDirVector(dirVector: Vector2Wrapper): Ability = this.modify(_.params.dirVector).setTo(dirVector)
+  def setDirVector(dirVector: Vector2Wrapper): Ability =
+    components.keys.foldLeft(this)((ability, componentId) => ability.setComponentDirVector(componentId, dirVector))
 
-  def updateHitbox(creature: Creature): Ability = this
+  def setComponentDirVector(componentId: String, dirVector: Vector2Wrapper): Ability = {
 
-  def restartActiveTimers(): Ability =
+    this.modify(_.components.at(componentId).params.dirVector).setTo(dirVector)
+  }
+
+  def updateHitbox(creature: Creature): Ability = {
+    components.keys.foldLeft(this)((ability, componentId) => ability.updateComponentHitbox(componentId, creature))
+  }
+
+  def updateComponentHitbox(componentId: String, creature: Creature): Ability = this
+
+  def restartComponentActiveTimers(componentId: String): Ability = {
     this
-      .modify(_.params.abilityActiveAnimationTimer)
+      .modify(_.components.at(componentId).params.abilityActiveAnimationTimer)
       .using(_.restart())
-      .modify(_.params.activeTimer)
+      .modify(_.components.at(componentId).params.activeTimer)
       .using(_.restart())
+  }
+
+  def restartActiveTimers(): Ability = {
+    components.keys.foldLeft(this)((ability, componentId) => ability.restartComponentActiveTimers(componentId))
+  }
 
   def updateTimers(delta: Float): Ability = {
+    components.keys.foldLeft(this)((ability, componentId) => ability.updateComponentTimers(componentId, delta))
+  }
+
+  def updateComponentTimers(componentId: String, delta: Float): Ability = {
     this
-      .modify(_.params.activeTimer)
+      .modify(_.components.at(componentId).params.activeTimer)
       .using(_.update(delta))
-      .modify(_.params.channelTimer)
+      .modify(_.components.at(componentId).params.channelTimer)
       .using(_.update(delta))
-      .modify(_.params.abilityChannelAnimationTimer)
+      .modify(_.components.at(componentId).params.abilityChannelAnimationTimer)
       .using(_.update(delta))
-      .modify(_.params.abilityActiveAnimationTimer)
+      .modify(_.components.at(componentId).params.abilityActiveAnimationTimer)
       .using(_.update(delta))
   }
 
-  def copy(params: AbilityParams = params): Ability
+  def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): Ability
 
 }

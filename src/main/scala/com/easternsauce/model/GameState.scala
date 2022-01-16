@@ -1,6 +1,6 @@
 package com.easternsauce.model
 
-import com.easternsauce.event.{AreaChangeEvent, CollisionEvent, EntityAbilityCollision}
+import com.easternsauce.event.{AbilityComponentCollision, AreaChangeEvent, CollisionEvent}
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.Ability
@@ -59,9 +59,9 @@ case class GameState(
 
   def processCollisions(collisionQueue: ListBuffer[CollisionEvent]): GameState = {
     collisionQueue.foldLeft(this) {
-      case (gameState, EntityAbilityCollision(creatureId, abilityId)) =>
-        val ability = gameState.abilities(creatureId, abilityId)
-        gameState.creatureTakeLifeDamage(creatureId, ability.damage)
+      case (gameState, AbilityComponentCollision(creatureId, abilityId, componentId)) =>
+        val abilityComponent = gameState.abilities(creatureId, abilityId).components(componentId)
+        gameState.creatureTakeLifeDamage(creatureId, abilityComponent.damage)
     }
   }
 

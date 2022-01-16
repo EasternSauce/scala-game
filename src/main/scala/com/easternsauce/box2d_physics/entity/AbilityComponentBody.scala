@@ -7,7 +7,7 @@ import com.easternsauce.box2d_physics.{B2BodyFactory, PhysicsController}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
 
-case class AbilityBody(creatureId: String, abilityId: String) {
+case class AbilityComponentBody(creatureId: String, abilityId: String, componentId: String) {
   var b2Body: Body = _
   var world: World = _
   private val sprite = new Sprite()
@@ -16,11 +16,14 @@ case class AbilityBody(creatureId: String, abilityId: String) {
   def hitboxVertices(gameState: GameState): Array[Float] = {
     val ability = gameState.abilities(creatureId, abilityId)
 
-    sprite.setSize(ability.params.abilityHitbox.width, ability.params.abilityHitbox.height)
+    sprite.setSize(
+      ability.components(componentId).params.abilityHitbox.width,
+      ability.components(componentId).params.abilityHitbox.height
+    )
     sprite.setCenter(0, 0)
     sprite.setOriginCenter()
-    sprite.setRotation(ability.params.abilityHitbox.rotationAngle)
-    sprite.setScale(ability.params.abilityHitbox.scale)
+    sprite.setRotation(ability.components(componentId).params.abilityHitbox.rotationAngle)
+    sprite.setScale(ability.components(componentId).params.abilityHitbox.scale)
 
     val vertices = sprite.getVertices
     Array(
@@ -42,11 +45,11 @@ case class AbilityBody(creatureId: String, abilityId: String) {
 
     val vertices = hitboxVertices(gameState)
 
-    b2Body = B2BodyFactory.createAbilityB2body(
+    b2Body = B2BodyFactory.createAbilityComponentB2body(
       world = world,
       abilityBody = this,
-      posX = ability.params.abilityHitbox.x,
-      posY = ability.params.abilityHitbox.y,
+      posX = ability.components(componentId).params.abilityHitbox.x,
+      posY = ability.components(componentId).params.abilityHitbox.y,
       vertices = vertices
     )
 
@@ -68,7 +71,11 @@ case class AbilityBody(creatureId: String, abilityId: String) {
     }
 
     if (isActive) {
-      b2Body.setTransform(ability.params.abilityHitbox.x, ability.params.abilityHitbox.y, 0f)
+      b2Body.setTransform(
+        ability.components(componentId).params.abilityHitbox.x,
+        ability.components(componentId).params.abilityHitbox.y,
+        0f
+      )
     }
   }
 

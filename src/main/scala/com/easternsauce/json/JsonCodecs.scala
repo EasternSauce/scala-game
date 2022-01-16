@@ -1,9 +1,9 @@
 package com.easternsauce.json
 
 import com.easternsauce.model.area.Area
+import com.easternsauce.model.creature._
 import com.easternsauce.model.creature.ability.AbilityState.AbilityState
 import com.easternsauce.model.creature.ability._
-import com.easternsauce.model.creature._
 import com.easternsauce.model.event.UpdateEvent
 import com.easternsauce.model.item.{Item, ItemParameterValue, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
@@ -35,6 +35,10 @@ object JsonCodecs {
   implicit val encodeItemParameterValue: Encoder[ItemParameterValue] = deriveEncoder
   implicit val decodeAbilityParams: Decoder[AbilityParams] = deriveDecoder
   implicit val encodeAbilityParams: Encoder[AbilityParams] = deriveEncoder
+  implicit val decodeAbilityComponentParams: Decoder[AbilityComponentParams] = deriveDecoder
+  implicit val encodeAbilityComponentParams: Encoder[AbilityComponentParams] = deriveEncoder
+  implicit val decodeAbilityComponent: Decoder[AbilityComponent] = deriveDecoder
+  implicit val encodeAbilityComponent: Encoder[AbilityComponent] = deriveEncoder
   implicit val decodeAbilityHitbox: Decoder[AbilityHitbox] = deriveDecoder
   implicit val encodeAbilityHitbox: Encoder[AbilityHitbox] = deriveEncoder
   implicit val decodeAbilityState: Decoder[AbilityState] = Decoder.decodeEnumeration(AbilityState)

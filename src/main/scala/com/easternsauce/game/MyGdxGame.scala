@@ -102,8 +102,8 @@ class MyGdxGame extends Game {
         case _: FileNotFoundException =>
           println("save file not found");
           GameState(
-            player = player,
-            nonPlayers = Map(skeleton.params.id -> skeleton, wolf.params.id -> wolf),
+            player = player.init(), // TODO: init elsewhere?
+            nonPlayers = Map(skeleton.params.id -> skeleton.init(), wolf.params.id -> wolf.init()),
             currentAreaId = "area1",
             areas = areas
           )

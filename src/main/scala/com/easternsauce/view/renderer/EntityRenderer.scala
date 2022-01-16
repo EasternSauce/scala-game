@@ -18,7 +18,7 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
 
   var textureRegion: TextureRegion = _
 
-  var abilityRenderers: List[AbilityRenderer] = _
+  var abilityComponentRenderers: List[AbilityComponentRenderer] = _
 
   def init(gameState: GameState): Unit = {
     val creature = gameState.creatures(creatureId)
@@ -50,9 +50,11 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
 
     }
 
-    abilityRenderers =
-      creature.params.abilities.keys.map(key => renderer.AbilityRenderer(gameView, creatureId, key, atlas)).toList
-    abilityRenderers.foreach(_.init(gameState))
+    abilityComponentRenderers =
+      (for ((abilityId, ability) <- creature.params.abilities; (componentId, _) <- ability.components)
+        yield renderer.AbilityComponentRenderer(gameView, creatureId, abilityId, componentId, atlas)).toList
+
+    abilityComponentRenderers.foreach(_.init(gameState))
 
   }
 
@@ -84,7 +86,7 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
       sprite.setRotation(90f)
     }
 
-    abilityRenderers.foreach(_.update(gameState))
+    abilityComponentRenderers.foreach(_.update(gameState))
 
   }
 
@@ -93,7 +95,7 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
   }
 
   def renderAbilities(gameState: GameState, batch: RendererBatch): Unit = {
-    abilityRenderers.foreach(_.render(gameState, batch))
+    abilityComponentRenderers.foreach(_.render(gameState, batch))
   }
 
   def renderLifeBar(batch: RendererBatch, gameState: GameState): Unit = {

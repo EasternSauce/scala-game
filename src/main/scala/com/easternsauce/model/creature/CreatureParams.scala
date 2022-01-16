@@ -1,6 +1,6 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.model.creature.ability.{Ability, RegularAttack}
+import com.easternsauce.model.creature.ability.Ability
 import com.easternsauce.model.item.{Item, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
 import com.easternsauce.util.Direction.Direction
@@ -18,7 +18,7 @@ case class CreatureParams(
   maxLife: Float,
   stamina: Float,
   maxStamina: Float,
-  abilities: Map[String, Ability] = Map("regularAttack" -> RegularAttack()),
+  abilities: Map[String, Ability] = Map(),
   dirVector: Vector2Wrapper = Vector2Wrapper(0, 0),
   staminaOveruse: Boolean = false,
   staminaOveruseTimer: SimpleTimer = SimpleTimer(),

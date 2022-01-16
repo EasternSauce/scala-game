@@ -1,6 +1,6 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.model.creature.ability.Ability
+import com.easternsauce.model.creature.ability.{Ability, RegularAttack}
 import com.easternsauce.util.Direction.Direction
 import com.softwaremill.quicklens._
 
@@ -26,6 +26,10 @@ abstract class Creature {
   protected val staminaRegeneration = 0.8f
   protected val staminaOveruseTime = 2f
   protected val staminaRegenerationDisabled = 1f
+
+  def init(): Creature = {
+    this.modify(_.params.abilities).setTo(Map("regularAttack" -> RegularAttack().init()))
+  }
 
   def update(delta: Float): Creature = {
     this

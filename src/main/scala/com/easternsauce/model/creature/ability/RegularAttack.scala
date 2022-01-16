@@ -2,52 +2,41 @@ package com.easternsauce.model.creature.ability
 
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.creature.Creature
-import com.softwaremill.quicklens.ModifyPimp
+import com.softwaremill.quicklens._
 
-case class RegularAttack(override val params: AbilityParams = AbilityParams()) extends Ability(params = params) {
+case class RegularAttack(
+  override val params: AbilityParams = AbilityParams(),
+  override val components: Map[String, AbilityComponent] = Map()
+) extends Ability(params = params, components = components) {
 
-  override val textureWidth: Int = 40
-  override val textureHeight: Int = 40
+  override def updateComponentHitbox(componentId: String, creature: Creature): Ability = {
 
-  override val totalActiveTime: Float = 0.3f
-  override val totalChannelTime: Float = 0.3f
+    val component = components(componentId)
 
-  override val cooldownTime: Float = 0.8f
+    val theta = new Vector2(component.params.dirVector.x, component.params.dirVector.y).angleDeg()
 
-  override val channelSpriteType: String = "slash_windup"
-  override val activeSpriteType: String = "slash"
-  override val channelFrameCount: Int = 6
-  override val activeFrameCount: Int = 6
-  override val channelFrameDuration: Float = 0.05f
-  override val activeFrameDuration: Float = 0.05f
-
-  override val isAttack: Boolean = true
-
-  override val damage: Float = 35f
-
-  override def updateHitbox(creature: Creature): Ability = {
-    val theta = new Vector2(params.dirVector.x, params.dirVector.y).angleDeg()
-
-    val attackShiftX = params.dirVector.normal.x * params.attackRange
-    val attackShiftY = params.dirVector.normal.y * params.attackRange
+    val attackShiftX = component.params.dirVector.normal.x * component.params.attackRange
+    val attackShiftY = component.params.dirVector.normal.y * component.params.attackRange
 
     val attackRectX = attackShiftX + creature.params.posX
     val attackRectY = attackShiftY + creature.params.posY
 
-    this
+    val updatedComponent = component
       .modify(_.params.abilityHitbox)
       .setTo(
         AbilityHitbox(
           x = attackRectX,
           y = attackRectY,
-          width = width,
-          height = height,
+          width = component.width,
+          height = component.height,
           rotationAngle = theta,
           scale = scale
         )
       )
+
+    this.modify(_.components.at(componentId)).setTo(updatedComponent)
   }
 
-  def copy(params: AbilityParams = params): RegularAttack = RegularAttack(params)
-
+  def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): RegularAttack =
+    RegularAttack(params, components)
 }
