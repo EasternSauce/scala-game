@@ -9,21 +9,21 @@ case class RegularAttack(
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
 
-  override val numOfComponents = 12
-
-  override def init(): Ability = {
-    val components = (for (i <- 0 until numOfComponents)
-      yield (
-        i.toString,
-        AbilityComponent(
-          AbilityComponentParams(componentId = i.toString, angleDeviation = (i - 1) * 30)
-        ) // TEST MULTIPLE COMPONENTS
-      )).toMap
-
-    this
-      .modify(_.components)
-      .setTo(components)
-  }
+//  override val numOfComponents = 12
+//
+//  override def init(): Ability = {
+//    val components = (for (i <- 0 until numOfComponents)
+//      yield (
+//        i.toString,
+//        AbilityComponent(
+//          AbilityComponentParams(componentId = i.toString, angleDeviation = (i - 1) * 30)
+//        ) // TEST MULTIPLE COMPONENTS
+//      )).toMap
+//
+//    this
+//      .modify(_.components)
+//      .setTo(components)
+//  }
 
   override def updateComponentHitbox(componentId: String, creature: Creature): Ability = {
 

@@ -165,7 +165,6 @@ class PlayScreen(
 
         val facingVector = Vector2Wrapper(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).normal
 
-        println("registered left click")
         val modification: GameState => GameState =
           _.modifyGameStateCreature("player")(_.modify(_.params.dirVector).setTo(facingVector))
             .performAbility("player", "regularAttack")
