@@ -37,6 +37,8 @@ object JsonCodecs {
   implicit val encodeAbilityParams: Encoder[AbilityParams] = deriveEncoder
   implicit val decodeAbilityComponentParams: Decoder[AbilityComponentParams] = deriveDecoder
   implicit val encodeAbilityComponentParams: Encoder[AbilityComponentParams] = deriveEncoder
+  implicit val decodeAbilitySpecification: Decoder[AbilitySpecification] = deriveDecoder
+  implicit val encodeAbilitySpecification: Encoder[AbilitySpecification] = deriveEncoder
   implicit val decodeAbilityComponent: Decoder[AbilityComponent] = deriveDecoder
   implicit val encodeAbilityComponent: Encoder[AbilityComponent] = deriveEncoder
   implicit val decodeAbilityHitbox: Decoder[AbilityHitbox] = deriveDecoder

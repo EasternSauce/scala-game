@@ -100,7 +100,6 @@ class MyGdxGame extends Game {
         decode[GameState](lines).getOrElse(throw new RuntimeException("error decoding save file"))
       } catch {
         case _: FileNotFoundException =>
-          println("save file not found");
           GameState(
             player = player.init(), // TODO: init elsewhere?
             nonPlayers = Map(skeleton.params.id -> skeleton.init(), wolf.params.id -> wolf.init()),

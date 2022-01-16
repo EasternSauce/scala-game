@@ -82,11 +82,11 @@ case class GameState(
     if (creatureId == player.params.id) {
       this
         .modify(_.player)
-        .using(_.modifyCreatureAbility(abilityId)(operation(_)))
+        .using(_.modifyAbility(abilityId)(operation(_)))
     } else {
       this
         .modify(_.nonPlayers.at(creatureId))
-        .using(_.modifyCreatureAbility(abilityId)(operation(_)))
+        .using(_.modifyAbility(abilityId)(operation(_)))
     }
 
   }

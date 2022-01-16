@@ -1,6 +1,6 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.model.creature.ability.{Ability, RegularAttack}
+import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, RegularAttack}
 import com.easternsauce.util.Direction.Direction
 import com.softwaremill.quicklens._
 
@@ -70,9 +70,16 @@ abstract class Creature {
     }
   }
 
-  def modifyCreatureAbility(abilityId: String)(operation: Ability => Ability): Creature =
+  def modifyAbility(abilityId: String)(operation: Ability => Ability): Creature =
     this
       .modify(_.params.abilities.at(abilityId))
+      .using(operation)
+
+  def modifyAbilityComponent(abilityId: String, componentId: String)(
+    operation: AbilityComponent => AbilityComponent
+  ): Creature =
+    this
+      .modify(_.params.abilities.at(abilityId).components.at(componentId))
       .using(operation)
 
   def updateStamina(delta: Float): Creature = {

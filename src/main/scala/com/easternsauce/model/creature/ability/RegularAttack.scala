@@ -9,6 +9,19 @@ case class RegularAttack(
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
 
+  override val specification: AbilitySpecification = AbilitySpecification(
+    textureWidth = 40,
+    textureHeight = 40,
+    totalActiveTime = 0.3f,
+    totalChannelTime = 0.3f,
+    channelSpriteType = "slash_windup",
+    activeSpriteType = "slash",
+    channelFrameCount = 6,
+    activeFrameCount = 6,
+    channelFrameDuration = 0.05f,
+    activeFrameDuration = 0.05f
+  )
+
 //  override val numOfComponents = 12
 //
 //  override def init(): Ability = {

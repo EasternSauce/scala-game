@@ -23,30 +23,31 @@ case class AbilityComponentRenderer(
   def init(gameState: GameState): Unit = {
     val abilityComponent = gameState.abilities(creatureId, abilityId).components(componentId)
 
-    channelTextureRegion = atlas.findRegion(abilityComponent.channelSpriteType)
-    activeTextureRegion = atlas.findRegion(abilityComponent.activeSpriteType)
+    channelTextureRegion = atlas.findRegion(abilityComponent.specification.channelSpriteType)
+    activeTextureRegion = atlas.findRegion(abilityComponent.specification.activeSpriteType)
 
-    val channelFrames = for { i <- (0 until abilityComponent.channelFrameCount).toArray } yield {
+    val channelFrames = for { i <- (0 until abilityComponent.specification.channelFrameCount).toArray } yield {
       new TextureRegion(
         channelTextureRegion,
-        i * abilityComponent.textureWidth,
+        i * abilityComponent.specification.textureWidth,
         0,
-        abilityComponent.textureWidth,
-        abilityComponent.textureHeight
+        abilityComponent.specification.textureWidth,
+        abilityComponent.specification.textureHeight
       )
     }
-    channelAnimation = new Animation[TextureRegion](abilityComponent.channelFrameDuration, channelFrames: _*)
+    channelAnimation =
+      new Animation[TextureRegion](abilityComponent.specification.channelFrameDuration, channelFrames: _*)
 
-    val activeFrames = for { i <- (0 until abilityComponent.activeFrameCount).toArray } yield {
+    val activeFrames = for { i <- (0 until abilityComponent.specification.activeFrameCount).toArray } yield {
       new TextureRegion(
         activeTextureRegion,
-        i * abilityComponent.textureWidth,
+        i * abilityComponent.specification.textureWidth,
         0,
-        abilityComponent.textureWidth,
-        abilityComponent.textureHeight
+        abilityComponent.specification.textureWidth,
+        abilityComponent.specification.textureHeight
       )
     }
-    activeAnimation = new Animation[TextureRegion](abilityComponent.activeFrameDuration, activeFrames: _*)
+    activeAnimation = new Animation[TextureRegion](abilityComponent.specification.activeFrameDuration, activeFrames: _*)
 
   }
 
