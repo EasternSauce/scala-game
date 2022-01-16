@@ -35,4 +35,8 @@ case class AbilityComponent(params: AbilityComponentParams) {
 
   def makeActive(): AbilityComponent = this.modify(_.params.state).setTo(AbilityState.Active)
 
+  def stop(): AbilityComponent = {
+    this // TODO?
+  }
+
 }

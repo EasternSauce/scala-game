@@ -57,7 +57,9 @@ abstract class Creature {
       .setTo(newPosY)
   }
 
-  def takeStaminaDamage(staminaDamage: Float): Creature =
+  def takeStaminaDamage(staminaDamage: Float): Creature = {
+    println("take stamina damage")
+
     if (params.stamina - staminaDamage > 0) this.modify(_.params.stamina).setTo(this.params.stamina - staminaDamage)
     else {
       this
@@ -68,6 +70,7 @@ abstract class Creature {
         .modify(_.params.staminaOveruseTimer)
         .using(_.restart())
     }
+  }
 
   def modifyCreatureAbility(abilityId: String)(operation: Ability => Ability): Creature =
     this

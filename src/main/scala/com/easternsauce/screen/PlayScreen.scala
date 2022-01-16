@@ -28,7 +28,7 @@ class PlayScreen(
 ) extends Screen {
   val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
-  val debugRenderEnabled = false
+  val debugRenderEnabled = true
 
   var gameState: GameState = state
   var gameView: GameView = view
@@ -156,7 +156,7 @@ class PlayScreen(
     }
 
     val leftClickInput: GameState => GameState =
-      if (Gdx.input.isButtonPressed(Input.Buttons.LEFT)) {
+      if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
         val mouseX = Gdx.input.getX
         val mouseY = Gdx.input.getY
 
@@ -165,6 +165,7 @@ class PlayScreen(
 
         val facingVector = Vector2Wrapper(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).normal
 
+        println("registered left click")
         val modification: GameState => GameState =
           _.modifyGameStateCreature("player")(_.modify(_.params.dirVector).setTo(facingVector))
             .performAbility("player", "regularAttack")

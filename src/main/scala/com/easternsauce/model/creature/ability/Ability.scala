@@ -23,18 +23,14 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
     1.4f
   }
 
-  def stop(): Ability = {
-    this // TODO?
-  }
-
   def setNotOnCooldown(): Ability = this.modify(_.params.onCooldown).setTo(false)
 
   def setDirVector(dirVector: Vector2Wrapper): Ability =
     components.keys.foldLeft(this)((ability, componentId) => ability.setComponentDirVector(componentId, dirVector))
 
   def setComponentDirVector(componentId: String, dirVector: Vector2Wrapper): Ability = {
-
-    this.modify(_.components.at(componentId).params.dirVector).setTo(dirVector)
+    val component = this.components(componentId)
+    this.modify(_.components.at(componentId).params.dirVector).setTo(dirVector.rotate(component.params.angleDeviation))
   }
 
   def updateHitbox(creature: Creature): Ability = {
@@ -53,10 +49,6 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
 
   def restartActiveTimers(): Ability = {
     components.keys.foldLeft(this)((ability, componentId) => ability.restartComponentActiveTimers(componentId))
-  }
-
-  def updateTimers(delta: Float): Ability = {
-    components.keys.foldLeft(this)((ability, componentId) => ability.updateComponentTimers(componentId, delta))
   }
 
   def updateComponentTimers(componentId: String, delta: Float): Ability = {
