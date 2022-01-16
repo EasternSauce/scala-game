@@ -58,8 +58,6 @@ abstract class Creature {
   }
 
   def takeStaminaDamage(staminaDamage: Float): Creature = {
-    println("take stamina damage")
-
     if (params.stamina - staminaDamage > 0) this.modify(_.params.stamina).setTo(this.params.stamina - staminaDamage)
     else {
       this

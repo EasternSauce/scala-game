@@ -101,15 +101,10 @@ trait AbilityInteractions {
             }
             .onAbilityComponentChannelUpdate(creatureId, abilityId)
         case Active =>
-          println(
-            "component active " + componentId + " active timer " + activeTimer.time + " max" + ability
-              .components(componentId)
-              .totalActiveTime
-          )
+
           gameState
             .pipe {
               case state if activeTimer.time > ability.components(componentId).totalActiveTime =>
-                println("stopping component")
                 state
                   .modifyGameStateAbility(creatureId, abilityId)(
                     _.modify(_.components.at(componentId)).using(_.stop().makeInactive())
@@ -133,21 +128,16 @@ trait AbilityInteractions {
   }
 
   def performAbility(creatureId: String, abilityId: String): GameState = {
-    println("performing ability")
     val creature = creatures(creatureId)
 
     val ability = creature.params.abilities(abilityId)
 
-    ability.components.keys
-      .foldLeft(this)((gameState, componentId) => {
-
-        if (
-          creature.params.stamina > 0 && ability
-            .components(componentId)
-            .params
-            .state == AbilityState.Inactive && !ability.params.onCooldown
-          /*&& !creature.abilityActive*/
-        ) {
+    if (
+      creature.params.stamina > 0 && !ability.componentsActive && !ability.params.onCooldown
+      /*&& !creature.abilityActive*/
+    ) {
+      ability.components.keys
+        .foldLeft(this)((gameState, componentId) => {
           gameState
             .modifyGameStateAbility(creatureId, abilityId) { ability =>
               ability
@@ -157,14 +147,15 @@ trait AbilityInteractions {
                 .setTo(AbilityState.Channel)
             }
             .onAbilityComponentChannelStart(creatureId, abilityId, componentId)
-        } else gameState
-      })
-      .modifyGameStateCreature(creatureId)(
-        _.modify(_.params.staminaRegenerationDisabledTimer)
-          .using(_.restart())
-          .modify(_.params.isStaminaRegenerationDisabled)
-          .setTo(true)
-          .takeStaminaDamage(15f)
-      )
+        })
+        .modifyGameStateCreature(creatureId)(
+          _.modify(_.params.staminaRegenerationDisabledTimer)
+            .using(_.restart())
+            .modify(_.params.isStaminaRegenerationDisabled)
+            .setTo(true)
+            .takeStaminaDamage(15f)
+        )
+
+    } else this
   }
 }
