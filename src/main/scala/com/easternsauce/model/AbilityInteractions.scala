@@ -48,6 +48,7 @@ trait AbilityInteractions {
           .setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y))
           .pipe(ability.updateComponentHitbox(creature, _))
       }
+      .modifyGameStateAbility(creatureId, abilityId)(_.modify(_.params.abilityTimer).using(_.restart()))
 
   }
 
@@ -85,45 +86,40 @@ trait AbilityInteractions {
   def updateCreatureAbility(creatureId: String, abilityId: String, delta: Float): GameState = {
     val ability = abilities(creatureId, abilityId)
 
-    ability.components.keys.foldLeft(this)((gameState, componentId) => {
-      val channelTimer = ability.components(componentId).params.channelTimer
-      val activeTimer = ability.components(componentId).params.activeTimer
+    ability.components.keys
+      .foldLeft(this)((gameState, componentId) => {
+        val channelTimer = ability.components(componentId).params.channelTimer
+        val activeTimer = ability.components(componentId).params.activeTimer
 
-      import com.easternsauce.model.creature.ability.AbilityState._
-      (ability.components(componentId).params.state match {
-        case Channel =>
-          gameState
-            .pipe {
-              case state if channelTimer.time > ability.components(componentId).specification.totalChannelTime =>
-                state
-                  .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeActive())
-                  .onAbilityComponentActiveStart(creatureId, abilityId, componentId)
-              case state => state
-            }
-            .onAbilityComponentChannelUpdate(creatureId, abilityId, componentId)
-        case Active =>
-          gameState
-            .pipe {
-              case state if activeTimer.time > ability.components(componentId).specification.totalActiveTime =>
-                state
-                  .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeInactive())
-                  .onAbilityComponentInactiveStart(creatureId, abilityId, componentId)
+        import com.easternsauce.model.creature.ability.AbilityState._
+        (ability.components(componentId).params.state match {
+          case Channel =>
+            gameState
+              .pipe {
+                case state if channelTimer.time > ability.components(componentId).specification.totalChannelTime =>
+                  state
+                    .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeActive())
+                    .onAbilityComponentActiveStart(creatureId, abilityId, componentId)
+                case state => state
+              }
+              .onAbilityComponentChannelUpdate(creatureId, abilityId, componentId)
+          case Active =>
+            gameState
+              .pipe {
+                case state if activeTimer.time > ability.components(componentId).specification.totalActiveTime =>
+                  state
+                    .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeInactive())
+                    .onAbilityComponentInactiveStart(creatureId, abilityId, componentId)
 
-              case state => state
-            }
-            .onAbilityComponentActiveUpdate(creatureId, abilityId, componentId)
-        case Inactive =>
-          gameState.pipe(
-            state =>
-              if (
-                ability.params.onCooldown && activeTimer.time > ability.cooldownTime // TODO this won't work; cooldown timer???
-              )
-                modifyGameStateAbility(creatureId, abilityId)(_.setNotOnCooldown())
-              else state
-          )
-        case _ => gameState
-      }).modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateComponentTimers(_, delta))
-    })
+                case state => state
+              }
+              .onAbilityComponentActiveUpdate(creatureId, abilityId, componentId)
+          case Inactive =>
+            gameState // TODO do we need update anything when inactive?
+          case _ => gameState
+        }).modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateComponentTimers(_, delta))
+      })
+      .modifyGameStateAbility(creatureId, abilityId)(_.updateTimers(delta))
 
   }
 
@@ -133,7 +129,7 @@ trait AbilityInteractions {
     val ability = creature.params.abilities(abilityId)
 
     if (
-      creature.params.stamina > 0 && !ability.componentsActive && !ability.params.onCooldown
+      creature.params.stamina > 0 && !ability.componentsActive && !ability.onCooldown
       /*&& !creature.abilityActive*/
     ) {
       ability.components.keys

@@ -25,7 +25,7 @@ abstract class Creature {
   protected val staminaRegenerationTickTime = 0.005f
   protected val staminaRegeneration = 0.8f
   protected val staminaOveruseTime = 2f
-  protected val staminaRegenerationDisabled = 1f
+  protected val staminaRegenerationDisabled = 1.2f
 
   def init(): Creature = {
     this.modify(_.params.abilities).setTo(Map("regularAttack" -> RegularAttack().init()))

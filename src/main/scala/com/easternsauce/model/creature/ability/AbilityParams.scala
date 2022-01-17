@@ -1,3 +1,5 @@
 package com.easternsauce.model.creature.ability
 
-case class AbilityParams(onCooldown: Boolean = false)
+import com.easternsauce.model.util.SimpleTimer
+
+case class AbilityParams(abilityTimer: SimpleTimer = SimpleTimer())

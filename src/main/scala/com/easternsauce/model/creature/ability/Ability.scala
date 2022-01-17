@@ -8,7 +8,7 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
   val specification: AbilitySpecification
 
   val numOfComponents = 1
-  val cooldownTime: Float = 0.8f
+  val cooldownTime: Float = 1f
 
   def init(): Ability = {
     val components = (for (i <- 0 until numOfComponents)
@@ -25,7 +25,7 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
     1.4f
   }
 
-  def setNotOnCooldown(): Ability = this.modify(_.params.onCooldown).setTo(false)
+  def onCooldown: Boolean = if (params.abilityTimer.isRunning) params.abilityTimer.time < cooldownTime else false
 
   def updateHitbox(creature: Creature): Ability = {
     components.keys.foldLeft(this)(
@@ -48,6 +48,10 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
       .using(_.update(delta))
       .modify(_.params.abilityActiveAnimationTimer)
       .using(_.update(delta))
+  }
+
+  def updateTimers(delta: Float): Ability = {
+    this.modify(_.params.abilityTimer).using(_.update(delta))
   }
 
   def componentsActive: Boolean = components.values.exists(component => component.params.state != AbilityState.Inactive)
