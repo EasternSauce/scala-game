@@ -14,42 +14,39 @@ trait AbilityInteractions {
 
     val ability = this.abilities(creatureId, abilityId)
 
+    val creature = this.creatures(creatureId)
+
     this
       .pipe(
         gameState => gameState.modify(_.events).setTo(AbilityCreateBodyEvent(creatureId, abilityId) :: gameState.events)
       )
-      .modifyGameStateCreature(creatureId) { creature =>
-        creature
-          .modifyAbilityComponent(abilityId, componentId)(
-            _.modify(_.params.abilityActiveAnimationTimer)
-              .using(_.restart())
-              .modify(_.params.activeTimer)
-              .using(_.restart())
-              .modify(_.params.channelTimer)
-              .using(_.stop())
-              .modify(_.params.abilityChannelAnimationTimer)
-              .using(_.stop())
-              .setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y))
-              .pipe(ability.updateComponentHitbox(creature, _))
-          )
+      .modifyGameStateAbilityComponent(creatureId, abilityId, componentId) {
+        _.modify(_.params.abilityActiveAnimationTimer)
+          .using(_.restart())
+          .modify(_.params.activeTimer)
+          .using(_.restart())
+          .modify(_.params.channelTimer)
+          .using(_.stop())
+          .modify(_.params.abilityChannelAnimationTimer)
+          .using(_.stop())
+          .setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y))
+          .pipe(ability.updateComponentHitbox(creature, _))
       }
   }
 
   def onAbilityComponentChannelStart(creatureId: String, abilityId: String, componentId: String): GameState = {
 
     val ability = this.abilities(creatureId, abilityId)
+    val creature = this.creatures(creatureId)
 
     this
-      .modifyGameStateCreature(creatureId) { creature =>
-        creature
-          .modifyAbilityComponent(abilityId, componentId)(
-            _.modify(_.params.channelTimer)
-              .using(_.restart())
-              .modify(_.params.abilityChannelAnimationTimer)
-              .using(_.restart())
-              .setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y))
-              .pipe(ability.updateComponentHitbox(creature, _))
-          )
+      .modifyGameStateAbilityComponent(creatureId, abilityId, componentId) {
+        _.modify(_.params.channelTimer)
+          .using(_.restart())
+          .modify(_.params.abilityChannelAnimationTimer)
+          .using(_.restart())
+          .setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y))
+          .pipe(ability.updateComponentHitbox(creature, _))
       }
 
   }
@@ -61,40 +58,28 @@ trait AbilityInteractions {
         gameState =>
           gameState.modify(_.events).setTo(AbilityDestroyBodyEvent(creatureId, abilityId) :: gameState.events)
       )
-      .modifyGameStateCreature(creatureId) { creature =>
-        creature
-          .modifyAbilityComponent(abilityId, componentId)(
-            _.modify(_.params.activeTimer)
-              .using(_.stop())
-              .modify(_.params.abilityActiveAnimationTimer)
-              .using(_.stop())
-          )
-      }
+      .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(
+        _.modify(_.params.activeTimer)
+          .using(_.stop())
+          .modify(_.params.abilityActiveAnimationTimer)
+          .using(_.stop())
+      )
 
   }
 
-  def onAbilityComponentChannelUpdate(creatureId: String, abilityId: String): GameState = {
+  def onAbilityComponentChannelUpdate(creatureId: String, abilityId: String, componentId: String): GameState = {
     val ability = abilities(creatureId, abilityId)
+    val creature = this.creatures(creatureId)
 
-    this.modifyGameStateCreature(creatureId)(
-      creature =>
-        ability.components.keys.foldLeft(creature)(
-          (creature, componentId) =>
-            creature.modifyAbilityComponent(abilityId, componentId)(ability.updateComponentHitbox(creature, _))
-        )
-    )
+    this.modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateComponentHitbox(creature, _))
   }
 
-  def onAbilityComponentActiveUpdate(creatureId: String, abilityId: String): GameState = {
+  def onAbilityComponentActiveUpdate(creatureId: String, abilityId: String, componentId: String): GameState = {
     val ability = abilities(creatureId, abilityId)
+    val creature = this.creatures(creatureId)
 
-    this.modifyGameStateCreature(creatureId)(
-      creature =>
-        ability.components.keys.foldLeft(creature)(
-          (creature, componentId) =>
-            creature.modifyAbilityComponent(abilityId, componentId)(ability.updateComponentHitbox(creature, _))
-        )
-    )
+    this.modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateComponentHitbox(creature, _))
+
   }
 
   def updateCreatureAbility(creatureId: String, abilityId: String, delta: Float): GameState = {
@@ -115,7 +100,7 @@ trait AbilityInteractions {
                   .onAbilityComponentActiveStart(creatureId, abilityId, componentId)
               case state => state
             }
-            .onAbilityComponentChannelUpdate(creatureId, abilityId)
+            .onAbilityComponentChannelUpdate(creatureId, abilityId, componentId)
         case Active =>
           gameState
             .pipe {
@@ -126,7 +111,7 @@ trait AbilityInteractions {
 
               case state => state
             }
-            .onAbilityComponentActiveUpdate(creatureId, abilityId)
+            .onAbilityComponentActiveUpdate(creatureId, abilityId, componentId)
         case Inactive =>
           gameState.pipe(
             state =>
