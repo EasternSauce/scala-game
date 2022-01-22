@@ -6,7 +6,7 @@ import com.easternsauce.model.creature.ability.AbilityState
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.renderer.RendererController
 
-case class AbilityComponentRenderer(
+case class ComponentRenderer(
   gameView: RendererController,
   creatureId: String,
   abilityId: String,

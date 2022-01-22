@@ -6,11 +6,11 @@ import com.badlogic.gdx.math.{Vector2, Vector3}
 import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
-import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.event.{AreaChangeEvent, CollisionEvent}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.util.{Constants, Direction, RendererBatch, Vector2Wrapper}
+import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.view.renderer.RendererController
 import com.softwaremill.quicklens._
 import io.circe.syntax.EncoderOps
@@ -20,11 +20,11 @@ import scala.collection.mutable.ListBuffer
 import scala.util.chaining._
 
 class PlayScreen(
-                  worldBatch: RendererBatch,
-                  hudBatch: RendererBatch,
-                  state: GameState,
-                  view: RendererController,
-                  physics: PhysicsController
+  worldBatch: RendererBatch,
+  hudBatch: RendererBatch,
+  state: GameState,
+  view: RendererController,
+  physics: PhysicsController
 ) extends Screen {
   val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
@@ -73,14 +73,12 @@ class PlayScreen(
 
   def updateCreatures(physicsController: PhysicsController, delta: Float)(gameState: GameState): GameState = {
 
-    def physicsPos(physicsController: PhysicsController, creature: Creature): Vector2 =
-      if (physicsController.entityBodies.contains(creature.params.id))
-        physicsController.entityBodies(creature.params.id).pos
-      else
-        new Vector2(creature.params.posX, creature.params.posY)
-
     val updateCreature = (creature: Creature) => {
-      val pos = physicsPos(physicsController, creature)
+      val pos =
+        if (physicsController.entityBodies.contains(creature.params.id))
+          physicsController.entityBodies(creature.params.id).pos
+        else
+          new Vector2(creature.params.posX, creature.params.posY)
 
       creature
         .setPosition(pos.x, pos.y)
@@ -96,7 +94,8 @@ class PlayScreen(
         val creatureAbilityPairs =
           gameState.creatures.values.flatMap(creature => creature.params.abilities.keys.map((_, creature.params.id)))
         creatureAbilityPairs.foldLeft(gameState)({
-          case (acc, (abilityId, creatureId)) => acc.updateCreatureAbility(creatureId, abilityId, delta)
+          case (acc, (abilityId, creatureId)) =>
+            acc.updateCreatureAbility(physicsController, creatureId, abilityId, delta)
         })
       })
 

@@ -3,13 +3,13 @@ package com.easternsauce.game
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
-import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.model.GameState
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.{CreatureParams, Player, Serpent, Skeleton}
 import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
+import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.view.renderer
 import com.easternsauce.view.renderer.RendererController
 import io.circe.parser.decode

@@ -12,7 +12,7 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
 
   def init(): Ability = {
     val components = (for (i <- 0 until numOfComponents)
-      yield (i.toString, AbilityComponent(specification, AbilityComponentParams(componentId = i.toString)))).toMap
+      yield (i.toString, AbilityComponent(specification, ComponentParams(componentId = i.toString)))).toMap
 
     this
       .modify(_.components)

@@ -1,13 +1,15 @@
 package com.easternsauce.view.physics.entity
 
 import com.badlogic.gdx.graphics.g2d.Sprite
+import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.{Body, World}
+import com.easternsauce.model.GameState
+import com.easternsauce.model.creature.ability.ComponentType
+import com.easternsauce.model.event.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
 import com.easternsauce.view.physics.terrain.Terrain
 import com.easternsauce.view.physics.{B2BodyFactory, PhysicsController}
-import com.easternsauce.model.GameState
-import com.easternsauce.model.event.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
 
-case class AbilityComponentBody(creatureId: String, abilityId: String, componentId: String) {
+case class ComponentBody(creatureId: String, abilityId: String, componentId: String) {
   var b2Body: Body = _
   var world: World = _
   private val sprite = new Sprite()
@@ -57,6 +59,7 @@ case class AbilityComponentBody(creatureId: String, abilityId: String, component
 
   def update(gameState: GameState, physicsController: PhysicsController, areaId: String): Unit = {
     val ability = gameState.abilities(creatureId, abilityId)
+    val component = ability.components(componentId)
 
     val terrain: Terrain = physicsController.terrain(areaId)
 
@@ -71,13 +74,20 @@ case class AbilityComponentBody(creatureId: String, abilityId: String, component
     }
 
     if (isActive) {
-      b2Body.setTransform(
-        ability.components(componentId).params.abilityHitbox.x,
-        ability.components(componentId).params.abilityHitbox.y,
-        0f
-      )
+      if (component.specification.componentType == ComponentType.MeleeAttack) {
+        b2Body.setTransform(component.params.abilityHitbox.x, component.params.abilityHitbox.y, 0f)
+      } else if (component.specification.componentType == ComponentType.RangedProjectile) {
+        b2Body.setLinearVelocity(
+          component.params.dirVector.x * component.params.speed,
+          component.params.dirVector.y * component.params.speed
+        )
+      }
+
     }
+
   }
+
+  def pos: Vector2 = b2Body.getWorldCenter
 
   def destroy(): Unit = {
     world.destroyBody(b2Body)

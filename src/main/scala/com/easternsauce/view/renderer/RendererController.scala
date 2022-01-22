@@ -6,7 +6,6 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.easternsauce.model.GameState
 import com.easternsauce.util.RendererBatch
-import com.easternsauce.view.renderer
 import com.easternsauce.view.renderer.entity.EntityRenderer
 import com.easternsauce.view.renderer.hud.InventoryRenderer
 import com.easternsauce.view.renderer.terrain.AreaRenderer

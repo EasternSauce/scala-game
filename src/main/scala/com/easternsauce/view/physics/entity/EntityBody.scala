@@ -2,16 +2,16 @@ package com.easternsauce.view.physics.entity
 
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.view.physics.terrain.Terrain
-import com.easternsauce.view.physics.{B2BodyFactory, PhysicsController}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.CreatureDeathEvent
+import com.easternsauce.view.physics.terrain.Terrain
+import com.easternsauce.view.physics.{B2BodyFactory, PhysicsController}
 
 case class EntityBody(creatureId: String) {
 
   var b2Body: Body = _
 
-  var abilityComponentBodies: Map[(String, String), AbilityComponentBody] = Map()
+  var componentBodies: Map[(String, String), ComponentBody] = Map()
 
   var currentAreaId: String = _
 
@@ -22,12 +22,12 @@ case class EntityBody(creatureId: String) {
 
     b2Body = B2BodyFactory.createCreatureB2body(world = terrain.world, entityBody = this, creature = creature)
 
-    abilityComponentBodies = creature.params.abilities.flatMap {
+    componentBodies = creature.params.abilities.flatMap {
       case abilityId -> _ =>
         val components = gameState.abilities(creatureId, abilityId).components
 
         components.keys.map(
-          componentId => (abilityId, componentId) -> AbilityComponentBody(creatureId, abilityId, componentId)
+          componentId => (abilityId, componentId) -> ComponentBody(creatureId, abilityId, componentId)
         )
     }
 
@@ -39,7 +39,7 @@ case class EntityBody(creatureId: String) {
       b2Body.getFixtureList.get(0).setSensor(true)
     }
 
-    abilityComponentBodies.values.foreach(_.update(gameState, physicsController, currentAreaId))
+    componentBodies.values.foreach(_.update(gameState, physicsController, currentAreaId))
   }
 
   def pos: Vector2 = b2Body.getWorldCenter

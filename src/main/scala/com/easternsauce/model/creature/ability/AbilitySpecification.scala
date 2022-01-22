@@ -1,5 +1,7 @@
 package com.easternsauce.model.creature.ability
 
+import com.easternsauce.model.creature.ability.ComponentType.ComponentType
+
 case class AbilitySpecification(
   textureWidth: Int,
   textureHeight: Int,
@@ -10,5 +12,6 @@ case class AbilitySpecification(
   channelFrameCount: Int,
   activeFrameCount: Int,
   channelFrameDuration: Float,
-  activeFrameDuration: Float
+  activeFrameDuration: Float,
+  componentType: ComponentType
 )

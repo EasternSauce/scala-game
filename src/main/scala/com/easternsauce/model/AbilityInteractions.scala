@@ -1,8 +1,10 @@
 package com.easternsauce.model
 
+import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.creature.ability.AbilityState
 import com.easternsauce.model.event.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
 import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
 
 import scala.util.chaining._
@@ -83,20 +85,27 @@ trait AbilityInteractions {
 
   }
 
-  def updateCreatureAbility(creatureId: String, abilityId: String, delta: Float): GameState = {
+  def updateCreatureAbility(
+    physicsController: PhysicsController,
+    creatureId: String,
+    abilityId: String,
+    delta: Float
+  ): GameState = {
     val ability = abilities(creatureId, abilityId)
 
     ability.components.keys
       .foldLeft(this)((gameState, componentId) => {
-        val channelTimer = ability.components(componentId).params.channelTimer
-        val activeTimer = ability.components(componentId).params.activeTimer
+        val component = ability.components(componentId)
+
+        val channelTimer = component.params.channelTimer
+        val activeTimer = component.params.activeTimer
 
         import com.easternsauce.model.creature.ability.AbilityState._
-        (ability.components(componentId).params.state match {
+        (component.params.state match {
           case Channel =>
             gameState
               .pipe {
-                case state if channelTimer.time > ability.components(componentId).specification.totalChannelTime =>
+                case state if channelTimer.time > component.specification.totalChannelTime =>
                   state
                     .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeActive())
                     .onAbilityComponentActiveStart(creatureId, abilityId, componentId)
@@ -104,9 +113,20 @@ trait AbilityInteractions {
               }
               .onAbilityComponentChannelUpdate(creatureId, abilityId, componentId)
           case Active =>
+            val pos =
+              if (
+                physicsController.entityBodies.contains(creatureId) && physicsController
+                  .entityBodies(creatureId)
+                  .componentBodies
+                  .contains(abilityId -> componentId)
+              ) {
+                physicsController.entityBodies(creatureId).componentBodies(abilityId -> componentId).pos
+              } else
+                new Vector2(component.params.abilityHitbox.x, component.params.abilityHitbox.y)
+
             gameState
               .pipe {
-                case state if activeTimer.time > ability.components(componentId).specification.totalActiveTime =>
+                case state if activeTimer.time > component.specification.totalActiveTime =>
                   state
                     .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeInactive())
                     .onAbilityComponentInactiveStart(creatureId, abilityId, componentId)
@@ -114,6 +134,12 @@ trait AbilityInteractions {
                 case state => state
               }
               .onAbilityComponentActiveUpdate(creatureId, abilityId, componentId)
+              .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(
+                _.modify(_.params.abilityHitbox.x)
+                  .setTo(pos.x)
+                  .modify(_.params.abilityHitbox.y)
+                  .setTo(pos.y)
+              )
           case Inactive =>
             gameState // TODO do we need update anything when inactive?
           case _ => gameState

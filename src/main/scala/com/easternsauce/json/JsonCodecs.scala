@@ -3,6 +3,7 @@ package com.easternsauce.json
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature._
 import com.easternsauce.model.creature.ability.AbilityState.AbilityState
+import com.easternsauce.model.creature.ability.ComponentType.ComponentType
 import com.easternsauce.model.creature.ability._
 import com.easternsauce.model.event.UpdateEvent
 import com.easternsauce.model.item.{Item, ItemParameterValue, ItemTemplate}
@@ -35,10 +36,12 @@ object JsonCodecs {
   implicit val encodeItemParameterValue: Encoder[ItemParameterValue] = deriveEncoder
   implicit val decodeAbilityParams: Decoder[AbilityParams] = deriveDecoder
   implicit val encodeAbilityParams: Encoder[AbilityParams] = deriveEncoder
-  implicit val decodeAbilityComponentParams: Decoder[AbilityComponentParams] = deriveDecoder
-  implicit val encodeAbilityComponentParams: Encoder[AbilityComponentParams] = deriveEncoder
+  implicit val decodeAbilityComponentParams: Decoder[ComponentParams] = deriveDecoder
+  implicit val encodeAbilityComponentParams: Encoder[ComponentParams] = deriveEncoder
   implicit val decodeAbilitySpecification: Decoder[AbilitySpecification] = deriveDecoder
   implicit val encodeAbilitySpecification: Encoder[AbilitySpecification] = deriveEncoder
+  implicit val decodeComponentType: Decoder[ComponentType] = Decoder.decodeEnumeration(ComponentType)
+  implicit val encodeComponentType: Encoder[ComponentType] = Encoder.encodeEnumeration(ComponentType)
   implicit val decodeAbilityComponent: Decoder[AbilityComponent] = deriveDecoder
   implicit val encodeAbilityComponent: Encoder[AbilityComponent] = deriveEncoder
   implicit val decodeAbilityHitbox: Decoder[AbilityHitbox] = deriveDecoder
@@ -65,6 +68,8 @@ object JsonCodecs {
   implicit val encodePlayer: Encoder[Player] = deriveEncoder
   implicit val decodeRegularAttack: Decoder[RegularAttack] = deriveDecoder
   implicit val encodeRegularAttack: Encoder[RegularAttack] = deriveEncoder
+  implicit val decodeTestProjectile: Decoder[TestProjectile] = deriveDecoder
+  implicit val encodeTestProjectile: Encoder[TestProjectile] = deriveEncoder
 
   implicit val encodeCreature: Encoder[Creature] = Encoder.instance { c =>
     {
@@ -105,6 +110,8 @@ object JsonCodecs {
       c match {
         case v: RegularAttack =>
           Map("RegularAttack" -> v).asJson
+        case v: TestProjectile =>
+          Map("TestProjectile" -> v).asJson
 
       }
     }
@@ -113,7 +120,8 @@ object JsonCodecs {
   implicit val decodeAbility: Decoder[Ability] = Decoder.instance(c => {
     val fname = c.keys.flatMap(_.headOption).toSeq.head
     fname match {
-      case "RegularAttack" => c.downField(fname).as[RegularAttack]
+      case "RegularAttack"  => c.downField(fname).as[RegularAttack]
+      case "TestProjectile" => c.downField(fname).as[TestProjectile]
     }
   })
 }

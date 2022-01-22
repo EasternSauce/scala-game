@@ -3,7 +3,7 @@ package com.easternsauce.model.creature.ability
 import com.easternsauce.util.{Constants, Vector2Wrapper}
 import com.softwaremill.quicklens.ModifyPimp
 
-case class AbilityComponent(specification: AbilitySpecification, params: AbilityComponentParams) {
+case class AbilityComponent(specification: AbilitySpecification, params: ComponentParams) {
 
   val isAttack: Boolean = true
 

@@ -19,7 +19,8 @@ case class RegularAttack(
     channelFrameCount = 6,
     activeFrameCount = 6,
     channelFrameDuration = 0.05f,
-    activeFrameDuration = 0.05f
+    activeFrameDuration = 0.05f,
+    componentType = ComponentType.MeleeAttack
   )
 
 //  override val numOfComponents = 12

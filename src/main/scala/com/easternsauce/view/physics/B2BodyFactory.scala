@@ -2,9 +2,9 @@ package com.easternsauce.view.physics
 
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.view.physics.entity.{AbilityComponentBody, EntityBody}
-import com.easternsauce.view.physics.terrain.TerrainTileBody
 import com.easternsauce.model.creature.Creature
+import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
+import com.easternsauce.view.physics.terrain.TerrainTileBody
 
 object B2BodyFactory {
   private def createB2body(
@@ -78,7 +78,7 @@ object B2BodyFactory {
 
   def createAbilityComponentB2body(
     world: World,
-    abilityBody: AbilityComponentBody,
+    abilityBody: ComponentBody,
     posX: Float,
     posY: Float,
     vertices: Array[Float]

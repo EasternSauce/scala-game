@@ -18,7 +18,7 @@ case class EntityRenderer(gameView: RendererController, creatureId: String, atla
 
   var textureRegion: TextureRegion = _
 
-  var abilityComponentRenderers: List[AbilityComponentRenderer] = _
+  var abilityComponentRenderers: List[ComponentRenderer] = _
 
   def init(gameState: GameState): Unit = {
     val creature = gameState.creatures(creatureId)
@@ -52,7 +52,7 @@ case class EntityRenderer(gameView: RendererController, creatureId: String, atla
 
     abilityComponentRenderers =
       (for ((abilityId, ability) <- creature.params.abilities; (componentId, _) <- ability.components)
-        yield AbilityComponentRenderer(gameView, creatureId, abilityId, componentId, atlas)).toList
+        yield ComponentRenderer(gameView, creatureId, abilityId, componentId, atlas)).toList
 
     abilityComponentRenderers.foreach(_.init(gameState))
 

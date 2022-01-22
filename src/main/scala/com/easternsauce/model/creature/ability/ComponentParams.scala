@@ -4,7 +4,7 @@ import com.easternsauce.model.creature.ability.AbilityState.AbilityState
 import com.easternsauce.model.util.SimpleTimer
 import com.easternsauce.util.Vector2Wrapper
 
-case class AbilityComponentParams(
+case class ComponentParams(
   componentId: String,
   state: AbilityState = AbilityState.Inactive,
   activeTimer: SimpleTimer = SimpleTimer(),
@@ -14,5 +14,6 @@ case class AbilityComponentParams(
   dirVector: Vector2Wrapper = Vector2Wrapper(0, 0),
   abilityHitbox: AbilityHitbox = AbilityHitbox(0, 0, 1, 1, 0, 1),
   attackRange: Float = 1.8f,
-  angleDeviation: Float = 0f
+  angleDeviation: Float = 0f,
+  speed: Float = 30.0f
 )
