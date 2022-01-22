@@ -1,13 +1,13 @@
-package com.easternsauce.view.renderer
+package com.easternsauce.view.renderer.entity
 
 import com.badlogic.gdx.graphics.g2d.{Animation, Sprite, TextureAtlas, TextureRegion}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.AbilityState
 import com.easternsauce.util.RendererBatch
-import com.easternsauce.view.GameView
+import com.easternsauce.view.renderer.RendererController
 
 case class AbilityComponentRenderer(
-  gameView: GameView,
+  gameView: RendererController,
   creatureId: String,
   abilityId: String,
   componentId: String,

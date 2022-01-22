@@ -6,12 +6,12 @@ import com.badlogic.gdx.math.{Vector2, Vector3}
 import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
-import com.easternsauce.box2d_physics.PhysicsController
+import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.event.{AreaChangeEvent, CollisionEvent}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.util.{Constants, Direction, RendererBatch, Vector2Wrapper}
-import com.easternsauce.view.GameView
+import com.easternsauce.view.renderer.RendererController
 import com.softwaremill.quicklens._
 import io.circe.syntax.EncoderOps
 
@@ -20,18 +20,18 @@ import scala.collection.mutable.ListBuffer
 import scala.util.chaining._
 
 class PlayScreen(
-  worldBatch: RendererBatch,
-  hudBatch: RendererBatch,
-  state: GameState,
-  view: GameView,
-  physics: PhysicsController
+                  worldBatch: RendererBatch,
+                  hudBatch: RendererBatch,
+                  state: GameState,
+                  view: RendererController,
+                  physics: PhysicsController
 ) extends Screen {
   val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
   val debugRenderEnabled = true
 
   var gameState: GameState = state
-  var gameView: GameView = view
+  var gameView: RendererController = view
   var physicsController: PhysicsController = physics
 
   val worldCamera: OrthographicCamera = new OrthographicCamera()

@@ -1,4 +1,4 @@
-package com.easternsauce.view.renderer
+package com.easternsauce.view.renderer.hud
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureRegion
@@ -7,10 +7,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.easternsauce.inventory.InventoryData
 import com.easternsauce.model.GameState
 import com.easternsauce.system.Assets
-import com.easternsauce.system.Assets._
 import com.easternsauce.util.{InventoryMapping, RendererBatch}
 
 case class InventoryRenderer() {
+  import com.easternsauce.system.Assets.bitmapFontToEnrichedBitmapFont
 
   val backgroundImage = new Image(Assets.atlas.findRegion("background2"))
 
@@ -36,6 +36,7 @@ case class InventoryRenderer() {
         case (index, rect) =>
           batch.shapeDrawer.filledRectangle(rect.x - 3, rect.y - 3, rect.width + 6, rect.height + 6, Color.BROWN)
           batch.shapeDrawer.filledRectangle(rect, Color.BLACK)
+
           Assets.defaultFont.draw(
             batch.spriteBatch,
             InventoryMapping.equipmentTypeNames(index) + ":",

@@ -1,8 +1,8 @@
-package com.easternsauce.box2d_physics
+package com.easternsauce.view.physics
 
 import com.badlogic.gdx.maps.tiled.TiledMap
-import com.easternsauce.box2d_physics.entity.EntityBody
-import com.easternsauce.box2d_physics.terrain.Terrain
+import com.easternsauce.view.physics.entity.EntityBody
+import com.easternsauce.view.physics.terrain.Terrain
 import com.easternsauce.event.{AreaChangeEvent, CollisionEvent}
 import com.easternsauce.model.GameState
 

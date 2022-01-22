@@ -3,14 +3,15 @@ package com.easternsauce.game
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
-import com.easternsauce.box2d_physics.PhysicsController
+import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.model.GameState
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.{CreatureParams, Player, Serpent, Skeleton}
 import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
-import com.easternsauce.view.GameView
+import com.easternsauce.view.renderer
+import com.easternsauce.view.renderer.RendererController
 import io.circe.parser.decode
 
 import java.io.FileNotFoundException
@@ -22,7 +23,7 @@ class MyGdxGame extends Game {
 
   var atlas: TextureAtlas = _
 
-  var gameView: GameView = _
+  var gameView: RendererController = _
 
   private val mapScale = 4.0f
 
@@ -109,7 +110,7 @@ class MyGdxGame extends Game {
 
       }
 
-    gameView = GameView(atlas)
+    gameView = renderer.RendererController(atlas)
     physicsController = PhysicsController()
 
     playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController)

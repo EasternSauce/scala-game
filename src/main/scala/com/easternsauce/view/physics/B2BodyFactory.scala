@@ -1,9 +1,9 @@
-package com.easternsauce.box2d_physics
+package com.easternsauce.view.physics
 
 import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.box2d_physics.entity.{AbilityComponentBody, EntityBody}
-import com.easternsauce.box2d_physics.terrain.TerrainTileBody
+import com.easternsauce.view.physics.entity.{AbilityComponentBody, EntityBody}
+import com.easternsauce.view.physics.terrain.TerrainTileBody
 import com.easternsauce.model.creature.Creature
 
 object B2BodyFactory {

@@ -1,4 +1,4 @@
-package com.easternsauce.view.renderer
+package com.easternsauce.view.renderer.terrain
 
 import com.badlogic.gdx.graphics.OrthographicCamera
 import com.badlogic.gdx.maps.tiled.TiledMap

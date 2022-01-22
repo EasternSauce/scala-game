@@ -1,14 +1,14 @@
-package com.easternsauce.view.renderer
+package com.easternsauce.view.renderer.entity
 
 import com.badlogic.gdx.graphics.Color
-import com.badlogic.gdx.graphics.g2d._
+import com.badlogic.gdx.graphics.g2d.{Animation, Sprite, TextureAtlas, TextureRegion}
 import com.badlogic.gdx.math.Rectangle
 import com.easternsauce.model.GameState
 import com.easternsauce.util.Direction.Direction
 import com.easternsauce.util.RendererBatch
-import com.easternsauce.view.{GameView, renderer}
+import com.easternsauce.view.renderer.RendererController
 
-case class EntityRenderer(gameView: GameView, creatureId: String, atlas: TextureAtlas) {
+case class EntityRenderer(gameView: RendererController, creatureId: String, atlas: TextureAtlas) {
 
   val sprite: Sprite = new Sprite()
 
@@ -52,7 +52,7 @@ case class EntityRenderer(gameView: GameView, creatureId: String, atlas: Texture
 
     abilityComponentRenderers =
       (for ((abilityId, ability) <- creature.params.abilities; (componentId, _) <- ability.components)
-        yield renderer.AbilityComponentRenderer(gameView, creatureId, abilityId, componentId, atlas)).toList
+        yield AbilityComponentRenderer(gameView, creatureId, abilityId, componentId, atlas)).toList
 
     abilityComponentRenderers.foreach(_.init(gameState))
 

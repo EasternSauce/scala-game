@@ -1,10 +1,10 @@
-package com.easternsauce.box2d_physics.terrain
+package com.easternsauce.view.physics.terrain
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.box2d_physics.entity.{AbilityComponentBody, EntityBody}
+import com.easternsauce.view.physics.entity.{AbilityComponentBody, EntityBody}
 import com.easternsauce.event.{AbilityComponentCollision, CollisionEvent}
 import com.easternsauce.util.Constants
 

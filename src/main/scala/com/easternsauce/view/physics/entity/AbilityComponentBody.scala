@@ -1,9 +1,9 @@
-package com.easternsauce.box2d_physics.entity
+package com.easternsauce.view.physics.entity
 
 import com.badlogic.gdx.graphics.g2d.Sprite
 import com.badlogic.gdx.physics.box2d.{Body, World}
-import com.easternsauce.box2d_physics.terrain.Terrain
-import com.easternsauce.box2d_physics.{B2BodyFactory, PhysicsController}
+import com.easternsauce.view.physics.terrain.Terrain
+import com.easternsauce.view.physics.{B2BodyFactory, PhysicsController}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
 

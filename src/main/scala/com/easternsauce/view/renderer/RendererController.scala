@@ -1,4 +1,4 @@
-package com.easternsauce.view
+package com.easternsauce.view.renderer
 
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
@@ -6,9 +6,12 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.easternsauce.model.GameState
 import com.easternsauce.util.RendererBatch
-import com.easternsauce.view.renderer.{AreaRenderer, EntityRenderer, InventoryRenderer}
+import com.easternsauce.view.renderer
+import com.easternsauce.view.renderer.entity.EntityRenderer
+import com.easternsauce.view.renderer.hud.InventoryRenderer
+import com.easternsauce.view.renderer.terrain.AreaRenderer
 
-case class GameView(atlas: TextureAtlas) {
+case class RendererController(atlas: TextureAtlas) {
 
   var entityRenderers: Map[String, EntityRenderer] = Map()
   var areaRenderers: Map[String, AreaRenderer] = Map()
@@ -18,11 +21,11 @@ case class GameView(atlas: TextureAtlas) {
   def init(gameState: GameState, maps: Map[String, TiledMap], mapScale: Float): Unit = {
 
     entityRenderers =
-      gameState.creatures.keys.map(creatureId => creatureId -> EntityRenderer(this, creatureId, atlas)).toMap
+      gameState.creatures.keys.map(creatureId => creatureId -> entity.EntityRenderer(this, creatureId, atlas)).toMap
 
     entityRenderers.values.foreach(_.init(gameState))
 
-    areaRenderers = maps.map { case (areaId, map) => areaId -> renderer.AreaRenderer(areaId, map, mapScale) }
+    areaRenderers = maps.map { case (areaId, map) => areaId -> AreaRenderer(areaId, map, mapScale) }
 
     areaRenderers.values.foreach(_.init())
 
