@@ -5,6 +5,8 @@ import com.easternsauce.model.creature._
 import com.easternsauce.model.creature.ability.AbilityState.AbilityState
 import com.easternsauce.model.creature.ability.ComponentType.ComponentType
 import com.easternsauce.model.creature.ability._
+import com.easternsauce.model.creature.ability.attack.RegularAttack
+import com.easternsauce.model.creature.ability.magic.BubbleAbility
 import com.easternsauce.model.event.UpdateEvent
 import com.easternsauce.model.item.{Item, ItemParameterValue, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
@@ -68,8 +70,8 @@ object JsonCodecs {
   implicit val encodePlayer: Encoder[Player] = deriveEncoder
   implicit val decodeRegularAttack: Decoder[RegularAttack] = deriveDecoder
   implicit val encodeRegularAttack: Encoder[RegularAttack] = deriveEncoder
-  implicit val decodeTestProjectile: Decoder[TestProjectile] = deriveDecoder
-  implicit val encodeTestProjectile: Encoder[TestProjectile] = deriveEncoder
+  implicit val decodeTestProjectile: Decoder[BubbleAbility] = deriveDecoder
+  implicit val encodeTestProjectile: Encoder[BubbleAbility] = deriveEncoder
 
   implicit val encodeCreature: Encoder[Creature] = Encoder.instance { c =>
     {
@@ -110,7 +112,7 @@ object JsonCodecs {
       c match {
         case v: RegularAttack =>
           Map("RegularAttack" -> v).asJson
-        case v: TestProjectile =>
+        case v: BubbleAbility =>
           Map("TestProjectile" -> v).asJson
 
       }
@@ -121,7 +123,7 @@ object JsonCodecs {
     val fname = c.keys.flatMap(_.headOption).toSeq.head
     fname match {
       case "RegularAttack"  => c.downField(fname).as[RegularAttack]
-      case "TestProjectile" => c.downField(fname).as[TestProjectile]
+      case "TestProjectile" => c.downField(fname).as[BubbleAbility]
     }
   })
 }

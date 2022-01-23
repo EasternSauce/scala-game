@@ -1,6 +1,7 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, TestProjectile}
+import com.easternsauce.model.creature.ability.magic.BubbleAbility
+import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.util.Direction.Direction
 import com.softwaremill.quicklens._
 
@@ -28,7 +29,7 @@ abstract class Creature {
   protected val staminaRegenerationDisabled = 1.2f
 
   def init(): Creature = {
-    this.modify(_.params.abilities).setTo(Map("regularAttack" -> TestProjectile().init()))
+    this.modify(_.params.abilities).setTo(Map("regularAttack" -> BubbleAbility().init()))
   }
 
   def update(delta: Float): Creature = {

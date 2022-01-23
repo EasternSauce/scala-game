@@ -66,14 +66,14 @@ case class ComponentRenderer(
 
     if (abilityState == AbilityState.Channel) {
       val texture =
-        channelAnimation.getKeyFrame(abilityComponent.params.abilityChannelAnimationTimer.time)
+        channelAnimation.getKeyFrame(abilityComponent.params.abilityChannelAnimationTimer.time, true)
       updateSprite(texture)
 
     }
 
     if (abilityState == AbilityState.Active) {
       val texture =
-        activeAnimation.getKeyFrame(abilityComponent.params.abilityActiveAnimationTimer.time)
+        activeAnimation.getKeyFrame(abilityComponent.params.abilityActiveAnimationTimer.time, true)
       updateSprite(texture)
 
     }

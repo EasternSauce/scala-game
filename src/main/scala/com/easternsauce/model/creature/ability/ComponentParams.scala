@@ -14,6 +14,5 @@ case class ComponentParams(
   dirVector: Vector2Wrapper = Vector2Wrapper(0, 0),
   abilityHitbox: AbilityHitbox = AbilityHitbox(0, 0, 1, 1, 0, 1),
   attackRange: Float = 1.8f,
-  angleDeviation: Float = 0f,
-  speed: Float = 30.0f
+  angleDeviation: Float = 0f
 )

@@ -78,8 +78,8 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
         b2Body.setTransform(component.params.abilityHitbox.x, component.params.abilityHitbox.y, 0f)
       } else if (component.specification.componentType == ComponentType.RangedProjectile) {
         b2Body.setLinearVelocity(
-          component.params.dirVector.x * component.params.speed,
-          component.params.dirVector.y * component.params.speed
+          component.params.dirVector.x * component.speed,
+          component.params.dirVector.y * component.speed
         )
       }
 

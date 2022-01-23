@@ -9,9 +9,11 @@ case class AbilityComponent(specification: AbilitySpecification, params: Compone
 
   val damage: Float = 35f // TODO
 
-  def width: Float = specification.textureWidth.toFloat / Constants.PPM
+  val speed: Float = specification.initSpeed
 
-  def height: Float = specification.textureHeight.toFloat / Constants.PPM
+  def width: Float = specification.textureWidth.toFloat * specification.scale / Constants.PPM
+
+  def height: Float = specification.textureHeight.toFloat * specification.scale / Constants.PPM
 
   def makeInactive(): AbilityComponent = this.modify(_.params.state).setTo(AbilityState.Inactive)
 

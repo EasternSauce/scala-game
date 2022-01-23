@@ -13,5 +13,7 @@ case class AbilitySpecification(
   activeFrameCount: Int,
   channelFrameDuration: Float,
   activeFrameDuration: Float,
-  componentType: ComponentType
+  componentType: ComponentType,
+  scale: Float,
+  initSpeed: Float
 )

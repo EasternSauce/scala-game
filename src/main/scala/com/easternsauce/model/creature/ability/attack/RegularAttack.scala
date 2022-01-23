@@ -1,8 +1,9 @@
-package com.easternsauce.model.creature.ability
+package com.easternsauce.model.creature.ability.attack
 
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.creature.Creature
-import com.softwaremill.quicklens._
+import com.easternsauce.model.creature.ability._
+import com.softwaremill.quicklens.ModifyPimp
 
 case class RegularAttack(
   override val params: AbilityParams = AbilityParams(),
@@ -20,7 +21,9 @@ case class RegularAttack(
     activeFrameCount = 6,
     channelFrameDuration = 0.05f,
     activeFrameDuration = 0.05f,
-    componentType = ComponentType.MeleeAttack
+    componentType = ComponentType.MeleeAttack,
+    scale = 1f,
+    initSpeed = 30f
   )
 
 //  override val numOfComponents = 12

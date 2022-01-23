@@ -1,22 +1,27 @@
-package com.easternsauce.model.creature.ability
+package com.easternsauce.model.creature.ability.magic
 
-case class TestProjectile(
+import com.easternsauce.model.creature.ability._
+import com.easternsauce.model.creature.ability.attack.RegularAttack
+
+case class BubbleAbility(
   override val params: AbilityParams = AbilityParams(),
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
 
   override val specification: AbilitySpecification = AbilitySpecification(
-    textureWidth = 40,
-    textureHeight = 40,
-    totalActiveTime = 0.3f,
-    totalChannelTime = 0.3f,
-    channelSpriteType = "slash_windup",
-    activeSpriteType = "slash",
-    channelFrameCount = 6,
-    activeFrameCount = 6,
-    channelFrameDuration = 0.05f,
-    activeFrameDuration = 0.05f,
-    componentType = ComponentType.RangedProjectile
+    textureWidth = 64,
+    textureHeight = 64,
+    totalActiveTime = 1.5f,
+    totalChannelTime = 0.5f,
+    channelSpriteType = "bubble",
+    activeSpriteType = "bubble",
+    channelFrameCount = 2,
+    activeFrameCount = 2,
+    channelFrameDuration = 0.1f,
+    activeFrameDuration = 0.3f,
+    componentType = ComponentType.RangedProjectile,
+    scale = 1.7f,
+    initSpeed = 10f
   )
 
   //  override val numOfComponents = 12
@@ -61,5 +66,5 @@ case class TestProjectile(
 //  }
 
   def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): RegularAttack =
-    RegularAttack(params, components)
+    attack.RegularAttack(params, components)
 }
