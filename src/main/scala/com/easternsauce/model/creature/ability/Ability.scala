@@ -1,5 +1,6 @@
 package com.easternsauce.model.creature.ability
 
+import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.softwaremill.quicklens._
 
@@ -19,11 +20,13 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
       .setTo(components)
   }
 
-  def scale: Float = {
-    //if (creature.isWeaponEquipped) creature.currentWeapon.template.attackScale.get
-    //else
-    1.4f
-  }
+  def onStart(gameState: GameState, creatureId: String, abilityId: String): Ability = this
+
+//  def scale: Float = {
+//    //if (creature.isWeaponEquipped) creature.currentWeapon.template.attackScale.get
+//    //else
+//    1.4f
+//  }
 
   def onCooldown: Boolean = if (params.abilityTimer.isRunning) params.abilityTimer.time < cooldownTime else false
 

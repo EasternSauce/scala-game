@@ -22,8 +22,9 @@ case class RegularAttack(
     channelFrameDuration = 0.05f,
     activeFrameDuration = 0.05f,
     componentType = ComponentType.MeleeAttack,
-    scale = 1f,
-    initSpeed = 30f
+    scale = 1.4f,
+    initSpeed = 30f,
+    range = 0f
   )
 
 //  override val numOfComponents = 12
@@ -61,7 +62,7 @@ case class RegularAttack(
           width = component.width,
           height = component.height,
           rotationAngle = theta,
-          scale = scale
+          scale = component.scale
         )
       )
 

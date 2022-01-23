@@ -15,5 +15,6 @@ case class AbilitySpecification(
   activeFrameDuration: Float,
   componentType: ComponentType,
   scale: Float,
-  initSpeed: Float
+  initSpeed: Float,
+  range: Float
 )

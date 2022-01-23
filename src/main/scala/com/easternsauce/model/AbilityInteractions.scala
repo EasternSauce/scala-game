@@ -176,6 +176,9 @@ trait AbilityInteractions {
             .setTo(true)
             .takeStaminaDamage(15f)
         )
+        .modifyGameStateAbility(creatureId, abilityId) {
+          _.onStart(this, creatureId, abilityId)
+        }
 
     } else this
   }

@@ -3,9 +3,10 @@ package com.easternsauce.model.creature.ability.magic
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability._
+import com.easternsauce.system.Random
 import com.softwaremill.quicklens._
 
-case class BubbleAbility(
+case class MeteorRainAbility(
   override val params: AbilityParams = AbilityParams(),
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
@@ -21,11 +22,23 @@ case class BubbleAbility(
     activeFrameCount = 2,
     channelFrameDuration = 0.1f,
     activeFrameDuration = 0.3f,
-    componentType = ComponentType.RangedProjectile,
-    scale = 1.7f,
+    componentType = ComponentType.RainingProjectile,
+    scale = 1.3f,
     initSpeed = 10f,
-    range = 0f
+    range = 3f
   )
+
+  override val numOfComponents: Int = 10
+
+  override def init(): Ability = {
+
+    val components = (for (i <- 0 until numOfComponents)
+      yield (i.toString, AbilityComponent(specification, ComponentParams(componentId = i.toString)))).toMap
+
+    this
+      .modify(_.components)
+      .setTo(components)
+  }
 
   override def onStart(gameState: GameState, creatureId: String, abilityId: String): Ability = {
     val creature = gameState.creatures(creatureId)
@@ -34,13 +47,15 @@ case class BubbleAbility(
       .foldLeft(this)((ability, componentId) => {
         val component = components(componentId)
         val theta = new Vector2(component.params.dirVector.x, component.params.dirVector.y).angleDeg()
+        val x = creature.params.posX + Random.between(-specification.range, specification.range)
+        val y = creature.params.posY + Random.between(-specification.range, specification.range)
 
         ability
           .modify(_.components.at(componentId).params.abilityHitbox)
           .setTo(
             AbilityHitbox(
-              x = creature.params.posX,
-              y = creature.params.posY,
+              x = x,
+              y = y,
               width = component.width,
               height = component.height,
               rotationAngle = theta,
@@ -51,6 +66,6 @@ case class BubbleAbility(
       })
   }
 
-  def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): BubbleAbility =
-    BubbleAbility(params, components)
+  def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): MeteorRainAbility =
+    MeteorRainAbility(params, components)
 }

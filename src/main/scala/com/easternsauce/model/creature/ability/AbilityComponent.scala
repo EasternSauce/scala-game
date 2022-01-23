@@ -5,11 +5,13 @@ import com.softwaremill.quicklens.ModifyPimp
 
 case class AbilityComponent(specification: AbilitySpecification, params: ComponentParams) {
 
-  val isAttack: Boolean = true
+  def isAttack: Boolean = true
 
-  val damage: Float = 35f // TODO
+  def damage: Float = 35f // TODO
 
-  val speed: Float = specification.initSpeed
+  def speed: Float = specification.initSpeed
+
+  def scale: Float = specification.scale
 
   def width: Float = specification.textureWidth.toFloat * specification.scale / Constants.PPM
 

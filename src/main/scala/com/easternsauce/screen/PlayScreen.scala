@@ -166,7 +166,7 @@ class PlayScreen(
 
         val modification: GameState => GameState =
           _.modifyGameStateCreature("player")(_.modify(_.params.dirVector).setTo(facingVector))
-            .performAbility("player", "regularAttack")
+            .performAbility("player", "defaultAbility")
         modification
       } else identity
 

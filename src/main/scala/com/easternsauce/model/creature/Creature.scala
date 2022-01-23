@@ -1,6 +1,6 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.model.creature.ability.magic.BubbleAbility
+import com.easternsauce.model.creature.ability.magic.MeteorRainAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.util.Direction.Direction
 import com.softwaremill.quicklens._
@@ -29,7 +29,11 @@ abstract class Creature {
   protected val staminaRegenerationDisabled = 1.2f
 
   def init(): Creature = {
-    this.modify(_.params.abilities).setTo(Map("regularAttack" -> BubbleAbility().init()))
+    this
+      .modify(_.params.abilities)
+      .setTo(
+        Map("defaultAbility" -> MeteorRainAbility().init())
+      ) // TODO: what is the purpose of ability ids? can they be generated?
   }
 
   def update(delta: Float): Creature = {
