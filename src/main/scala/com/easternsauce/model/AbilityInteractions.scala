@@ -2,7 +2,7 @@ package com.easternsauce.model
 
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.creature.ability.AbilityState
-import com.easternsauce.model.event.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
+import com.easternsauce.model.event.{ComponentCreateBodyEvent, ComponentDestroyBodyEvent}
 import com.easternsauce.util.Vector2Wrapper
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
@@ -18,9 +18,13 @@ trait AbilityInteractions {
 
     val creature = this.creatures(creatureId)
 
+    println("sending create body event")
     this
       .pipe(
-        gameState => gameState.modify(_.events).setTo(AbilityCreateBodyEvent(creatureId, abilityId) :: gameState.events)
+        gameState =>
+          gameState
+            .modify(_.events)
+            .setTo(ComponentCreateBodyEvent(creatureId, abilityId, componentId) :: gameState.events)
       )
       .modifyGameStateAbilityComponent(creatureId, abilityId, componentId) {
         _.modify(_.params.abilityActiveAnimationTimer)
@@ -50,7 +54,6 @@ trait AbilityInteractions {
           .setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y))
           .pipe(ability.updateComponentHitbox(creature, _))
       }
-      .modifyGameStateAbility(creatureId, abilityId)(_.modify(_.params.abilityTimer).using(_.restart()))
 
   }
 
@@ -59,7 +62,9 @@ trait AbilityInteractions {
     this
       .pipe(
         gameState =>
-          gameState.modify(_.events).setTo(AbilityDestroyBodyEvent(creatureId, abilityId) :: gameState.events)
+          gameState
+            .modify(_.events)
+            .setTo(ComponentDestroyBodyEvent(creatureId, abilityId, componentId) :: gameState.events)
       )
       .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(
         _.modify(_.params.activeTimer)
@@ -102,14 +107,27 @@ trait AbilityInteractions {
 
         import com.easternsauce.model.creature.ability.AbilityState._
         (component.params.state match {
+          case DelayedStart =>
+            gameState.pipe {
+              case gameState if ability.params.abilityTimer.time > component.params.delay =>
+                println(
+                  "delayed start of component " + component.params.componentId + " and delay " + component.params.delay
+                )
+                gameState
+                  .onAbilityComponentChannelStart(creatureId, abilityId, componentId)
+                  .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(
+                    _.modify(_.params.state).setTo(AbilityState.Channel)
+                  )
+              case gameState => gameState
+            }
           case Channel =>
             gameState
               .pipe {
-                case state if channelTimer.time > component.specification.totalChannelTime =>
-                  state
+                case gameState if channelTimer.time > component.specification.totalChannelTime =>
+                  gameState
                     .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeActive())
                     .onAbilityComponentActiveStart(creatureId, abilityId, componentId)
-                case state => state
+                case gameState => gameState
               }
               .onAbilityComponentChannelUpdate(creatureId, abilityId, componentId)
           case Active =>
@@ -165,9 +183,8 @@ trait AbilityInteractions {
               _.modify(_.params.channelTimer)
                 .using(_.restart())
                 .modify(_.params.state)
-                .setTo(AbilityState.Channel)
+                .setTo(AbilityState.DelayedStart)
             }
-            .onAbilityComponentChannelStart(creatureId, abilityId, componentId)
         })
         .modifyGameStateCreature(creatureId)(
           _.modify(_.params.staminaRegenerationDisabledTimer)
@@ -178,6 +195,8 @@ trait AbilityInteractions {
         )
         .modifyGameStateAbility(creatureId, abilityId) {
           _.onStart(this, creatureId, abilityId)
+            .modify(_.params.abilityTimer)
+            .using(_.restart())
         }
 
     } else this

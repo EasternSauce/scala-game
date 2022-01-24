@@ -25,7 +25,7 @@ case class MeteorRainAbility(
     componentType = ComponentType.RainingProjectile,
     scale = 1.3f,
     initSpeed = 10f,
-    range = 3f
+    range = 10f
   )
 
   override val numOfComponents: Int = 10
@@ -33,7 +33,10 @@ case class MeteorRainAbility(
   override def init(): Ability = {
 
     val components = (for (i <- 0 until numOfComponents)
-      yield (i.toString, AbilityComponent(specification, ComponentParams(componentId = i.toString)))).toMap
+      yield (
+        i.toString,
+        AbilityComponent(specification, ComponentParams(componentId = i.toString, delay = i * 1.0f))
+      )).toMap
 
     this
       .modify(_.components)

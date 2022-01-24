@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.{Body, World}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.ComponentType
-import com.easternsauce.model.event.{AbilityCreateBodyEvent, AbilityDestroyBodyEvent}
+import com.easternsauce.model.event.{ComponentCreateBodyEvent, ComponentDestroyBodyEvent}
 import com.easternsauce.view.physics.terrain.Terrain
 import com.easternsauce.view.physics.{B2BodyFactory, PhysicsController}
 
@@ -41,17 +41,21 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
   }
 
   def init(world: World, gameState: GameState): Unit = {
+
     this.world = world
 
     val ability = gameState.abilities(creatureId, abilityId)
+    val component = ability.components(componentId)
+
+    println("initing body")
 
     val vertices = hitboxVertices(gameState)
 
     b2Body = B2BodyFactory.createAbilityComponentB2body(
       world = world,
       abilityBody = this,
-      posX = ability.components(componentId).params.abilityHitbox.x,
-      posY = ability.components(componentId).params.abilityHitbox.y,
+      posX = component.params.abilityHitbox.x,
+      posY = component.params.abilityHitbox.y,
       vertices = vertices
     )
 
@@ -63,12 +67,12 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
 
     val terrain: Terrain = physicsController.terrain(areaId)
 
-    if (gameState.events.contains(AbilityCreateBodyEvent(creatureId, abilityId))) {
+    if (gameState.events.contains(ComponentCreateBodyEvent(creatureId, abilityId, componentId))) {
       init(terrain.world, gameState)
       isActive = true
     }
 
-    if (gameState.events.contains(AbilityDestroyBodyEvent(creatureId, abilityId))) {
+    if (gameState.events.contains(ComponentDestroyBodyEvent(creatureId, abilityId, componentId))) {
       destroy()
       isActive = false
     }
