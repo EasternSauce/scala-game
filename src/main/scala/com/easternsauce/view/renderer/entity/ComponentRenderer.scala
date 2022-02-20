@@ -52,6 +52,7 @@ case class ComponentRenderer(
   }
 
   def update(gameState: GameState): Unit = {
+    val ability = gameState.abilities(creatureId, abilityId)
     val abilityComponent = gameState.abilities(creatureId, abilityId).components(componentId)
     val abilityState = abilityComponent.params.state
 
@@ -66,14 +67,20 @@ case class ComponentRenderer(
 
     if (abilityState == AbilityState.Channel) {
       val texture =
-        channelAnimation.getKeyFrame(abilityComponent.params.abilityChannelAnimationTimer.time, true)
+        channelAnimation.getKeyFrame(
+          abilityComponent.params.abilityChannelAnimationTimer.time,
+          ability.specification.channelAnimationLooping
+        )
       updateSprite(texture)
 
     }
 
     if (abilityState == AbilityState.Active) {
       val texture =
-        activeAnimation.getKeyFrame(abilityComponent.params.abilityActiveAnimationTimer.time, true)
+        activeAnimation.getKeyFrame(
+          abilityComponent.params.abilityActiveAnimationTimer.time,
+          ability.specification.activeAnimationLooping
+        )
       updateSprite(texture)
 
     }

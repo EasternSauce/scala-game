@@ -24,7 +24,8 @@ case class BubbleAbility(
     componentType = ComponentType.RangedProjectile,
     scale = 1.7f,
     initSpeed = 10f,
-    range = 0f
+    range = 0f,
+    activeAnimationLooping = true
   )
 
   override def onStart(gameState: GameState, creatureId: String, abilityId: String): Ability = {

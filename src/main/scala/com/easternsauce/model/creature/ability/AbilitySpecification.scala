@@ -14,7 +14,9 @@ case class AbilitySpecification(
   channelFrameDuration: Float,
   activeFrameDuration: Float,
   componentType: ComponentType,
-  scale: Float,
-  initSpeed: Float,
-  range: Float
+  scale: Float = 1.0f,
+  initSpeed: Float = 0f,
+  range: Float,
+  activeAnimationLooping: Boolean = false,
+  channelAnimationLooping: Boolean = false
 )
