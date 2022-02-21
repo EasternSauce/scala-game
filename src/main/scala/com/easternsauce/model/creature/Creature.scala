@@ -1,6 +1,6 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.model.creature.ability.magic.{IceSpearAbility, MeteorRainAbility}
+import com.easternsauce.model.creature.ability.magic.IceSpearAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.util.Direction.Direction
 import com.softwaremill.quicklens._

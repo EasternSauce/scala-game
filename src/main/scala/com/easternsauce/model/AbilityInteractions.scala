@@ -3,7 +3,6 @@ package com.easternsauce.model
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.creature.ability.AbilityState
 import com.easternsauce.model.event.{ComponentCreateBodyEvent, ComponentDestroyBodyEvent}
-import com.easternsauce.util.Vector2Wrapper
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
 
