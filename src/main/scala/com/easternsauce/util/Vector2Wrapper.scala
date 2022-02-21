@@ -15,4 +15,8 @@ case class Vector2Wrapper(x: Float, y: Float) {
     val v2 = vector2.cpy().rotateDeg(degrees)
     Vector2Wrapper(v2.x, v2.y)
   }
+
+  def angleDeg(): Float = {
+    vector2.angleDeg()
+  }
 }

@@ -18,7 +18,6 @@ trait AbilityInteractions {
 
     val creature = this.creatures(creatureId)
 
-    println("sending create body event")
     this
       .pipe(
         gameState =>
@@ -35,7 +34,7 @@ trait AbilityInteractions {
           .using(_.stop())
           .modify(_.params.abilityChannelAnimationTimer)
           .using(_.stop())
-          .setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y))
+          //.setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y)) TODO: this is too late to set this
           .pipe(ability.updateComponentHitbox(creature, _))
       }
   }
@@ -51,7 +50,6 @@ trait AbilityInteractions {
           .using(_.restart())
           .modify(_.params.abilityChannelAnimationTimer)
           .using(_.restart())
-          .setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y))
           .pipe(ability.updateComponentHitbox(creature, _))
       }
 
@@ -110,9 +108,6 @@ trait AbilityInteractions {
           case DelayedStart =>
             gameState.pipe {
               case gameState if ability.params.abilityTimer.time > component.params.delay =>
-                println(
-                  "delayed start of component " + component.params.componentId + " and delay " + component.params.delay
-                )
                 gameState
                   .onAbilityComponentChannelStart(creatureId, abilityId, componentId)
                   .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(

@@ -47,8 +47,6 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
     val ability = gameState.abilities(creatureId, abilityId)
     val component = ability.components(componentId)
 
-    println("initing body")
-
     val vertices = hitboxVertices(gameState)
 
     b2Body = B2BodyFactory.createAbilityComponentB2body(
