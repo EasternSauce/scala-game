@@ -1,8 +1,8 @@
 package com.easternsauce.model.creature.ability.magic
 
-import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability._
+import com.easternsauce.util.Vector2Wrapper
 import com.softwaremill.quicklens._
 
 case class BubbleAbility(
@@ -23,10 +23,30 @@ case class BubbleAbility(
     activeFrameDuration = 0.3f,
     componentType = ComponentType.RangedProjectile,
     scale = 1.7f,
-    initSpeed = 10f,
+    initSpeed = 12f,
     range = 0f,
     activeAnimationLooping = true
   )
+
+  override val numOfComponents: Int = 3
+  val delayBetween = 0.8f
+
+  override def init(): Ability = {
+
+    val components = (for (i <- 0 until numOfComponents)
+      yield (
+        i.toString,
+        AbilityComponent(
+          specification, {
+            ComponentParams(componentId = i.toString, delay = i * delayBetween)
+          }
+        )
+      )).toMap
+
+    this
+      .modify(_.components)
+      .setTo(components)
+  }
 
   override def onStart(gameState: GameState, creatureId: String, abilityId: String): Ability = {
     val creature = gameState.creatures(creatureId)
@@ -34,7 +54,8 @@ case class BubbleAbility(
     components.keys
       .foldLeft(this)((ability, componentId) => {
         val component = components(componentId)
-        val theta = new Vector2(component.params.dirVector.x, component.params.dirVector.y).angleDeg()
+        val dirVector = Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y)
+        val theta = dirVector.angleDeg() + component.params.angleDeviation
 
         ability
           .modify(_.components.at(componentId).params.abilityHitbox)
@@ -42,16 +63,28 @@ case class BubbleAbility(
             AbilityHitbox(
               x = creature.params.posX,
               y = creature.params.posY,
-              width = component.width,
-              height = component.height,
+              width = component.textureWidth,
+              height = component.textureHeight,
               rotationAngle = theta,
               scale = component.scale
             )
           )
-
+          .modify(_.components.at(componentId).params.renderPos)
+          .setTo(Vector2Wrapper(x = creature.params.posX, y = creature.params.posY))
+          .modify(_.components.at(componentId))
+          .using(_.setDirVector(dirVector))
+          .modify(_.components.at(componentId).params.renderWidth)
+          .setTo(component.textureWidth)
+          .modify(_.components.at(componentId).params.renderHeight)
+          .setTo(component.textureHeight)
+          .modify(_.components.at(componentId).params.renderScale)
+          .setTo(component.scale)
+          .modify(_.components.at(componentId).params.renderRotation)
+          .setTo(theta)
       })
   }
 
   def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): BubbleAbility =
     BubbleAbility(params, components)
+
 }

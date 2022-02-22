@@ -30,16 +30,9 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
 
   def onCooldown: Boolean = if (params.abilityTimer.isRunning) params.abilityTimer.time < cooldownTime else false
 
-  def updateHitbox(creature: Creature): Ability = {
-    components.keys.foldLeft(this)(
-      (ability, componentId) =>
-        ability
-          .modify(_.components.at(componentId))
-          .using(updateComponentHitbox(creature, _))
-    )
-  }
-
   def updateComponentHitbox(creature: Creature, component: AbilityComponent): AbilityComponent = component
+
+  def updateRenderPos(creature: Creature, component: AbilityComponent): AbilityComponent = component
 
   def updateComponentTimers(component: AbilityComponent, delta: Float): AbilityComponent = {
     component

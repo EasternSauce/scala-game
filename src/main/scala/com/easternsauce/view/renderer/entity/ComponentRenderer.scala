@@ -58,11 +58,11 @@ case class ComponentRenderer(
 
     def updateSprite(texture: TextureRegion): Unit = {
       sprite.setRegion(texture)
-      sprite.setSize(abilityComponent.params.abilityHitbox.width, abilityComponent.params.abilityHitbox.height)
-      sprite.setCenter(abilityComponent.params.abilityHitbox.x, abilityComponent.params.abilityHitbox.y)
+      sprite.setSize(abilityComponent.params.renderWidth, abilityComponent.params.renderHeight)
+      sprite.setCenter(abilityComponent.params.renderPos.x, abilityComponent.params.renderPos.y)
       sprite.setOriginCenter()
-      sprite.setRotation(abilityComponent.params.abilityHitbox.rotationAngle)
-      sprite.setScale(abilityComponent.params.abilityHitbox.scale)
+      sprite.setRotation(abilityComponent.params.renderRotation)
+      sprite.setScale(abilityComponent.params.renderScale)
     }
 
     if (abilityState == AbilityState.Channel) {

@@ -13,9 +13,9 @@ case class AbilityComponent(specification: AbilitySpecification, params: Compone
 
   def scale: Float = specification.scale
 
-  def width: Float = specification.textureWidth.toFloat * specification.scale / Constants.PPM
+  def textureWidth: Float = specification.textureWidth.toFloat * specification.scale / Constants.PPM
 
-  def height: Float = specification.textureHeight.toFloat * specification.scale / Constants.PPM
+  def textureHeight: Float = specification.textureHeight.toFloat * specification.scale / Constants.PPM
 
   def makeInactive(): AbilityComponent = this.modify(_.params.state).setTo(AbilityState.Inactive)
 
