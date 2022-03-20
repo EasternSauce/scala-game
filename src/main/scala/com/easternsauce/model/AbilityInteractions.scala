@@ -35,7 +35,6 @@ trait AbilityInteractions {
           .using(_.stop())
           //.setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y)) TODO: this is too late to set this
           .pipe(ability.updateComponentHitbox(creature, _))
-          .pipe(ability.updateRenderPos(creature, _))
       }
   }
 
@@ -77,15 +76,18 @@ trait AbilityInteractions {
     val ability = abilities(creatureId, abilityId)
     val creature = this.creatures(creatureId)
 
-    this.modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateComponentHitbox(creature, _))
+    this
+      .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateComponentHitbox(creature, _))
+      .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateRenderPos(creature, _))
   }
 
   def onAbilityComponentActiveUpdate(creatureId: String, abilityId: String, componentId: String): GameState = {
     val ability = abilities(creatureId, abilityId)
     val creature = this.creatures(creatureId)
 
-    this.modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateComponentHitbox(creature, _))
-
+    this
+      .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateComponentHitbox(creature, _))
+      .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateRenderPos(creature, _))
   }
 
   def updateCreatureAbility(
@@ -146,13 +148,19 @@ trait AbilityInteractions {
 
                 case state => state
               }
-              .onAbilityComponentActiveUpdate(creatureId, abilityId, componentId)
+              // set hitbox x and y to body x and y
               .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(
                 _.modify(_.params.abilityHitbox.x)
                   .setTo(pos.x)
                   .modify(_.params.abilityHitbox.y)
                   .setTo(pos.y)
               )
+              .onAbilityComponentActiveUpdate(
+                creatureId,
+                abilityId,
+                componentId
+              ) // needs to be after setting hitbox so it everrides properly
+
           case Inactive =>
             gameState // TODO do we need update anything when inactive?
           case _ => gameState
