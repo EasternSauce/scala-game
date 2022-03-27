@@ -5,8 +5,8 @@ import com.easternsauce.model.creature._
 import com.easternsauce.model.creature.ability.AbilityState.AbilityState
 import com.easternsauce.model.creature.ability.ComponentType.ComponentType
 import com.easternsauce.model.creature.ability._
-import com.easternsauce.model.creature.ability.attack.RegularAttack
-import com.easternsauce.model.creature.ability.magic.{BubbleAbility, FistSlamAbility, IceSpearAbility, MeteorRainAbility}
+import com.easternsauce.model.creature.ability.magic._
+import com.easternsauce.model.creature.ability.sword.SwingSwordAttack
 import com.easternsauce.model.event.UpdateEvent
 import com.easternsauce.model.item.{Item, ItemParameterValue, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
@@ -68,8 +68,8 @@ object JsonCodecs {
   implicit val encodeSerpent: Encoder[Serpent] = deriveEncoder
   implicit val decodePlayer: Decoder[Player] = deriveDecoder
   implicit val encodePlayer: Encoder[Player] = deriveEncoder
-  implicit val decodeRegularAttack: Decoder[RegularAttack] = deriveDecoder
-  implicit val encodeRegularAttack: Encoder[RegularAttack] = deriveEncoder
+  implicit val decodeRegularAttack: Decoder[SwingSwordAttack] = deriveDecoder
+  implicit val encodeRegularAttack: Encoder[SwingSwordAttack] = deriveEncoder
   implicit val decodeMeteorRainAbility: Decoder[MeteorRainAbility] = deriveDecoder
   implicit val encodeMeteorRainAbility: Encoder[MeteorRainAbility] = deriveEncoder
   implicit val decodeIceSpearAbility: Decoder[IceSpearAbility] = deriveDecoder
@@ -78,6 +78,8 @@ object JsonCodecs {
   implicit val encodeBubbleAbility: Encoder[BubbleAbility] = deriveEncoder
   implicit val decodeFistSlamAbility: Decoder[FistSlamAbility] = deriveDecoder
   implicit val encodeFistSlamAbility: Encoder[FistSlamAbility] = deriveEncoder
+  implicit val decodeMeteorCrashAbility: Decoder[MeteorCrashAbility] = deriveDecoder
+  implicit val encodeMeteorCrashAbility: Encoder[MeteorCrashAbility] = deriveEncoder
 
   implicit val encodeCreature: Encoder[Creature] = Encoder.instance { c =>
     {
@@ -116,7 +118,7 @@ object JsonCodecs {
   implicit val encodeAbility: Encoder[Ability] = Encoder.instance { c =>
     {
       c match {
-        case v: RegularAttack =>
+        case v: SwingSwordAttack =>
           Map("RegularAttack" -> v).asJson
         case v: MeteorRainAbility =>
           Map("MeteorRainAbility" -> v).asJson
@@ -126,6 +128,8 @@ object JsonCodecs {
           Map("IceSpearAbility" -> v).asJson
         case v: FistSlamAbility =>
           Map("FistSlamAbility" -> v).asJson
+        case v: MeteorCrashAbility =>
+          Map("MeteorCrashAbility" -> v).asJson
 
       }
     }
@@ -134,11 +138,12 @@ object JsonCodecs {
   implicit val decodeAbility: Decoder[Ability] = Decoder.instance(c => {
     val fname = c.keys.flatMap(_.headOption).toSeq.head
     fname match {
-      case "RegularAttack"     => c.downField(fname).as[RegularAttack]
-      case "MeteorRainAbility" => c.downField(fname).as[MeteorRainAbility]
-      case "BubbleAbility"     => c.downField(fname).as[BubbleAbility]
-      case "IceSpearAbility"   => c.downField(fname).as[IceSpearAbility]
-      case "FistSlamAbility"   => c.downField(fname).as[FistSlamAbility]
+      case "RegularAttack"      => c.downField(fname).as[SwingSwordAttack]
+      case "MeteorRainAbility"  => c.downField(fname).as[MeteorRainAbility]
+      case "BubbleAbility"      => c.downField(fname).as[BubbleAbility]
+      case "IceSpearAbility"    => c.downField(fname).as[IceSpearAbility]
+      case "FistSlamAbility"    => c.downField(fname).as[FistSlamAbility]
+      case "MeteorCrashAbility" => c.downField(fname).as[MeteorCrashAbility]
     }
   })
 }

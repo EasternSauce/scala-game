@@ -20,7 +20,7 @@ case class RendererController(atlas: TextureAtlas) {
   def init(gameState: GameState, maps: Map[String, TiledMap], mapScale: Float): Unit = {
 
     entityRenderers =
-      gameState.creatures.keys.map(creatureId => creatureId -> entity.EntityRenderer(this, creatureId, atlas)).toMap
+      gameState.creatures.keys.map(creatureId => creatureId -> EntityRenderer(this, creatureId, atlas)).toMap
 
     entityRenderers.values.foreach(_.init(gameState))
 
@@ -77,7 +77,7 @@ case class RendererController(atlas: TextureAtlas) {
 
   }
 
-  def renderAbilties(gameState: GameState, batch: RendererBatch): Unit = {
+  def renderAbilities(gameState: GameState, batch: RendererBatch): Unit = {
 
     gameState.creatures.keys.foreach { creatureId =>
       if (entityRenderers.contains(creatureId)) {

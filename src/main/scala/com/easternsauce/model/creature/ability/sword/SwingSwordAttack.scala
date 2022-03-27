@@ -1,4 +1,4 @@
-package com.easternsauce.model.creature.ability.attack
+package com.easternsauce.model.creature.ability.sword
 
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.GameState
@@ -7,7 +7,7 @@ import com.easternsauce.model.creature.ability._
 import com.easternsauce.util.Vector2Wrapper
 import com.softwaremill.quicklens._
 
-case class RegularAttack(
+case class SwingSwordAttack(
   override val params: AbilityParams = AbilityParams(),
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
@@ -60,8 +60,8 @@ case class RegularAttack(
             AbilityHitbox(
               x = creature.params.posX,
               y = creature.params.posY,
-              width = component.textureWidth,
-              height = component.textureHeight,
+              width = component.width,
+              height = component.height,
               rotationAngle = theta,
               scale = component.scale
             )
@@ -71,9 +71,9 @@ case class RegularAttack(
           .modify(_.components.at(componentId))
           .using(_.setDirVector(dirVector))
           .modify(_.components.at(componentId).params.renderWidth)
-          .setTo(component.textureWidth)
+          .setTo(component.width)
           .modify(_.components.at(componentId).params.renderHeight)
-          .setTo(component.textureHeight)
+          .setTo(component.height)
           .modify(_.components.at(componentId).params.renderScale)
           .setTo(component.scale)
           .modify(_.components.at(componentId).params.renderRotation)
@@ -97,8 +97,8 @@ case class RegularAttack(
         AbilityHitbox(
           x = attackRectX,
           y = attackRectY,
-          width = component.textureWidth,
-          height = component.textureHeight,
+          width = component.width,
+          height = component.height,
           rotationAngle = theta,
           scale = component.scale
         )
@@ -118,6 +118,6 @@ case class RegularAttack(
       .setTo(Vector2Wrapper(x = attackRectX, y = attackRectY))
   }
 
-  def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): RegularAttack =
-    RegularAttack(params, components)
+  def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): SwingSwordAttack =
+    SwingSwordAttack(params, components)
 }

@@ -20,5 +20,6 @@ case class ComponentParams(
   abilityHitbox: AbilityHitbox = AbilityHitbox(0, 0, 1, 1, 0, 1),
   attackRange: Float = 1.8f,
   angleDeviation: Float = 0f,
-  delay: Float = 0f
+  delay: Float = 0f,
+  speed: Float = 1.0f // cannot be zero!
 )

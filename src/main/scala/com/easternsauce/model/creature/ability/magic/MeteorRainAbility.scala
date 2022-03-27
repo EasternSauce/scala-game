@@ -55,20 +55,14 @@ case class MeteorRainAbility(
         ability
           .modify(_.components.at(componentId).params.abilityHitbox)
           .setTo(
-            AbilityHitbox(
-              x = x,
-              y = y,
-              width = component.textureWidth,
-              height = component.textureHeight,
-              scale = component.scale
-            )
+            AbilityHitbox(x = x, y = y, width = component.width, height = component.height, scale = component.scale)
           )
           .modify(_.components.at(componentId).params.renderPos)
           .setTo(Vector2Wrapper(x = x, y = y))
           .modify(_.components.at(componentId).params.renderWidth)
-          .setTo(component.textureWidth)
+          .setTo(component.width)
           .modify(_.components.at(componentId).params.renderHeight)
-          .setTo(component.textureHeight)
+          .setTo(component.height)
           .modify(_.components.at(componentId).params.renderScale)
           .setTo(component.scale)
 

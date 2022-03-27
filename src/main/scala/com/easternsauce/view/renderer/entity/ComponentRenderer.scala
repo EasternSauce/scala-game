@@ -35,8 +35,10 @@ case class ComponentRenderer(
         abilityComponent.specification.textureHeight
       )
     }
-    channelAnimation =
-      new Animation[TextureRegion](abilityComponent.specification.channelFrameDuration, channelFrames: _*)
+    channelAnimation = new Animation[TextureRegion](
+      abilityComponent.specification.channelFrameDuration / abilityComponent.params.speed,
+      channelFrames: _*
+    )
 
     val activeFrames = for { i <- (0 until abilityComponent.specification.activeFrameCount).toArray } yield {
       new TextureRegion(
@@ -47,7 +49,10 @@ case class ComponentRenderer(
         abilityComponent.specification.textureHeight
       )
     }
-    activeAnimation = new Animation[TextureRegion](abilityComponent.specification.activeFrameDuration, activeFrames: _*)
+    activeAnimation = new Animation[TextureRegion](
+      abilityComponent.specification.activeFrameDuration / abilityComponent.params.speed,
+      activeFrames: _*
+    )
 
   }
 

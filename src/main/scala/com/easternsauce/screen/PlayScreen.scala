@@ -292,7 +292,7 @@ class PlayScreen(
 
     worldBatch.begin()
 
-    gameView.renderAbilties(gameState, worldBatch)
+    gameView.renderAbilities(gameState, worldBatch)
 
     worldBatch.end()
 

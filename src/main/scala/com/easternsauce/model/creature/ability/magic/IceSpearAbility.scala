@@ -62,8 +62,8 @@ case class IceSpearAbility(
             AbilityHitbox(
               x = creature.params.posX,
               y = creature.params.posY,
-              width = component.textureWidth,
-              height = component.textureHeight,
+              width = component.width,
+              height = component.height,
               rotationAngle = theta,
               scale = component.scale
             )
@@ -73,9 +73,9 @@ case class IceSpearAbility(
           .modify(_.components.at(componentId))
           .using(_.setDirVector(dirVector))
           .modify(_.components.at(componentId).params.renderWidth)
-          .setTo(component.textureWidth)
+          .setTo(component.width)
           .modify(_.components.at(componentId).params.renderHeight)
-          .setTo(component.textureHeight)
+          .setTo(component.height)
           .modify(_.components.at(componentId).params.renderScale)
           .setTo(component.scale)
           .modify(_.components.at(componentId).params.renderRotation)

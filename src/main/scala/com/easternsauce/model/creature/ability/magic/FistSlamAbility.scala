@@ -57,18 +57,18 @@ case class FistSlamAbility(
           .setTo(
             AbilityHitbox(
               x = x,
-              y = y - component.textureHeight / 4 * component.scale, // shift hitbox downwards
-              width = component.textureWidth,
-              height = component.textureHeight / 2,
+              y = y - component.height / 4 * component.scale, // shift hitbox downwards
+              width = component.width,
+              height = component.height / 2,
               scale = component.scale
             )
           )
           .modify(_.components.at(componentId).params.renderPos)
           .setTo(Vector2Wrapper(x = x, y = y))
           .modify(_.components.at(componentId).params.renderWidth)
-          .setTo(component.textureWidth)
+          .setTo(component.width)
           .modify(_.components.at(componentId).params.renderHeight)
-          .setTo(component.textureHeight)
+          .setTo(component.height)
           .modify(_.components.at(componentId).params.renderScale)
           .setTo(component.scale)
 

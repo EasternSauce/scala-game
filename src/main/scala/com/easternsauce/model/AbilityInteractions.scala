@@ -120,7 +120,8 @@ trait AbilityInteractions {
           case Channel =>
             gameState
               .pipe {
-                case gameState if channelTimer.time > component.specification.totalChannelTime =>
+                case gameState
+                    if channelTimer.time > component.specification.totalChannelTime / component.params.speed =>
                   gameState
                     .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeActive())
                     .onAbilityComponentActiveStart(creatureId, abilityId, componentId)
@@ -141,7 +142,7 @@ trait AbilityInteractions {
 
             gameState
               .pipe {
-                case state if activeTimer.time > component.specification.totalActiveTime =>
+                case state if activeTimer.time > component.specification.totalActiveTime / component.params.speed =>
                   state
                     .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeInactive())
                     .onAbilityComponentInactiveStart(creatureId, abilityId, componentId)
