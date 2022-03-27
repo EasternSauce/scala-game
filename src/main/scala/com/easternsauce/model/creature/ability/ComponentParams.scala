@@ -21,5 +21,6 @@ case class ComponentParams(
   attackRange: Float = 1.8f,
   angleDeviation: Float = 0f,
   delay: Float = 0f,
-  speed: Float = 1.0f // cannot be zero!
+  speed: Float = 1.0f, // cannot be zero!
+  range: Float = 0f
 )

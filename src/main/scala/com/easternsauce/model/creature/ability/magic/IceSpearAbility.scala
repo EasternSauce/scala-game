@@ -23,8 +23,7 @@ case class IceSpearAbility(
     activeFrameDuration = 0.3f,
     componentType = ComponentType.RangedProjectile,
     scale = 0.8f,
-    initSpeed = 20f,
-    range = 0f
+    initSpeed = 20f
   )
 
   override val numOfComponents: Int = 5

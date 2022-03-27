@@ -23,8 +23,7 @@ case class FistSlamAbility(
     channelFrameDuration = 0.04f,
     activeFrameDuration = 0.05f,
     componentType = ComponentType.RainingProjectile,
-    scale = 1.5f,
-    range = 4f
+    scale = 1.5f
   )
 
   override val numOfComponents: Int = 18
@@ -35,7 +34,7 @@ case class FistSlamAbility(
     val components = (for (i <- 0 until numOfComponents)
       yield (
         i.toString,
-        AbilityComponent(specification, ComponentParams(componentId = i.toString, delay = i * delayBetween))
+        AbilityComponent(specification, ComponentParams(componentId = i.toString, delay = i * delayBetween, range = 4f))
       )).toMap
 
     this
@@ -49,8 +48,8 @@ case class FistSlamAbility(
     components.keys
       .foldLeft(this)((ability, componentId) => {
         val component = components(componentId)
-        val x = creature.params.posX + Random.between(-specification.range, specification.range)
-        val y = creature.params.posY + Random.between(-specification.range, specification.range)
+        val x = creature.params.posX + Random.between(-component.params.range, component.params.range)
+        val y = creature.params.posY + Random.between(-component.params.range, component.params.range)
 
         ability
           .modify(_.components.at(componentId).params.abilityHitbox)

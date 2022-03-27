@@ -16,7 +16,6 @@ case class AbilitySpecification(
   componentType: ComponentType,
   scale: Float = 1.0f,
   initSpeed: Float = 0f,
-  range: Float,
   activeAnimationLooping: Boolean = false,
   channelAnimationLooping: Boolean = false
 )

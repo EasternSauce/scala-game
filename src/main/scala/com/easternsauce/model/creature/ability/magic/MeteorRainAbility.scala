@@ -23,8 +23,7 @@ case class MeteorRainAbility(
     channelFrameDuration = 0.071428f,
     activeFrameDuration = 0.035714f,
     componentType = ComponentType.RainingProjectile,
-    scale = 1.4f,
-    range = 8f
+    scale = 1.4f
   )
 
   override val numOfComponents: Int = 18
@@ -35,7 +34,7 @@ case class MeteorRainAbility(
     val components = (for (i <- 0 until numOfComponents)
       yield (
         i.toString,
-        AbilityComponent(specification, ComponentParams(componentId = i.toString, delay = i * delayBetween))
+        AbilityComponent(specification, ComponentParams(componentId = i.toString, delay = i * delayBetween, range = 8f))
       )).toMap
 
     this
@@ -49,8 +48,8 @@ case class MeteorRainAbility(
     components.keys
       .foldLeft(this)((ability, componentId) => {
         val component = components(componentId)
-        val x = creature.params.posX + Random.between(-specification.range, specification.range)
-        val y = creature.params.posY + Random.between(-specification.range, specification.range)
+        val x = creature.params.posX + Random.between(-component.params.range, component.params.range)
+        val y = creature.params.posY + Random.between(-component.params.range, component.params.range)
 
         ability
           .modify(_.components.at(componentId).params.abilityHitbox)

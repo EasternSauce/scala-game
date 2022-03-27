@@ -25,8 +25,7 @@ case class SwingSwordAttack(
     activeFrameDuration = 0.05f,
     componentType = ComponentType.MeleeAttack,
     scale = 1.4f,
-    initSpeed = 30f,
-    range = 0f
+    initSpeed = 30f
   )
 
 //  override val numOfComponents = 12

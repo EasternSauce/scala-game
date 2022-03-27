@@ -24,7 +24,6 @@ case class BubbleAbility(
     componentType = ComponentType.RangedProjectile,
     scale = 1.7f,
     initSpeed = 12f,
-    range = 0f,
     activeAnimationLooping = true
   )
 

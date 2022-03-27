@@ -21,11 +21,10 @@ case class MeteorCrashAbility(
     channelFrameDuration = 0.071428f,
     activeFrameDuration = 0.035714f,
     componentType = ComponentType.RainingProjectile,
-    scale = 1.4f,
-    range = 8f
+    scale = 2f
   )
 
-  override val numOfComponents: Int = 18
+  override val numOfComponents: Int = 18 // divisible by 3
   val delayBetween = 0.3f
 
   override def init(): Ability = {
@@ -35,10 +34,7 @@ case class MeteorCrashAbility(
     val meteors3 = for (i <- 0 until numOfComponents / 3) yield "3_" + i.toString
 
     val components = (for (componentId <- (meteors1 ++ meteors2 ++ meteors3))
-      yield (
-        componentId,
-        AbilityComponent(specification, ComponentParams(componentId = componentId))
-      )).toMap // TODO: wer'e doing this just to delare ids for renderers... fix this
+      yield (componentId, AbilityComponent(specification, ComponentParams(componentId = componentId)))).toMap
 
     this
       .modify(_.components)
@@ -64,15 +60,17 @@ case class MeteorCrashAbility(
       val x = creature.params.posX + (3.125f * (i + 1)) * vector.x
       val y = creature.params.posY + (3.125f * (i + 1)) * vector.y
 
+      val scale = (i + 1) / 5f * component.scale
+
       ability
-        .modify(_.components.at(componentId).specification.range)
+        .modify(_.components.at(componentId).params.range)
         .setTo(1.5625f + 0.09375f * i * i)
         .modify(_.components.at(componentId).params.speed)
         .setTo(2.5f)
         .modify(_.components.at(componentId).params.delay)
         .setTo(0.1f * i)
         .modify(_.components.at(componentId).params.abilityHitbox)
-        .setTo(AbilityHitbox(x = x, y = y, width = component.width, height = component.height, scale = component.scale))
+        .setTo(AbilityHitbox(x = x, y = y, width = component.width, height = component.height, scale = scale))
         .modify(_.components.at(componentId).params.renderPos)
         .setTo(Vector2Wrapper(x = x, y = y))
         .modify(_.components.at(componentId).params.renderWidth)
@@ -80,7 +78,7 @@ case class MeteorCrashAbility(
         .modify(_.components.at(componentId).params.renderHeight)
         .setTo(component.height)
         .modify(_.components.at(componentId).params.renderScale)
-        .setTo(component.scale)
+        .setTo(scale)
     })
 
   }
