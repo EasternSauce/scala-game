@@ -7,42 +7,26 @@ import com.easternsauce.model.creature.ability._
 import com.easternsauce.util.Vector2Wrapper
 import com.softwaremill.quicklens._
 
-case class SwingSwordAttack(
+case class ThrustWeaponAbility(
   override val params: AbilityParams = AbilityParams(),
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
 
   override val specification: AbilitySpecification = AbilitySpecification(
-    textureWidth = 40,
-    textureHeight = 40,
-    totalActiveTime = 0.3f,
-    totalChannelTime = 0.3f,
-    channelSpriteType = "slash_windup",
-    activeSpriteType = "slash",
-    channelFrameCount = 6,
-    activeFrameCount = 6,
-    channelFrameDuration = 0.05f,
-    activeFrameDuration = 0.05f,
+    textureWidth = 64,
+    textureHeight = 32,
+    totalActiveTime = 0.275f,
+    totalChannelTime = 0.595f,
+    channelSpriteType = "trident_thrust_windup",
+    activeSpriteType = "trident_thrust",
+    channelFrameCount = 7,
+    activeFrameCount = 11,
+    channelFrameDuration = 0.085f,
+    activeFrameDuration = 0.025f,
     componentType = ComponentType.MeleeAttack,
     scale = 1.4f,
     initSpeed = 30f
   )
-
-//  override val numOfComponents = 12
-//
-//  override def init(): Ability = {
-//    val components = (for (i <- 0 until numOfComponents)
-//      yield (
-//        i.toString,
-//        AbilityComponent(
-//          AbilityComponentParams(componentId = i.toString, angleDeviation = (i - 1) * 30)
-//        ) // TEST MULTIPLE COMPONENTS
-//      )).toMap
-//
-//    this
-//      .modify(_.components)
-//      .setTo(components)
-//  }
 
   override def onStart(gameState: GameState, creatureId: String, abilityId: String): Ability = {
     val creature = gameState.creatures(creatureId)
@@ -117,6 +101,9 @@ case class SwingSwordAttack(
       .setTo(Vector2Wrapper(x = attackRectX, y = attackRectY))
   }
 
-  def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): SwingSwordAttack =
-    SwingSwordAttack(params, components)
+  def copy(
+    params: AbilityParams = params,
+    components: Map[String, AbilityComponent] = components
+  ): ThrustWeaponAbility =
+    ThrustWeaponAbility(params, components)
 }

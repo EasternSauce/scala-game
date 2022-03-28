@@ -1,6 +1,6 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.model.creature.ability.magic.MeteorCrashAbility
+import com.easternsauce.model.creature.ability.sword.ThrustWeaponAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.util.Direction.Direction
 import com.softwaremill.quicklens._
@@ -32,7 +32,7 @@ abstract class Creature {
     this
       .modify(_.params.abilities)
       .setTo(
-        Map("defaultAbility" -> MeteorCrashAbility().init())
+        Map("defaultAbility" -> ThrustWeaponAbility().init())
       ) // TODO: what is the purpose of ability ids? can they be generated?
   }
 

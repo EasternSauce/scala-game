@@ -6,7 +6,7 @@ import com.easternsauce.model.creature.ability.AbilityState.AbilityState
 import com.easternsauce.model.creature.ability.ComponentType.ComponentType
 import com.easternsauce.model.creature.ability._
 import com.easternsauce.model.creature.ability.magic._
-import com.easternsauce.model.creature.ability.sword.SwingSwordAttack
+import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
 import com.easternsauce.model.event.UpdateEvent
 import com.easternsauce.model.item.{Item, ItemParameterValue, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
@@ -68,8 +68,8 @@ object JsonCodecs {
   implicit val encodeSerpent: Encoder[Serpent] = deriveEncoder
   implicit val decodePlayer: Decoder[Player] = deriveDecoder
   implicit val encodePlayer: Encoder[Player] = deriveEncoder
-  implicit val decodeRegularAttack: Decoder[SwingSwordAttack] = deriveDecoder
-  implicit val encodeRegularAttack: Encoder[SwingSwordAttack] = deriveEncoder
+  implicit val decodeRegularAttack: Decoder[SwingWeaponAbility] = deriveDecoder
+  implicit val encodeRegularAttack: Encoder[SwingWeaponAbility] = deriveEncoder
   implicit val decodeMeteorRainAbility: Decoder[MeteorRainAbility] = deriveDecoder
   implicit val encodeMeteorRainAbility: Encoder[MeteorRainAbility] = deriveEncoder
   implicit val decodeIceSpearAbility: Decoder[IceSpearAbility] = deriveDecoder
@@ -118,7 +118,7 @@ object JsonCodecs {
   implicit val encodeAbility: Encoder[Ability] = Encoder.instance { c =>
     {
       c match {
-        case v: SwingSwordAttack =>
+        case v: SwingWeaponAbility =>
           Map("RegularAttack" -> v).asJson
         case v: MeteorRainAbility =>
           Map("MeteorRainAbility" -> v).asJson
@@ -138,7 +138,7 @@ object JsonCodecs {
   implicit val decodeAbility: Decoder[Ability] = Decoder.instance(c => {
     val fname = c.keys.flatMap(_.headOption).toSeq.head
     fname match {
-      case "RegularAttack"      => c.downField(fname).as[SwingSwordAttack]
+      case "RegularAttack"      => c.downField(fname).as[SwingWeaponAbility]
       case "MeteorRainAbility"  => c.downField(fname).as[MeteorRainAbility]
       case "BubbleAbility"      => c.downField(fname).as[BubbleAbility]
       case "IceSpearAbility"    => c.downField(fname).as[IceSpearAbility]
