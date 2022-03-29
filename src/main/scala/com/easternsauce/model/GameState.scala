@@ -61,7 +61,13 @@ case class GameState(
     collisionQueue.foldLeft(this) {
       case (gameState, AbilityComponentCollision(creatureId, abilityId, componentId)) =>
         val abilityComponent = gameState.abilities(creatureId, abilityId).components(componentId)
-        gameState.creatureTakeLifeDamage(creatureId, abilityComponent.damage)
+
+        if (!creatures(creatureId).isEffectActive("immunityFrames")) {
+          gameState
+            .creatureTakeLifeDamage(creatureId, abilityComponent.damage)
+            .creatureActivateEffect(creatureId, "immunityFrames", 2f)
+        } else gameState
+
     }
   }
 
@@ -126,6 +132,11 @@ case class GameState(
           gameState.creatureOnDeath(creatureId)
         } else gameState
       })
+  }
+
+  def creatureActivateEffect(creatureId: String, effectName: String, effectTime: Float): GameState = {
+    this
+      .modifyGameStateCreature(creatureId)(_.activateEffect(effectName, effectTime))
   }
 
   def creatureOnDeath(creatureId: String): GameState = {

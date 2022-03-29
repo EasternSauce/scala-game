@@ -9,9 +9,9 @@ Already done:
 - creature inventory (and items) + inventory window,
 - add remaining creatures,
 - game save to/load from file,
+- add remaining abilities and components,
 
 To be done: 
-- add remaining abilities and components,
 - creature logic (temporary effects),
 - area gates,
 - enemy spawns,

@@ -6,7 +6,8 @@ import com.easternsauce.model.creature.ability.AbilityState.AbilityState
 import com.easternsauce.model.creature.ability.ComponentType.ComponentType
 import com.easternsauce.model.creature.ability._
 import com.easternsauce.model.creature.ability.magic._
-import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
+import com.easternsauce.model.creature.ability.sword.{SwingWeaponAbility, ThrustWeaponAbility}
+import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.model.event.UpdateEvent
 import com.easternsauce.model.item.{Item, ItemParameterValue, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
@@ -80,6 +81,10 @@ object JsonCodecs {
   implicit val encodeFistSlamAbility: Encoder[FistSlamAbility] = deriveEncoder
   implicit val decodeMeteorCrashAbility: Decoder[MeteorCrashAbility] = deriveDecoder
   implicit val encodeMeteorCrashAbility: Encoder[MeteorCrashAbility] = deriveEncoder
+  implicit val decodeEffect: Decoder[Effect] = deriveDecoder
+  implicit val encodeEffect: Encoder[Effect] = deriveEncoder
+  implicit val decodeThrustWeaponAbility: Decoder[ThrustWeaponAbility] = deriveDecoder
+  implicit val encodeThrustWeaponAbility: Encoder[ThrustWeaponAbility] = deriveEncoder
 
   implicit val encodeCreature: Encoder[Creature] = Encoder.instance { c =>
     {
@@ -119,7 +124,7 @@ object JsonCodecs {
     {
       c match {
         case v: SwingWeaponAbility =>
-          Map("RegularAttack" -> v).asJson
+          Map("SwingWeaponAbility" -> v).asJson
         case v: MeteorRainAbility =>
           Map("MeteorRainAbility" -> v).asJson
         case v: BubbleAbility =>
@@ -130,7 +135,8 @@ object JsonCodecs {
           Map("FistSlamAbility" -> v).asJson
         case v: MeteorCrashAbility =>
           Map("MeteorCrashAbility" -> v).asJson
-
+        case v: ThrustWeaponAbility =>
+          Map("ThrustWeaponAbility" -> v).asJson
       }
     }
   }

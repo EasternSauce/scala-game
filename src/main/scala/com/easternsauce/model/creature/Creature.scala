@@ -2,6 +2,7 @@ package com.easternsauce.model.creature
 
 import com.easternsauce.model.creature.ability.sword.ThrustWeaponAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
+import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.util.Direction.Direction
 import com.softwaremill.quicklens._
 
@@ -40,6 +41,8 @@ abstract class Creature {
     this
       .updateTimers(delta)
       .updateStamina(delta)
+      .modify(_.params.effects)
+      .using(_.map { case (name, effect) => (name, effect.update(delta)) })
   }
 
   def updateTimers(delta: Float): Creature = {
@@ -135,6 +138,18 @@ abstract class Creature {
   }
 
   def isAlive: Boolean = params.life > 0f
+
+  def activateEffect(effect: String, time: Float): Creature = {
+    if (params.effects.contains(effect)) {
+      this.modify(_.params.effects.at(effect)).using(_.activate(time))
+    } else {
+      this.modify(_.params.effects).setTo(this.params.effects + (effect -> Effect(effect).activate(time)))
+    }
+  }
+
+  def isEffectActive(effect: String): Boolean = {
+    params.effects.contains(effect) && params.effects(effect).isActive
+  }
 
   def copy(params: CreatureParams = params): Creature
 

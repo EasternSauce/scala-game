@@ -1,6 +1,7 @@
 package com.easternsauce.model.creature
 
 import com.easternsauce.model.creature.ability.Ability
+import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.model.item.{Item, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
 import com.easternsauce.util.Direction.Direction
@@ -30,5 +31,6 @@ case class CreatureParams(
   totalArmor: Float = 0f,
   equipmentItems: Map[Int, Item] = Map(),
   inventoryItems: Map[Int, Item] =
-    Map(2 -> Item(ItemTemplate.templates("leatherArmor"))) // TODO: test item present, remove after
+    Map(2 -> Item(ItemTemplate.templates("leatherArmor"))), // TODO: test item present, remove after
+  effects: Map[String, Effect] = Map()
 )
