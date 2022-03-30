@@ -10,9 +10,9 @@ Already done:
 - add remaining creatures,
 - game save to/load from file,
 - add remaining abilities and components,
+- creature logic (temporary effects).
 
-To be done: 
-- creature logic (temporary effects),
+To be done:
 - area gates,
 - enemy spawns,
 - boss arena and boss fight,

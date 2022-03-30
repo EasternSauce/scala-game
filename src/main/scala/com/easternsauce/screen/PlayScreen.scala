@@ -226,7 +226,9 @@ class PlayScreen(
 
     val playerBodyCreated = physicsController.entityBodies.contains(gameState.player.params.id)
 
-    if (playerBodyCreated)
+    val ableToMove = !gameState.player.isEffectActive("stagger")
+
+    if (playerBodyCreated && ableToMove)
       physicsController.entityBodies(gameState.player.params.id).setVelocity(new Vector2(vectorX, vectorY))
 
     val pos =
@@ -241,11 +243,11 @@ class PlayScreen(
       .modify(_.player.params.posY)
       .setTo(pos.y)
       .modify(_.player.params.facingDirection)
-      .setTo(facingDirection)
+      .setToIf(ableToMove)(facingDirection)
       .modify(_.player.params.isMoving)
-      .setTo(isMoving)
+      .setToIf(ableToMove)(isMoving)
       .modify(_.player)
-      .using(startMovingAction)
+      .usingIf(ableToMove)(startMovingAction)
       .pipe(leftClickInput)
       .pipe(handleInventoryOpen)
 

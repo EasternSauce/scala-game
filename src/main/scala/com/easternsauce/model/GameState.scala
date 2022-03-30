@@ -66,6 +66,7 @@ case class GameState(
           gameState
             .creatureTakeLifeDamage(creatureId, abilityComponent.damage)
             .creatureActivateEffect(creatureId, "immunityFrames", 2f)
+            .creatureActivateEffect(creatureId, "stagger", 0.35f)
         } else gameState
 
     }
