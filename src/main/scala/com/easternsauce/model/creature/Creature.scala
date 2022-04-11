@@ -9,7 +9,6 @@ import com.softwaremill.quicklens._
 import scala.util.chaining.scalaUtilChainingOps
 
 abstract class Creature {
-
   val isPlayer = false
 
   val params: CreatureParams
@@ -43,6 +42,7 @@ abstract class Creature {
       .updateStamina(delta)
       .modify(_.params.effects)
       .using(_.map { case (name, effect) => (name, effect.update(delta)) })
+      .updateAutomaticControls(delta)
   }
 
   def updateTimers(delta: Float): Creature = {
@@ -150,6 +150,8 @@ abstract class Creature {
   def isEffectActive(effect: String): Boolean = {
     params.effects.contains(effect) && params.effects(effect).isActive
   }
+
+  def updateAutomaticControls(delta: Float): Creature = this
 
   def copy(params: CreatureParams = params): Creature
 

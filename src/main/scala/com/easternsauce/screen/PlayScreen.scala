@@ -224,24 +224,16 @@ class PlayScreen(
       case _ => player: Creature => player
     }
 
-    val playerBodyCreated = physicsController.entityBodies.contains(gameState.player.params.id)
-
     val ableToMove = !gameState.player.isEffectActive("stagger")
 
-    if (playerBodyCreated && ableToMove)
-      physicsController.entityBodies(gameState.player.params.id).setVelocity(new Vector2(vectorX, vectorY))
+//    val playerBodyCreated = physicsController.entityBodies.contains(gameState.player.params.id)
 
-    val pos =
-      if (playerBodyCreated)
-        physicsController.entityBodies(gameState.player.params.id).pos
-      else
-        new Vector2(gameState.player.params.posX, gameState.player.params.posY)
+//    if (playerBodyCreated && ableToMove)
+//      physicsController.entityBodies(gameState.player.params.id).setVelocity(new Vector2(vectorX, vectorY))
 
     gameState
-      .modify(_.player.params.posX)
-      .setTo(pos.x)
-      .modify(_.player.params.posY)
-      .setTo(pos.y)
+      .modify(_.player.params.velocity)
+      .setTo(Vector2Wrapper(vectorX, vectorY))
       .modify(_.player.params.facingDirection)
       .setToIf(ableToMove)(facingDirection)
       .modify(_.player.params.isMoving)

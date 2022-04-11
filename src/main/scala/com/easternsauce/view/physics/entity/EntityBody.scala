@@ -39,6 +39,16 @@ case class EntityBody(creatureId: String) {
       b2Body.getFixtureList.get(0).setSensor(true)
     }
 
+    val ableToMove = !gameState.creatures(creatureId).isEffectActive("stagger")
+
+    val bodyCreated = physicsController.entityBodies.contains(creatureId)
+
+    val vectorX = gameState.creatures(creatureId).params.velocity.x
+    val vectorY = gameState.creatures(creatureId).params.velocity.y
+
+    if (bodyCreated && ableToMove)
+      physicsController.entityBodies(creatureId).setVelocity(new Vector2(vectorX, vectorY))
+
     componentBodies.values.foreach(_.update(gameState, physicsController, currentAreaId))
   }
 

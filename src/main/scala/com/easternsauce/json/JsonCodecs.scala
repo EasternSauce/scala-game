@@ -144,12 +144,13 @@ object JsonCodecs {
   implicit val decodeAbility: Decoder[Ability] = Decoder.instance(c => {
     val fname = c.keys.flatMap(_.headOption).toSeq.head
     fname match {
-      case "RegularAttack"      => c.downField(fname).as[SwingWeaponAbility]
-      case "MeteorRainAbility"  => c.downField(fname).as[MeteorRainAbility]
-      case "BubbleAbility"      => c.downField(fname).as[BubbleAbility]
-      case "IceSpearAbility"    => c.downField(fname).as[IceSpearAbility]
-      case "FistSlamAbility"    => c.downField(fname).as[FistSlamAbility]
-      case "MeteorCrashAbility" => c.downField(fname).as[MeteorCrashAbility]
+      case "RegularAttack"       => c.downField(fname).as[SwingWeaponAbility]
+      case "MeteorRainAbility"   => c.downField(fname).as[MeteorRainAbility]
+      case "BubbleAbility"       => c.downField(fname).as[BubbleAbility]
+      case "IceSpearAbility"     => c.downField(fname).as[IceSpearAbility]
+      case "FistSlamAbility"     => c.downField(fname).as[FistSlamAbility]
+      case "MeteorCrashAbility"  => c.downField(fname).as[MeteorCrashAbility]
+      case "ThrustWeaponAbility" => c.downField(fname).as[ThrustWeaponAbility]
     }
   })
 }

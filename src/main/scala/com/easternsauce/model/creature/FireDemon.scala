@@ -3,7 +3,7 @@ package com.easternsauce.model.creature
 import com.easternsauce.util.Direction
 import com.easternsauce.util.Direction.Direction
 
-case class FireDemon(override val params: CreatureParams) extends Creature {
+case class FireDemon(override val params: CreatureParams) extends Enemy(params = params) {
   override val spriteType: String = "taurus"
   override val textureWidth: Int = 80
   override val textureHeight: Int = 80

@@ -32,5 +32,6 @@ case class CreatureParams(
   equipmentItems: Map[Int, Item] = Map(),
   inventoryItems: Map[Int, Item] =
     Map(2 -> Item(ItemTemplate.templates("leatherArmor"))), // TODO: test item present, remove after
-  effects: Map[String, Effect] = Map()
+  effects: Map[String, Effect] = Map(),
+  velocity: Vector2Wrapper = Vector2Wrapper(0, 0)
 )
