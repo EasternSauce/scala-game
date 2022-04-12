@@ -43,8 +43,10 @@ case class EntityBody(creatureId: String) {
 
     val bodyCreated = physicsController.entityBodies.contains(creatureId)
 
-    val vectorX = gameState.creatures(creatureId).params.velocity.x
-    val vectorY = gameState.creatures(creatureId).params.velocity.y
+    val v = gameState.creatures(creatureId).params.speed
+    val normalMovingDir = gameState.creatures(creatureId).params.movingDir.normal
+    val vectorX = normalMovingDir.x * v
+    val vectorY = normalMovingDir.y * v
 
     if (bodyCreated && ableToMove)
       physicsController.entityBodies(creatureId).setVelocity(new Vector2(vectorX, vectorY))

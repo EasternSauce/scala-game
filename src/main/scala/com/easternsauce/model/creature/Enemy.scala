@@ -5,7 +5,7 @@ import com.softwaremill.quicklens.ModifyPimp
 
 abstract class Enemy(override val params: CreatureParams) extends Creature {
   override def updateAutomaticControls(delta: Float): Enemy = {
-    this.modify(_.params.velocity).setTo(Vector2Wrapper(1.0f, 1.0f))
+    this.modify(_.params.movingDir).setTo(Vector2Wrapper(1.0f, 0.1f))
   }
 
   override def copy(params: CreatureParams): Enemy = {

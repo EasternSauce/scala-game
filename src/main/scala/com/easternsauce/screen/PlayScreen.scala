@@ -170,33 +170,18 @@ class PlayScreen(
         modification
       } else identity
 
-    val directionalSpeed: Float = {
-      import Input.Keys._
-
-      val sqrt2 = 1.4142135f
-      val speed = 25f
-
-      List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {
-        case List(true, _, true, _) => speed / sqrt2
-        case List(true, _, _, true) => speed / sqrt2
-        case List(_, true, true, _) => speed / sqrt2
-        case List(_, true, _, true) => speed / sqrt2
-        case _                      => speed
-      }
-    }
-
     val (vectorX, vectorY) = {
       import Input.Keys._
 
       val x: Float = List(A, D).map(Gdx.input.isKeyPressed(_)) match {
-        case List(true, false) => -directionalSpeed
-        case List(false, true) => directionalSpeed
+        case List(true, false) => -1
+        case List(false, true) => 1
         case _                 => 0
       }
 
       val y: Float = List(S, W).map(Gdx.input.isKeyPressed(_)) match {
-        case List(true, false) => -directionalSpeed
-        case List(false, true) => directionalSpeed
+        case List(true, false) => -1
+        case List(false, true) => 1
         case _                 => 0
       }
 
@@ -232,7 +217,7 @@ class PlayScreen(
 //      physicsController.entityBodies(gameState.player.params.id).setVelocity(new Vector2(vectorX, vectorY))
 
     gameState
-      .modify(_.player.params.velocity)
+      .modify(_.player.params.movingDir)
       .setTo(Vector2Wrapper(vectorX, vectorY))
       .modify(_.player.params.facingDirection)
       .setToIf(ableToMove)(facingDirection)
