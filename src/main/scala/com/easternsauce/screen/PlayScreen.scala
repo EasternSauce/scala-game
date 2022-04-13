@@ -147,7 +147,7 @@ class PlayScreen(
       }
     }
 
-    val handleInventoryOpen: GameState => GameState = gameState => {
+    val handleInventoryOpenClose: GameState => GameState = gameState => {
       val inventoryOpen = gameState.inventoryState.inventoryOpen
       if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
         if (!inventoryOpen) {
@@ -157,7 +157,7 @@ class PlayScreen(
       } else gameState
     }
 
-    val leftClickInput: GameState => GameState =
+    val handleLeftClickInput: GameState => GameState =
       if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
         val mouseX = Gdx.input.getX
         val mouseY = Gdx.input.getY
@@ -173,63 +173,65 @@ class PlayScreen(
         modification
       } else identity
 
-    val (vectorX, vectorY) = {
-      import Input.Keys._
+    val handleMovement: GameState => GameState = { gameState =>
+      val (movementVectorX, movementVectorY) = {
+        import Input.Keys._
 
-      val x: Float = List(A, D).map(Gdx.input.isKeyPressed(_)) match {
-        case List(true, false) => -1
-        case List(false, true) => 1
-        case _                 => 0
-      }
-
-      val y: Float = List(S, W).map(Gdx.input.isKeyPressed(_)) match {
-        case List(true, false) => -1
-        case List(false, true) => 1
-        case _                 => 0
-      }
-
-      (x, y)
-    }
-
-    val (facingDirection, isMoving) = {
-      import Input.Keys._
-      List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {
-        case List(true, _, _, _) => (Direction.Up, true)
-        case List(_, true, _, _) => (Direction.Down, true)
-        case List(_, _, true, _) => (Direction.Left, true)
-        case List(_, _, _, true) => (Direction.Right, true)
-        case _                   => (gameState.player.params.facingDirection, false)
-      }
-
-    }
-
-    val ableToMove = !gameState.player.isEffectActive("stagger")
-
-    val wasMoving = gameState.player.isMoving
-    val startMovingAction = (wasMoving, isMoving) match {
-      case (false, true) =>
-        player: Creature => {
-          if (ableToMove) player.startMoving()
-          else player
+        val x: Float = List(A, D).map(Gdx.input.isKeyPressed(_)) match {
+          case List(true, false) => -1
+          case List(false, true) => 1
+          case _                 => 0
         }
-      case (true, false) =>
-        player: Creature => player.stopMoving()
-      case _ => player: Creature => player
+
+        val y: Float = List(S, W).map(Gdx.input.isKeyPressed(_)) match {
+          case List(true, false) => -1
+          case List(false, true) => 1
+          case _                 => 0
+        }
+
+        (x, y)
+      }
+
+      val ableToMove = !gameState.player.isEffectActive("stagger")
+
+      if (ableToMove) gameState.modify(_.player).using { player =>
+        val (facingDirection, isMoving) = { // TODO: universal (for all creatures) facing direction based on movingDir!
+          import Input.Keys._
+          List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {
+            case List(true, _, _, _) => (Direction.Up, true)
+            case List(_, true, _, _) => (Direction.Down, true)
+            case List(_, _, true, _) => (Direction.Left, true)
+            case List(_, _, _, true) => (Direction.Right, true)
+            case _                   => (gameState.player.params.facingDirection, false)
+          }
+
+        }
+
+        val wasMoving = gameState.player.isMoving
+
+        player
+          .modify(_.params.facingDirection)
+          .setTo(facingDirection)
+          .modify(_.params.movingDir)
+          .setTo(Vector2Wrapper(movementVectorX, movementVectorY))
+          .pipe((wasMoving, isMoving) match {
+
+            case (false, true) =>
+              player: Creature => player.startMoving()
+
+            case (true, false) =>
+              player: Creature => player.stopMoving()
+            case _ => player: Creature => player
+          })
+
+      }
+      else gameState
     }
-
-//    val playerBodyCreated = physicsController.entityBodies.contains(gameState.player.params.id)
-
-//    if (playerBodyCreated && ableToMove)
-//      physicsController.entityBodies(gameState.player.params.id).setVelocity(new Vector2(vectorX, vectorY))
 
     gameState
-      .modify(_.player.params.movingDir)
-      .setTo(Vector2Wrapper(vectorX, vectorY))
-      .modify(_.player.params.facingDirection)
-      .setToIf(ableToMove)(facingDirection)
-      .pipe(gameState => if (ableToMove) gameState.modify(_.player).using(startMovingAction) else gameState)
-      .pipe(leftClickInput)
-      .pipe(handleInventoryOpen)
+      .pipe(handleMovement)
+      .pipe(handleLeftClickInput)
+      .pipe(handleInventoryOpenClose)
 
   }
 
