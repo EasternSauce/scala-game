@@ -54,8 +54,7 @@ class MyGdxGame extends Game {
         life = 62f,
         maxLife = 100f,
         stamina = 100f,
-        maxStamina = 100f,
-        speed = 25f
+        maxStamina = 100f
       )
     )
 
@@ -68,8 +67,7 @@ class MyGdxGame extends Game {
         life = 100f,
         maxLife = 100f,
         stamina = 100f,
-        maxStamina = 100f,
-        speed = 25f
+        maxStamina = 100f
       )
     )
 
@@ -82,8 +80,7 @@ class MyGdxGame extends Game {
         life = 100f,
         maxLife = 100f,
         stamina = 100f,
-        maxStamina = 100f,
-        speed = 25f
+        maxStamina = 100f
       )
     )
 

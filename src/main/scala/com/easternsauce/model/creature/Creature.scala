@@ -1,9 +1,11 @@
 package com.easternsauce.model.creature
 
+import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.sword.ThrustWeaponAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.util.Direction.Direction
+import com.easternsauce.util.Vector2Wrapper
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -23,10 +25,14 @@ abstract class Creature {
   val dirMap: Map[Direction, Int]
   val baseLife: Float
 
+  val isControlledAutomatically: Boolean = false
+
   protected val staminaRegenerationTickTime = 0.005f
   protected val staminaRegeneration = 0.8f
   protected val staminaOveruseTime = 2f
   protected val staminaRegenerationDisabled = 1.2f
+
+  val speed: Float = 15f
 
   def init(): Creature = {
     this
@@ -42,7 +48,6 @@ abstract class Creature {
       .updateStamina(delta)
       .modify(_.params.effects)
       .using(_.map { case (name, effect) => (name, effect.update(delta)) })
-      .updateAutomaticControls(delta)
   }
 
   def updateTimers(delta: Float): Creature = {
@@ -64,6 +69,8 @@ abstract class Creature {
       .modify(_.params.posY)
       .setTo(newPosY)
   }
+
+  def pos: Vector2Wrapper = Vector2Wrapper(params.posX, params.posY)
 
   def takeStaminaDamage(staminaDamage: Float): Creature = {
     if (params.stamina - staminaDamage > 0) this.modify(_.params.stamina).setTo(this.params.stamina - staminaDamage)
@@ -151,7 +158,16 @@ abstract class Creature {
     params.effects.contains(effect) && params.effects(effect).isActive
   }
 
-  def updateAutomaticControls(delta: Float): Creature = this
+  def startMoving(): Creature =
+    this.modify(_.params.currentSpeed).setTo(this.speed).modify(_.params.animationTimer).using(_.restart())
+
+  def stopMoving(): Creature = this.modify(_.params.currentSpeed).setTo(0f)
+
+  def moveInDir(dir: Vector2Wrapper): Creature = this.modify(_.params.movingDir).setTo(dir).startMoving()
+
+  def isMoving: Boolean = this.params.currentSpeed > 0f
+
+  def updateAutomaticControls(gameState: GameState): Creature = this
 
   def copy(params: CreatureParams = params): Creature
 

@@ -19,4 +19,12 @@ case class Vector2Wrapper(x: Float, y: Float) {
   def angleDeg(): Float = {
     vector2.angleDeg()
   }
+
+  def distance(point: Vector2Wrapper): Float = {
+    vector2.dst(point.vector2)
+  }
+
+  def vectorTowards(point: Vector2Wrapper): Vector2Wrapper = {
+    Vector2Wrapper(point.x - x, point.y - y).normal
+  }
 }

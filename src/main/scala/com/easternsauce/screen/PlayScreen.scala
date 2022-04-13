@@ -83,6 +83,9 @@ class PlayScreen(
       creature
         .setPosition(pos.x, pos.y)
         .update(delta)
+        .pipe(
+          creature => if (creature.isControlledAutomatically) creature.updateAutomaticControls(gameState) else creature
+        )
     }
 
     gameState // TODO: dont update creatures outside the current area
@@ -200,16 +203,19 @@ class PlayScreen(
 
     }
 
-    val wasMoving = gameState.player.params.isMoving
+    val ableToMove = !gameState.player.isEffectActive("stagger")
+
+    val wasMoving = gameState.player.isMoving
     val startMovingAction = (wasMoving, isMoving) match {
       case (false, true) =>
         player: Creature => {
-          player.modify(_.params.animationTimer).using(_.restart())
+          if (ableToMove) player.startMoving()
+          else player
         }
+      case (true, false) =>
+        player: Creature => player.stopMoving()
       case _ => player: Creature => player
     }
-
-    val ableToMove = !gameState.player.isEffectActive("stagger")
 
 //    val playerBodyCreated = physicsController.entityBodies.contains(gameState.player.params.id)
 
@@ -221,10 +227,7 @@ class PlayScreen(
       .setTo(Vector2Wrapper(vectorX, vectorY))
       .modify(_.player.params.facingDirection)
       .setToIf(ableToMove)(facingDirection)
-      .modify(_.player.params.isMoving)
-      .setToIf(ableToMove)(isMoving)
-      .modify(_.player)
-      .usingIf(ableToMove)(startMovingAction)
+      .pipe(gameState => if (ableToMove) gameState.modify(_.player).using(startMovingAction) else gameState)
       .pipe(leftClickInput)
       .pipe(handleInventoryOpen)
 

@@ -19,6 +19,8 @@ case class Player(override val params: CreatureParams) extends Creature {
 
   override val isPlayer = true
 
+  override val speed: Float = 25f
+
   override def update(delta: Float): Player = {
     super.update(delta).asInstanceOf[Player]
   }

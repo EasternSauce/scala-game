@@ -1,15 +1,25 @@
 package com.easternsauce.model.creature
 
-import com.easternsauce.util.Vector2Wrapper
-import com.softwaremill.quicklens.ModifyPimp
+import com.easternsauce.model.GameState
+
+import scala.util.chaining.scalaUtilChainingOps
 
 abstract class Enemy(override val params: CreatureParams) extends Creature {
-  override def updateAutomaticControls(delta: Float): Enemy = {
-    this.modify(_.params.movingDir).setTo(Vector2Wrapper(1.0f, 0.1f))
+
+  override val isControlledAutomatically = true
+
+  override def updateAutomaticControls(gameState: GameState): Enemy = {
+
+    this.pipe(
+      creature =>
+        if (gameState.player.pos.distance(creature.pos) < 15f)
+          creature.moveInDir(creature.pos.vectorTowards(gameState.player.pos)).asInstanceOf[Enemy]
+        else creature.stopMoving().asInstanceOf[Enemy]
+    )
   }
 
   override def copy(params: CreatureParams): Enemy = {
-    // unreachable, needed for quicklens to work in abstract class
+    // unreachable, always overriden; needed for quicklens to work in abstract class
     ???
   }
 }
