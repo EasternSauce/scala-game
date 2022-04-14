@@ -9,7 +9,7 @@ import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.easternsauce.event.{AreaChangeEvent, CollisionEvent}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
-import com.easternsauce.util.{Constants, Direction, RendererBatch, Vector2Wrapper}
+import com.easternsauce.util.{Constants, RendererBatch, Vector2Wrapper}
 import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.view.renderer.RendererController
 import com.softwaremill.quicklens._
@@ -189,20 +189,23 @@ class PlayScreen(
           case _                 => 0
         }
 
-        (x, y)
+        (x, y) match {
+          case (0, 0) => (gameState.player.params.movingDir.x, gameState.player.params.movingDir.y)
+          case _      => (x, y)
+        }
       }
 
       val ableToMove = !gameState.player.isEffectActive("stagger")
 
       if (ableToMove) gameState.modify(_.player).using { player =>
-        val (facingDirection, isMoving) = { // TODO: universal (for all creatures) facing direction based on movingDir!
+        val isMoving = {
           import Input.Keys._
           List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {
-            case List(true, _, _, _) => (Direction.Up, true)
-            case List(_, true, _, _) => (Direction.Down, true)
-            case List(_, _, true, _) => (Direction.Left, true)
-            case List(_, _, _, true) => (Direction.Right, true)
-            case _                   => (gameState.player.params.facingDirection, false)
+            case List(true, _, _, _) => true
+            case List(_, true, _, _) => true
+            case List(_, _, true, _) => true
+            case List(_, _, _, true) => true
+            case _                   => false
           }
 
         }
@@ -210,10 +213,8 @@ class PlayScreen(
         val wasMoving = gameState.player.isMoving
 
         player
-          .modify(_.params.facingDirection)
-          .setTo(facingDirection)
           .modify(_.params.movingDir)
-          .setTo(Vector2Wrapper(movementVectorX, movementVectorY))
+          .setTo(Vector2Wrapper(movementVectorX, movementVectorY).normal)
           .pipe((wasMoving, isMoving) match {
 
             case (false, true) =>

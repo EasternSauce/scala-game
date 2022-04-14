@@ -75,8 +75,8 @@ case class EntityRenderer(gameView: RendererController, creatureId: String, atla
 
     val creature = gameState.creatures(creatureId)
     val texture =
-      if (!creature.isMoving) facingTexture(gameState, creature.params.facingDirection)
-      else runningAnimation(gameState, creature.params.facingDirection)
+      if (!creature.isMoving) facingTexture(gameState, creature.facingDirection)
+      else runningAnimation(gameState, creature.facingDirection)
     sprite.setRegion(texture)
     sprite.setCenter(creature.params.posX, creature.params.posY)
     sprite.setSize(creature.width, creature.height)

@@ -12,7 +12,7 @@ case class Skeleton(override val params: CreatureParams) extends Enemy(params = 
   override val height: Float = 2
   override val frameDuration: Float = 0.05f
   override val frameCount: Int = 9
-  override val neutralStanceFrame: Int = 1
+  override val neutralStanceFrame: Int = 0
   override val dirMap: Map[Direction, Int] =
     Map(Direction.Up -> 0, Direction.Down -> 2, Direction.Left -> 1, Direction.Right -> 3)
   override val baseLife: Float = 200f

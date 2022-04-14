@@ -5,7 +5,7 @@ import com.easternsauce.model.creature.ability.sword.ThrustWeaponAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.util.Direction.Direction
-import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.util.{Direction, Vector2Wrapper}
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -168,6 +168,16 @@ abstract class Creature {
   def isMoving: Boolean = this.params.currentSpeed > 0f
 
   def updateAutomaticControls(gameState: GameState): Creature = this
+
+  def facingDirection: Direction = {
+    val movingDir = params.movingDir
+    movingDir.angleDeg() match {
+      case angle if angle >= 45 && angle < 135  => Direction.Up
+      case angle if angle >= 135 && angle < 225 => Direction.Left
+      case angle if angle >= 225 && angle < 315 => Direction.Down
+      case _                                    => Direction.Right
+    }
+  }
 
   def copy(params: CreatureParams = params): Creature
 
