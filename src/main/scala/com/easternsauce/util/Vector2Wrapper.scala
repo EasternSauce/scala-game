@@ -27,4 +27,6 @@ case class Vector2Wrapper(x: Float, y: Float) {
   def vectorTowards(point: Vector2Wrapper): Vector2Wrapper = {
     Vector2Wrapper(point.x - x, point.y - y).normal
   }
+
+  def length: Float = vector2.len()
 }

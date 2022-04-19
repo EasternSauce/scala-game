@@ -168,7 +168,7 @@ class PlayScreen(
         val facingVector = Vector2Wrapper(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).normal
 
         val modification: GameState => GameState =
-          _.modifyGameStateCreature("player")(_.modify(_.params.dirVector).setTo(facingVector))
+          _.modifyGameStateCreature("player")(_.modify(_.params.actionDirVector).setTo(facingVector))
             .performAbility("player", "defaultAbility")
         modification
       } else identity
@@ -195,7 +195,7 @@ class PlayScreen(
         }
       }
 
-      val ableToMove = !gameState.player.isEffectActive("stagger")
+      val ableToMove = !gameState.player.isEffectActive("stagger") && gameState.player.isAlive
 
       if (ableToMove) gameState.modify(_.player).using { player =>
         val isMoving = {

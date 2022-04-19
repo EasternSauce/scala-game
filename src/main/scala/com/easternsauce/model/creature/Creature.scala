@@ -1,8 +1,8 @@
 package com.easternsauce.model.creature
 
 import com.easternsauce.model.GameState
-import com.easternsauce.model.creature.ability.sword.ThrustWeaponAbility
-import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
+import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
+import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, AbilityState}
 import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.util.Direction.Direction
 import com.easternsauce.util.{Direction, Vector2Wrapper}
@@ -38,7 +38,7 @@ abstract class Creature {
     this
       .modify(_.params.abilities)
       .setTo(
-        Map("defaultAbility" -> ThrustWeaponAbility().init())
+        Map("defaultAbility" -> SwingWeaponAbility().init())
       ) // TODO: what is the purpose of ability ids? can they be generated?
   }
 
@@ -141,7 +141,7 @@ abstract class Creature {
   }
 
   def onDeath(): Creature = {
-    this
+    this.stopMoving()
   }
 
   def isAlive: Boolean = params.life > 0f
@@ -177,6 +177,41 @@ abstract class Creature {
       case angle if angle >= 225 && angle < 315 => Direction.Down
       case _                                    => Direction.Right
     }
+  }
+
+  def attack(dir: Vector2Wrapper): Creature =
+    this.modify(_.params.actionDirVector).setTo(dir).performAbility("defaultAbility")
+
+  def performAbility(abilityId: String): Creature = {
+
+    val ability = this.params.abilities(abilityId)
+
+    if (
+      this.params.stamina > 0 && !ability.componentsActive && !ability.onCooldown
+      /*&& !creature.abilityActive*/
+    ) {
+      ability.components.keys
+        .foldLeft(this)((creature, componentId) => {
+          creature
+            .modifyAbilityComponent(abilityId, componentId) {
+              _.modify(_.params.channelTimer)
+                .using(_.restart())
+                .modify(_.params.state)
+                .setTo(AbilityState.DelayedStart)
+            }
+        })
+        .modify(_.params.staminaRegenerationDisabledTimer)
+        .using(_.restart())
+        .modify(_.params.isStaminaRegenerationDisabled)
+        .setTo(true)
+        .takeStaminaDamage(15f)
+        .modifyAbility(abilityId) {
+          _.onStart(this)
+            .modify(_.params.abilityTimer)
+            .using(_.restart())
+        }
+
+    } else this
   }
 
   def copy(params: CreatureParams = params): Creature

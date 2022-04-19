@@ -59,14 +59,17 @@ case class GameState(
 
   def processCollisions(collisionQueue: ListBuffer[CollisionEvent]): GameState = {
     collisionQueue.foldLeft(this) {
-      case (gameState, AbilityComponentCollision(creatureId, abilityId, componentId)) =>
+      case (gameState, AbilityComponentCollision(creatureId, abilityId, componentId, collidedCreatureId)) =>
         val abilityComponent = gameState.abilities(creatureId, abilityId).components(componentId)
 
-        if (!creatures(creatureId).isEffectActive("immunityFrames")) {
+        val attackingDisallowed =
+          creatures(creatureId).isControlledAutomatically && creatures(collidedCreatureId).isControlledAutomatically
+
+        if (!attackingDisallowed && !creatures(collidedCreatureId).isEffectActive("immunityFrames")) {
           gameState
-            .creatureTakeLifeDamage(creatureId, abilityComponent.damage)
-            .creatureActivateEffect(creatureId, "immunityFrames", 2f)
-            .creatureActivateEffect(creatureId, "stagger", 0.35f)
+            .creatureTakeLifeDamage(collidedCreatureId, abilityComponent.damage)
+            .creatureActivateEffect(collidedCreatureId, "immunityFrames", 2f)
+            .creatureActivateEffect(collidedCreatureId, "stagger", 0.35f)
         } else gameState
 
     }
@@ -146,6 +149,7 @@ case class GameState(
         gameState
           .modify(_.events)
           .setTo(CreatureDeathEvent(creatureId) :: gameState.events)
+          .modifyGameStateCreature(creatureId)(_.onDeath())
     )
   }
 }

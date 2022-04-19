@@ -48,7 +48,7 @@ class MyGdxGame extends Game {
     val player: Player = Player(
       CreatureParams(
         id = "player",
-        posX = 15,
+        posX = 50,
         posY = 10,
         areaId = "area1",
         life = 62f,
@@ -74,7 +74,7 @@ class MyGdxGame extends Game {
     val wolf: Serpent = Serpent(
       CreatureParams(
         id = "zzzzzz",
-        posX = 15,
+        posX = 20,
         posY = 10,
         areaId = "area1",
         life = 100f,

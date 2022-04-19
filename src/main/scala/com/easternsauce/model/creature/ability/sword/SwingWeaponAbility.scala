@@ -1,7 +1,6 @@
 package com.easternsauce.model.creature.ability.sword
 
 import com.badlogic.gdx.math.Vector2
-import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability._
 import com.easternsauce.util.Vector2Wrapper
@@ -28,13 +27,12 @@ case class SwingWeaponAbility(
     initSpeed = 30f
   )
 
-  override def onStart(gameState: GameState, creatureId: String, abilityId: String): Ability = {
-    val creature = gameState.creatures(creatureId)
+  override def onStart(creature: Creature): Ability = {
 
     components.keys
       .foldLeft(this)((ability, componentId) => {
         val component = components(componentId)
-        val dirVector = Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y)
+        val dirVector = Vector2Wrapper(creature.params.actionDirVector.x, creature.params.actionDirVector.y)
         val theta = dirVector.angleDeg() + component.params.angleDeviation
 
         ability
@@ -66,10 +64,15 @@ case class SwingWeaponAbility(
 
   override def updateComponentHitbox(creature: Creature, component: AbilityComponent): AbilityComponent = {
 
-    val theta = new Vector2(component.params.dirVector.x, component.params.dirVector.y).angleDeg()
+    val dirVector = component.params.dirVector match {
+      case dirVector if dirVector.length <= 0 => Vector2Wrapper(1, 0).normal
+      case dirVector                          => dirVector
+    }
 
-    val attackShiftX = component.params.dirVector.normal.x * component.params.attackRange
-    val attackShiftY = component.params.dirVector.normal.y * component.params.attackRange
+    val theta = new Vector2(dirVector.x, dirVector.y).angleDeg()
+
+    val attackShiftX = dirVector.normal.x * component.params.attackRange
+    val attackShiftY = dirVector.normal.y * component.params.attackRange
 
     val attackRectX = attackShiftX + creature.params.posX
     val attackRectY = attackShiftY + creature.params.posY
@@ -90,8 +93,14 @@ case class SwingWeaponAbility(
   }
 
   override def updateRenderPos(creature: Creature, component: AbilityComponent): AbilityComponent = {
-    val attackShiftX = component.params.dirVector.normal.x * component.params.attackRange
-    val attackShiftY = component.params.dirVector.normal.y * component.params.attackRange
+
+    val dirVector = component.params.dirVector match {
+      case dirVector if dirVector.length <= 0 => Vector2Wrapper(1, 0).normal
+      case dirVector                          => dirVector
+    }
+
+    val attackShiftX = dirVector.normal.x * component.params.attackRange
+    val attackShiftY = dirVector.normal.y * component.params.attackRange
 
     val attackRectX = attackShiftX + creature.params.posX
     val attackRectY = attackShiftY + creature.params.posY

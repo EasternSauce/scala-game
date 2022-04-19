@@ -10,12 +10,26 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
 
   override def updateAutomaticControls(gameState: GameState): Enemy = {
 
-    this.pipe(
-      creature =>
-        if (gameState.player.pos.distance(creature.pos) < 15f)
-          creature.moveInDir(creature.pos.vectorTowards(gameState.player.pos)).asInstanceOf[Enemy]
-        else creature.stopMoving().asInstanceOf[Enemy]
-    )
+    val potentialTarget = gameState.player // TODO: look for closest target instead
+
+    val vectorTowardsTarget = pos.vectorTowards(potentialTarget.pos)
+
+    if (isAlive && potentialTarget.isAlive) {
+      this
+        .pipe(
+          creature =>
+            if (potentialTarget.pos.distance(creature.pos) > 3f && potentialTarget.pos.distance(creature.pos) < 15f)
+              creature.moveInDir(vectorTowardsTarget).asInstanceOf[Enemy]
+            else creature.stopMoving().asInstanceOf[Enemy]
+        )
+        .pipe(
+          creature =>
+            if (potentialTarget.pos.distance(creature.pos) < 4f)
+              creature.attack(vectorTowardsTarget).asInstanceOf[Enemy]
+            else creature
+        )
+    } else this.stopMoving().asInstanceOf[Enemy]
+
   }
 
   override def copy(params: CreatureParams): Enemy = {

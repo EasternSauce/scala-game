@@ -147,9 +147,10 @@ case class Terrain(map: TiledMap, mapScale: Float) {
               if (entityBody.creatureId != abilityComponentBody.creatureId) {
                 collisionQueue.prepend(
                   AbilityComponentCollision(
-                    entityBody.creatureId,
+                    abilityComponentBody.creatureId,
                     abilityComponentBody.abilityId,
-                    abilityComponentBody.componentId
+                    abilityComponentBody.componentId,
+                    entityBody.creatureId
                   )
                 )
               }

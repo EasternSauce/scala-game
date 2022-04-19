@@ -1,7 +1,6 @@
 package com.easternsauce.model.creature.ability.sword
 
 import com.badlogic.gdx.math.Vector2
-import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability._
 import com.easternsauce.util.Vector2Wrapper
@@ -28,13 +27,11 @@ case class ThrustWeaponAbility(
     initSpeed = 30f
   )
 
-  override def onStart(gameState: GameState, creatureId: String, abilityId: String): Ability = {
-    val creature = gameState.creatures(creatureId)
-
+  override def onStart(creature: Creature): Ability = {
     components.keys
       .foldLeft(this)((ability, componentId) => {
         val component = components(componentId)
-        val dirVector = Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y)
+        val dirVector = Vector2Wrapper(creature.params.actionDirVector.x, creature.params.actionDirVector.y)
         val theta = dirVector.angleDeg() + component.params.angleDeviation
 
         ability

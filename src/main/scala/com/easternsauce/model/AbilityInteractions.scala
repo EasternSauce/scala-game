@@ -198,7 +198,7 @@ trait AbilityInteractions {
             .takeStaminaDamage(15f)
         )
         .modifyGameStateAbility(creatureId, abilityId) {
-          _.onStart(this, creatureId, abilityId)
+          _.onStart(creature)
             .modify(_.params.abilityTimer)
             .using(_.restart())
         }

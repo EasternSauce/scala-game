@@ -1,6 +1,5 @@
 package com.easternsauce.model.creature.ability
 
-import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.softwaremill.quicklens._
 
@@ -20,7 +19,7 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
       .setTo(components)
   }
 
-  def onStart(gameState: GameState, creatureId: String, abilityId: String): Ability = this
+  def onStart(creature: Creature): Ability = this
 
 //  def scale: Float = {
 //    //if (creature.isWeaponEquipped) creature.currentWeapon.template.attackScale.get

@@ -1,6 +1,6 @@
 package com.easternsauce.model.creature.ability.magic
 
-import com.easternsauce.model.GameState
+import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability._
 import com.easternsauce.system.Random
 import com.easternsauce.util.Vector2Wrapper
@@ -42,8 +42,8 @@ case class MeteorRainAbility(
       .setTo(components)
   }
 
-  override def onStart(gameState: GameState, creatureId: String, abilityId: String): Ability = {
-    val creature = gameState.creatures(creatureId)
+  override def onStart(creature: Creature): Ability = {
+//    val creature = gameState.creatures(creatureId)
 
     components.keys
       .foldLeft(this)((ability, componentId) => {

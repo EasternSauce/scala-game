@@ -17,7 +17,7 @@ case class CreatureParams(
   stamina: Float,
   maxStamina: Float,
   abilities: Map[String, Ability] = Map(),
-  dirVector: Vector2Wrapper = Vector2Wrapper(0, 0),
+  actionDirVector: Vector2Wrapper = Vector2Wrapper(0, 0),
   staminaOveruse: Boolean = false,
   staminaOveruseTimer: SimpleTimer = SimpleTimer(),
   staminaRegenerationTimer: SimpleTimer = SimpleTimer(isRunning = true),

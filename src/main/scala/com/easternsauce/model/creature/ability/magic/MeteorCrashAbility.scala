@@ -1,6 +1,6 @@
 package com.easternsauce.model.creature.ability.magic
 
-import com.easternsauce.model.GameState
+import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability._
 import com.easternsauce.util.Vector2Wrapper
 import com.softwaremill.quicklens._
@@ -42,10 +42,9 @@ case class MeteorCrashAbility(
 
   }
 
-  override def onStart(gameState: GameState, creatureId: String, abilityId: String): Ability = {
-    val creature = gameState.creatures(creatureId)
+  override def onStart(creature: Creature): Ability = {
 
-    val facingVector: Vector2Wrapper = creature.params.dirVector
+    val facingVector: Vector2Wrapper = creature.params.actionDirVector
 
     val meteors1 = for (i <- 0 until numOfComponents / 3) yield ("1_" + i.toString, i, 0)
     val meteors2 = for (i <- 0 until numOfComponents / 3) yield ("2_" + i.toString, i, 50)
