@@ -171,38 +171,4 @@ trait AbilityInteractions {
 
   }
 
-  def performAbility(creatureId: String, abilityId: String): GameState = {
-    val creature = creatures(creatureId)
-
-    val ability = creature.params.abilities(abilityId)
-
-    if (
-      creature.params.stamina > 0 && !ability.componentsActive && !ability.onCooldown
-      /*&& !creature.abilityActive*/
-    ) {
-      ability.components.keys
-        .foldLeft(this)((gameState, componentId) => {
-          gameState
-            .modifyGameStateAbilityComponent(creatureId, abilityId, componentId) {
-              _.modify(_.params.channelTimer)
-                .using(_.restart())
-                .modify(_.params.state)
-                .setTo(AbilityState.DelayedStart)
-            }
-        })
-        .modifyGameStateCreature(creatureId)(
-          _.modify(_.params.staminaRegenerationDisabledTimer)
-            .using(_.restart())
-            .modify(_.params.isStaminaRegenerationDisabled)
-            .setTo(true)
-            .takeStaminaDamage(15f)
-        )
-        .modifyGameStateAbility(creatureId, abilityId) {
-          _.onStart(creature)
-            .modify(_.params.abilityTimer)
-            .using(_.restart())
-        }
-
-    } else this
-  }
 }

@@ -168,8 +168,9 @@ class PlayScreen(
         val facingVector = Vector2Wrapper(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).normal
 
         val modification: GameState => GameState =
-          _.modifyGameStateCreature("player")(_.modify(_.params.actionDirVector).setTo(facingVector))
-            .performAbility("player", "defaultAbility")
+          _.modifyGameStateCreature("player")(
+            _.modify(_.params.actionDirVector).setTo(facingVector).performAbility("defaultAbility")
+          )
         modification
       } else identity
 
