@@ -63,7 +63,7 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
     val ability = gameState.abilities(creatureId, abilityId)
     val component = ability.components(componentId)
 
-    val terrain: Terrain = physicsController.terrain(areaId)
+    val terrain: Terrain = physicsController.terrains(areaId)
 
     if (gameState.events.contains(ComponentCreateBodyEvent(creatureId, abilityId, componentId))) {
       init(terrain.world, gameState)

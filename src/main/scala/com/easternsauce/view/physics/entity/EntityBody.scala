@@ -18,7 +18,7 @@ case class EntityBody(creatureId: String) {
   def init(gameState: GameState, physicsController: PhysicsController, areaId: String): Unit = {
     val creature = gameState.creatures(creatureId)
 
-    val terrain: Terrain = physicsController.terrain(areaId)
+    val terrain: Terrain = physicsController.terrains(areaId)
 
     b2Body = B2BodyFactory.createCreatureB2body(world = terrain.world, entityBody = this, creature = creature)
 

@@ -6,21 +6,22 @@ import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.easternsauce.model.GameState
 import com.easternsauce.util.RendererBatch
+import com.easternsauce.view.physics.terrain.AreaGate
 import com.easternsauce.view.renderer.entity.EntityRenderer
 import com.easternsauce.view.renderer.hud.InventoryRenderer
-import com.easternsauce.view.renderer.terrain.AreaRenderer
+import com.easternsauce.view.renderer.terrain.{AreaGateRenderer, AreaRenderer}
 
 case class RendererController(atlas: TextureAtlas) {
 
   var entityRenderers: Map[String, EntityRenderer] = Map()
   var areaRenderers: Map[String, AreaRenderer] = Map()
+  var areaGateRenderers: List[AreaGateRenderer] = List()
 
   var inventoryRenderer: InventoryRenderer = _
 
-  def init(gameState: GameState, maps: Map[String, TiledMap], mapScale: Float): Unit = {
+  def init(gameState: GameState, maps: Map[String, TiledMap], mapScale: Float, areaGates: List[AreaGate]): Unit = {
 
-    entityRenderers =
-      gameState.creatures.keys.map(creatureId => creatureId -> EntityRenderer(this, creatureId, atlas)).toMap
+    entityRenderers = gameState.creatures.keys.map(creatureId => creatureId -> EntityRenderer(creatureId, atlas)).toMap
 
     entityRenderers.values.foreach(_.init(gameState))
 
@@ -29,6 +30,8 @@ case class RendererController(atlas: TextureAtlas) {
     areaRenderers.values.foreach(_.init())
 
     inventoryRenderer = InventoryRenderer()
+
+    areaGateRenderers = areaGates.map(AreaGateRenderer)
 
   }
 
@@ -85,6 +88,10 @@ case class RendererController(atlas: TextureAtlas) {
       }
     }
 
+  }
+
+  def renderAreaGates(gameState: GameState, batch: RendererBatch): Unit = {
+    areaGateRenderers.foreach(_.render(gameState, batch))
   }
 
   def dispose(): Unit = {

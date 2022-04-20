@@ -10,6 +10,7 @@ import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.physics.PhysicsController
+import com.easternsauce.view.physics.terrain.{AreaGate, Terrain}
 import com.easternsauce.view.renderer
 import com.easternsauce.view.renderer.RendererController
 import io.circe.parser.decode
@@ -27,7 +28,13 @@ class MyGdxGame extends Game {
 
   private val mapScale = 4.0f
 
-  val mapsToLoad = Map("area1" -> "assets/areas/area1", "area2" -> "assets/areas/area2")
+  val mapsToLoad =
+    Map("area1" -> "assets/areas/area1", "area2" -> "assets/areas/area2", "area3" -> "assets/areas/area3")
+
+  val areaGates: List[AreaGate] = List( // TODO: load this from file?
+    AreaGate("area1", 199.5f, 15f, "area3", 17f, 2.5f),
+    AreaGate("area1", 2f, 63f, "area2", 58f, 9f)
+  )
 
   val mapLoader: TmxMapLoader = new TmxMapLoader()
 
@@ -111,12 +118,17 @@ class MyGdxGame extends Game {
       }
 
     gameView = renderer.RendererController(atlas)
-    physicsController = PhysicsController()
+
+    val terrains: Map[String, Terrain] = maps.map { case (areaId, map) => areaId -> Terrain(map, mapScale) }
+
+    areaGates.foreach(_.init(terrains))
+
+    physicsController = PhysicsController(terrains, areaGates)
 
     playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController)
 
-    gameView.init(gameState, maps, mapScale)
-    physicsController.init(gameState, maps, mapScale)
+    gameView.init(gameState, maps, mapScale, areaGates)
+    physicsController.init(gameState)
 
     setScreen(playScreen)
   }

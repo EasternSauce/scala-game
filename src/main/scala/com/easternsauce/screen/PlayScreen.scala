@@ -107,7 +107,7 @@ class PlayScreen(
   def update(delta: Float): Unit = {
 
     val currentArea = gameView.areaRenderers(gameState.currentAreaId)
-    val currentTerrain = physicsController.terrain(gameState.currentAreaId)
+    val currentTerrain = physicsController.terrains(gameState.currentAreaId)
 
     currentTerrain.step()
 
@@ -264,11 +264,13 @@ class PlayScreen(
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | coverageBuffer)
 
     val currentArea = gameView.areaRenderers(gameState.currentAreaId)
-    val currentTerrain = physicsController.terrain(gameState.currentAreaId)
+    val currentTerrain = physicsController.terrains(gameState.currentAreaId)
 
     currentArea.render(Array(0, 1))
 
     worldBatch.begin()
+
+    gameView.renderAreaGates(gameState, worldBatch)
 
     gameView.renderEntities(gameState, worldBatch)
 

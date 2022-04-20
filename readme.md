@@ -1,8 +1,10 @@
 TODO:
 
-Rewrite libgdxgame (https://github.com/EasternSauce/libgdx-game) separating functional game model (that describes the current game state) from procedural libgdx code.
+Rewrite libgdxgame (https://github.com/EasternSauce/libgdx-game) separating functional game model (that describes the
+current game state) from procedural libgdx code.
 
 Already done:
+
 - rendering animated terrain/creatures/abilities,
 - ability collision detection,
 - creature life and stamina,
@@ -13,6 +15,7 @@ Already done:
 - creature logic (temporary effects).
 
 To be done:
+
 - area gates,
 - enemy spawns,
 - boss arena and boss fight,

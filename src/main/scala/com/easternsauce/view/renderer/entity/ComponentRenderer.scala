@@ -4,15 +4,8 @@ import com.badlogic.gdx.graphics.g2d.{Animation, Sprite, TextureAtlas, TextureRe
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.AbilityState
 import com.easternsauce.util.RendererBatch
-import com.easternsauce.view.renderer.RendererController
 
-case class ComponentRenderer(
-  gameView: RendererController,
-  creatureId: String,
-  abilityId: String,
-  componentId: String,
-  atlas: TextureAtlas
-) {
+case class ComponentRenderer(creatureId: String, abilityId: String, componentId: String, atlas: TextureAtlas) {
   val sprite: Sprite = new Sprite()
   var channelAnimation: Animation[TextureRegion] = _
   var activeAnimation: Animation[TextureRegion] = _

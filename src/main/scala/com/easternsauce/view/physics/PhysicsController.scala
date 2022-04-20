@@ -1,24 +1,20 @@
 package com.easternsauce.view.physics
 
-import com.badlogic.gdx.maps.tiled.TiledMap
 import com.easternsauce.event.{AreaChangeEvent, CollisionEvent}
 import com.easternsauce.model.GameState
 import com.easternsauce.view.physics.entity.EntityBody
-import com.easternsauce.view.physics.terrain.Terrain
+import com.easternsauce.view.physics.terrain.{AreaGate, Terrain}
 
 import scala.collection.mutable.ListBuffer
 
-case class PhysicsController() {
+case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[AreaGate]) {
   var entityBodies: Map[String, EntityBody] = Map()
-  var terrain: Map[String, Terrain] = Map()
 
   var collisionQueue: ListBuffer[CollisionEvent] = _
 
-  def init(gameState: GameState, maps: Map[String, TiledMap], mapScale: Float): Unit = {
+  def init(gameState: GameState): Unit = {
 
-    terrain = maps.map { case (areaId, map) => areaId -> Terrain(map, mapScale) }
-
-    terrain.values.foreach(_.init(collisionQueue))
+    terrains.values.foreach(_.init(collisionQueue))
 
     entityBodies = gameState.creatures.keys.map(creatureId => creatureId -> EntityBody(creatureId)).toMap
 
@@ -35,7 +31,7 @@ case class PhysicsController() {
 
     areaChangeQueue.foreach {
       case AreaChangeEvent(creatureId, oldAreaId, newAreaId) =>
-        terrain(oldAreaId).world.destroyBody(entityBodies(creatureId).b2Body)
+        terrains(oldAreaId).world.destroyBody(entityBodies(creatureId).b2Body)
         entityBodies(creatureId).init(gameState = gameState, physicsController = this, areaId = newAreaId)
     }
 
@@ -43,5 +39,5 @@ case class PhysicsController() {
 
   def setCollisionQueue(collisionQueue: ListBuffer[CollisionEvent]): Unit = this.collisionQueue = collisionQueue
 
-  def dispose(): Unit = terrain.values.foreach(_.dispose())
+  def dispose(): Unit = terrains.values.foreach(_.dispose())
 }
