@@ -3,9 +3,11 @@ package com.easternsauce.game
 import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
+import com.easternsauce.event.PhysicsEvent
 import com.easternsauce.model.GameState
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.{CreatureParams, Player, Serpent, Skeleton}
+import com.easternsauce.model.event.AreaChangeEvent
 import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
@@ -16,6 +18,7 @@ import com.easternsauce.view.renderer.RendererController
 import io.circe.parser.decode
 
 import java.io.FileNotFoundException
+import scala.collection.mutable.ListBuffer
 
 class MyGdxGame extends Game {
 
@@ -43,6 +46,9 @@ class MyGdxGame extends Game {
   var physicsController: PhysicsController = _
 
   var playScreen: PlayScreen = _
+
+  var areaChangeQueue: ListBuffer[AreaChangeEvent] = ListBuffer()
+  var collisionQueue: ListBuffer[PhysicsEvent] = ListBuffer()
 
   override def create(): Unit = {
     Assets.loadAssets()
@@ -125,10 +131,10 @@ class MyGdxGame extends Game {
 
     physicsController = PhysicsController(terrains, areaGates)
 
-    playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController)
+    playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController, collisionQueue)
 
     gameView.init(gameState, maps, mapScale, areaGates)
-    physicsController.init(gameState)
+    physicsController.init(gameState, collisionQueue)
 
     setScreen(playScreen)
   }

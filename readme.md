@@ -12,11 +12,12 @@ Already done:
 - add remaining creatures,
 - game save to/load from file,
 - add remaining abilities and components,
-- creature logic (temporary effects).
+- creature logic (temporary effects),
+- area gates.
 
 To be done:
 
-- area gates,
+- area gates REFACTOR!,
 - enemy spawns,
 - boss arena and boss fight,
 - creature movement AI,

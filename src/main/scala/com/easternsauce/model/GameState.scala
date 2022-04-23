@@ -1,13 +1,12 @@
 package com.easternsauce.model
 
-import com.easternsauce.event.{AbilityComponentCollision, AreaChangeEvent, CollisionEvent}
+import com.easternsauce.event.{AbilityComponentCollision, AreaGateCollision, LeftAreaGateEvent, PhysicsEvent}
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
-import com.easternsauce.model.event.{CreatureDeathEvent, UpdateEvent}
+import com.easternsauce.model.event.{AreaChangeEvent, CreatureDeathEvent, UpdateEvent}
 import com.softwaremill.quicklens._
 
-import scala.collection.mutable.ListBuffer
 import scala.util.chaining.scalaUtilChainingOps
 
 case class GameState(
@@ -43,22 +42,29 @@ case class GameState(
 
   }
 
-  def processCreatureAreaChanges(changes: ListBuffer[AreaChangeEvent]): GameState = {
-    changes.foldLeft(this) {
-      case (gameState, AreaChangeEvent(creatureId, oldAreaId, newAreaId)) =>
+  def processCreatureAreaChanges(): GameState = {
+    events.foldLeft(this) {
+      case (gameState, AreaChangeEvent(creatureId, oldAreaId, newAreaId, posX, posY)) =>
         gameState
           .assignCreatureToArea(creatureId, Some(oldAreaId), newAreaId)
+          .modifyGameStateCreature(creatureId) {
+            _.setPosition(posX, posY)
+              .modify(_.params.passedGateRecently)
+              .setTo(true)
+          }
           .modify(_.currentAreaId)
           .setToIf(creatureId == gameState.player.params.id)(newAreaId) // change game area
+
+      case (gameState, _) => gameState
     }
   }
 
-  def clearEventsQueue(): GameState = {
+  def clearQueues(): GameState = {
     this.modify(_.events).setTo(List())
   }
 
-  def processCollisions(collisionQueue: ListBuffer[CollisionEvent]): GameState = {
-    collisionQueue.foldLeft(this) {
+  def processPhysicsQueue(physicsQueue: List[PhysicsEvent]): GameState = {
+    physicsQueue.foldLeft(this) {
       case (gameState, AbilityComponentCollision(creatureId, abilityId, componentId, collidedCreatureId)) =>
         val abilityComponent = gameState.abilities(creatureId, abilityId).components(componentId)
 
@@ -71,8 +77,26 @@ case class GameState(
             .creatureActivateEffect(collidedCreatureId, "immunityFrames", 2f)
             .creatureActivateEffect(collidedCreatureId, "stagger", 0.35f)
         } else gameState
+      case (gameState, AreaGateCollision(creatureId, areaGate)) =>
+        if (!gameState.creatures(creatureId).params.passedGateRecently) {
+          val (fromAreaId: String, toAreaId: String, posX: Float, posY: Float) =
+            creatures(creatureId).params.areaId match {
+              case areaId if areaId == areaGate.areaFrom =>
+                (areaGate.areaFrom, areaGate.areaTo, areaGate.toPosX, areaGate.toPosY)
+              case areaId if areaId == areaGate.areaTo =>
+                (areaGate.areaTo, areaGate.areaFrom, areaGate.fromPosX, areaGate.fromPosY)
+              case _ => ("errorArea", -1, -1)
+            }
+          gameState
+            .modify(_.events)
+            .setTo(AreaChangeEvent(creatureId, fromAreaId, toAreaId, posX, posY) :: gameState.events)
+        } else gameState
 
+      case (gameState, LeftAreaGateEvent(creatureId)) =>
+        gameState
+        gameState.modifyGameStateCreature(creatureId) { _.modify(_.params.passedGateRecently).setTo(false) }
     }
+
   }
 
   def modifyGameStateCreature(creatureId: String)(operation: Creature => Creature): GameState = {

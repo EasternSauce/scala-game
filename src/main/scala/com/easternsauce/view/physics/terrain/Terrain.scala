@@ -4,9 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.event.{AbilityComponentCollision, CollisionEvent}
 import com.easternsauce.util.Constants
-import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
 
 import scala.collection.mutable.ListBuffer
 
@@ -26,11 +24,7 @@ case class Terrain(map: TiledMap, mapScale: Float) {
   val terrainTiles: ListBuffer[TerrainTileBody] = ListBuffer()
   val terrainBorders: ListBuffer[TerrainTileBody] = ListBuffer()
 
-  var collisionQueue: ListBuffer[CollisionEvent] = _
-
-  def init(collisionQueue: ListBuffer[CollisionEvent]): Unit = {
-    this.collisionQueue = collisionQueue
-
+  def init(): Unit = {
     val widthInTiles = layer.getWidth
     val heightInTiles = layer.getHeight
 
@@ -55,8 +49,6 @@ case class Terrain(map: TiledMap, mapScale: Float) {
 
     createMapTerrain(widthInTiles, heightInTiles)
     createBorders(widthInTiles, heightInTiles)
-
-    createContactListener()
 
   }
 
@@ -133,43 +125,6 @@ case class Terrain(map: TiledMap, mapScale: Float) {
 
   def getClosestTile(x: Float, y: Float): Vector2 = {
     new Vector2(x / tileWidth, y / tileHeight)
-  }
-
-  def createContactListener(): Unit = {
-    val contactListener: ContactListener = new ContactListener {
-      override def beginContact(contact: Contact): Unit = {
-        val objA = contact.getFixtureA.getBody.getUserData
-        val objB = contact.getFixtureB.getBody.getUserData
-
-        def onContactStart(pair: (AnyRef, AnyRef)): Unit = {
-          pair match { // will run onContact twice for same type objects!
-            case (entityBody: EntityBody, abilityComponentBody: ComponentBody) =>
-              if (entityBody.creatureId != abilityComponentBody.creatureId) {
-                collisionQueue.prepend(
-                  AbilityComponentCollision(
-                    abilityComponentBody.creatureId,
-                    abilityComponentBody.abilityId,
-                    abilityComponentBody.componentId,
-                    entityBody.creatureId
-                  )
-                )
-              }
-            case _ =>
-          }
-        }
-
-        onContactStart(objA, objB)
-        onContactStart(objB, objA)
-      }
-
-      override def endContact(contact: Contact): Unit = {}
-
-      override def preSolve(contact: Contact, oldManifold: Manifold): Unit = {}
-
-      override def postSolve(contact: Contact, impulse: ContactImpulse): Unit = {}
-    }
-
-    world.setContactListener(contactListener)
   }
 
   def step(): Unit = world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2)

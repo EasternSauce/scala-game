@@ -31,5 +31,6 @@ case class CreatureParams(
     Map(2 -> Item(ItemTemplate.templates("leatherArmor"))), // TODO: test item present, remove after
   effects: Map[String, Effect] = Map(),
   movingDir: Vector2Wrapper = Vector2Wrapper(1, 1),
-  currentSpeed: Float = 0f
+  currentSpeed: Float = 0f,
+  passedGateRecently: Boolean = false
 )

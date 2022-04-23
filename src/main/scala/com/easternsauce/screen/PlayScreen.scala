@@ -6,7 +6,8 @@ import com.badlogic.gdx.math.{Vector2, Vector3}
 import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
-import com.easternsauce.event.{AreaChangeEvent, CollisionEvent}
+import com.easternsauce.event.PhysicsEvent
+import com.easternsauce.json.JsonCodecs
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.util.{Constants, RendererBatch, Vector2Wrapper}
@@ -20,19 +21,16 @@ import scala.collection.mutable.ListBuffer
 import scala.util.chaining._
 
 class PlayScreen(
-  worldBatch: RendererBatch,
-  hudBatch: RendererBatch,
-  state: GameState,
-  view: RendererController,
-  physics: PhysicsController
+  val worldBatch: RendererBatch,
+  val hudBatch: RendererBatch,
+  val state: GameState,
+  var gameView: RendererController,
+  var physicsController: PhysicsController,
+  var collisionQueue: ListBuffer[PhysicsEvent]
 ) extends Screen {
   val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
   val debugRenderEnabled = true
-
-  var gameState: GameState = state
-  var gameView: RendererController = view
-  var physicsController: PhysicsController = physics
 
   val worldCamera: OrthographicCamera = new OrthographicCamera()
   val hudCamera: OrthographicCamera = {
@@ -40,6 +38,8 @@ class PlayScreen(
     cam.position.set(Constants.WindowWidth / 2f, Constants.WindowHeight / 2f, 0)
     cam
   }
+
+  var gameState: GameState = state
 
   val worldViewport: Viewport =
     new FitViewport(
@@ -50,11 +50,6 @@ class PlayScreen(
 
   val hudViewport: Viewport =
     new FitViewport(Constants.WindowWidth.toFloat, Constants.WindowHeight.toFloat, hudCamera)
-
-  var areaChangeQueue: ListBuffer[AreaChangeEvent] = ListBuffer()
-  var collisionQueue: ListBuffer[CollisionEvent] = ListBuffer()
-
-  physicsController.setCollisionQueue(collisionQueue)
 
   var justStarted = true
 
@@ -113,24 +108,24 @@ class PlayScreen(
 
     // --- update model (can update based on player input or physical world state)
     gameState = gameState
-      .pipe(_.clearEventsQueue())
+      .pipe(_.clearQueues())
       .pipe(processPlayerInput)
       .pipe(processInventoryActions)
       .pipe(updateCreatures(physicsController, delta))
-      .pipe(_.processCreatureAreaChanges(areaChangeQueue))
-      .pipe(_.processCollisions(collisionQueue))
+      .pipe(_.processPhysicsQueue(collisionQueue.toList))
+      .pipe(_.processCreatureAreaChanges())
+
     // ---
+
+    collisionQueue.clear()
 
     // --- update libGDX view
     gameView.update(gameState)
     // ---
 
     // --- update physics
-    physicsController.update(gameState, areaChangeQueue)
+    physicsController.update(gameState)
     //
-
-    areaChangeQueue.clear()
-    collisionQueue.clear()
 
     currentArea.setView(worldCamera)
 
@@ -139,13 +134,13 @@ class PlayScreen(
 
   private def processPlayerInput(gameState: GameState): GameState = {
     // TODO: temporarily simulate creature changing areas on SPACE
-    if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
-      if (gameState.currentAreaId == "area1") {
-        areaChangeQueue.prepend(AreaChangeEvent("player", "area1", "area2"))
-      } else {
-        areaChangeQueue.prepend(AreaChangeEvent("player", "area2", "area1"))
-      }
-    }
+//    if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) {
+//      if (gameState.currentAreaId == "area1") {
+//        areaChangeQueue.prepend(AreaChangeEvent("player", "area1", "area2"))
+//      } else {
+//        areaChangeQueue.prepend(AreaChangeEvent("player", "area2", "area1"))
+//      }
+//    }
 
     val handleInventoryOpenClose: GameState => GameState = gameState => {
       val inventoryOpen = gameState.inventoryState.inventoryOpen
@@ -314,9 +309,7 @@ class PlayScreen(
 
     val writer = new PrintWriter(new File(saveFilePath + "/savefile.txt"))
 
-    import com.easternsauce.json.JsonCodecs._
-
-    writer.write(gameState.asJson.toString())
+    writer.write(gameState.asJson(JsonCodecs.encodeGameState).toString())
 
     writer.close()
   }

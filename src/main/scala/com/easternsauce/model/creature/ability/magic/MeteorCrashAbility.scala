@@ -54,7 +54,7 @@ case class MeteorCrashAbility(
       val (componentId, i, angle) = meteor
 
       val component = components(componentId)
-      val vector: Vector2Wrapper = facingVector.rotate(angle)
+      val vector: Vector2Wrapper = facingVector.rotate(angle.toFloat)
 
       val x = creature.params.posX + (3.125f * (i + 1)) * vector.x
       val y = creature.params.posY + (3.125f * (i + 1)) * vector.y

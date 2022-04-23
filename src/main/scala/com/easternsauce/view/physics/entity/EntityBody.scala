@@ -31,10 +31,13 @@ case class EntityBody(creatureId: String) {
         )
     }
 
+    if (!creature.isAlive) b2Body.getFixtureList.get(0).setSensor(true)
+
     currentAreaId = areaId
   }
 
   def update(gameState: GameState, physicsController: PhysicsController): Unit = {
+
     if (gameState.events.contains(CreatureDeathEvent(creatureId))) {
       b2Body.getFixtureList.get(0).setSensor(true)
     }
