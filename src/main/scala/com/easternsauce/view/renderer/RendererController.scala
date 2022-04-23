@@ -67,13 +67,19 @@ case class RendererController(atlas: TextureAtlas) {
   def renderEntities(gameState: GameState, batch: RendererBatch): Unit = {
 
     gameState.creatures.keys.foreach { creatureId =>
-      if (entityRenderers.contains(creatureId)) {
+      if (
+        entityRenderers.contains(creatureId) &&
+        gameState.creatures(creatureId).params.areaId == gameState.currentAreaId
+      ) {
         entityRenderers(creatureId).render(batch)
       }
     }
 
     gameState.creatures.keys.foreach { creatureId =>
-      if (entityRenderers.contains(creatureId)) {
+      if (
+        entityRenderers.contains(creatureId) &&
+        gameState.creatures(creatureId).params.areaId == gameState.currentAreaId
+      ) {
         entityRenderers(creatureId).renderLifeBar(batch, gameState)
       }
     }

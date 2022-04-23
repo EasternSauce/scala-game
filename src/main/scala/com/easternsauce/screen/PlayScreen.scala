@@ -75,12 +75,15 @@ class PlayScreen(
         else
           new Vector2(creature.params.posX, creature.params.posY)
 
-      creature
-        .setPosition(pos.x, pos.y)
-        .update(delta)
-        .pipe(
-          creature => if (creature.isControlledAutomatically) creature.updateAutomaticControls(gameState) else creature
-        )
+      if (creature.params.areaId == gameState.currentAreaId) {
+        creature
+          .setPosition(pos.x, pos.y)
+          .update(delta)
+          .pipe(
+            creature =>
+              if (creature.isControlledAutomatically) creature.updateAutomaticControls(gameState) else creature
+          )
+      } else creature
     }
 
     gameState // TODO: dont update creatures outside the current area
