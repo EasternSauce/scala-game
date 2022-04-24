@@ -145,6 +145,11 @@ class PlayScreen(
 //      }
 //    }
 
+    val handleDebugButton: GameState => GameState = gameState => {
+      if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) gameState.spawnEnemy()
+      else gameState
+    }
+
     val handleInventoryOpenClose: GameState => GameState = gameState => {
       val inventoryOpen = gameState.inventoryState.inventoryOpen
       if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
@@ -232,6 +237,7 @@ class PlayScreen(
       .pipe(handleMovement)
       .pipe(handleLeftClickInput)
       .pipe(handleInventoryOpenClose)
+      .pipe(handleDebugButton)
 
   }
 

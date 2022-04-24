@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.easternsauce.model.GameState
+import com.easternsauce.model.event.EnemySpawnEvent
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.physics.terrain.AreaGatePair
 import com.easternsauce.view.renderer.entity.EntityRenderer
@@ -36,6 +37,17 @@ case class RendererController(atlas: TextureAtlas) {
   }
 
   def update(gameState: GameState): Unit = {
+
+    gameState.events.foreach {
+      case EnemySpawnEvent(creatureId) =>
+        entityRenderers = entityRenderers + (creatureId -> {
+          val renderer = EntityRenderer(creatureId, atlas)
+          renderer.init(gameState)
+          renderer
+        })
+      case _ =>
+    }
+
     gameState.creatures.keys.foreach { creatureId =>
       entityRenderers(creatureId).update(gameState)
     }

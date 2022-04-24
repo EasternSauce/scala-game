@@ -10,3 +10,5 @@ case class ComponentDestroyBodyEvent(creatureId: String, abilityId: String, comp
 
 case class AreaChangeEvent(creatureId: String, oldAreaId: String, newAreaId: String, posX: Float, posY: Float)
     extends UpdateEvent
+
+case class EnemySpawnEvent(creatureId: String) extends UpdateEvent

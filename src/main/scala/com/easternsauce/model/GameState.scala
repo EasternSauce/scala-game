@@ -2,9 +2,9 @@ package com.easternsauce.model
 
 import com.easternsauce.event.{AbilityComponentCollision, AreaGateCollision, LeftAreaGateEvent, PhysicsEvent}
 import com.easternsauce.model.area.Area
-import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
-import com.easternsauce.model.event.{AreaChangeEvent, CreatureDeathEvent, UpdateEvent}
+import com.easternsauce.model.creature.{Creature, CreatureParams, Serpent}
+import com.easternsauce.model.event.{AreaChangeEvent, CreatureDeathEvent, EnemySpawnEvent, UpdateEvent}
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -175,5 +175,27 @@ case class GameState(
           .setTo(CreatureDeathEvent(creatureId) :: gameState.events)
           .modifyGameStateCreature(creatureId)(_.onDeath())
     )
+  }
+
+  def spawnEnemy(): GameState = {
+    val id = "zzzzzz543523"
+    val wolf: Serpent = Serpent(
+      CreatureParams(
+        id = id,
+        posX = player.params.posX + 3f,
+        posY = player.params.posY,
+        areaId = "area1",
+        life = 100f,
+        maxLife = 100f,
+        stamina = 100f,
+        maxStamina = 100f
+      )
+    )
+
+    this
+      .modify(_.nonPlayers)
+      .setTo(this.nonPlayers + (id -> wolf.init()))
+      .modify(_.events)
+      .setTo(EnemySpawnEvent(id) :: this.events)
   }
 }

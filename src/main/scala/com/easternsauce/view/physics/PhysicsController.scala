@@ -3,7 +3,7 @@ package com.easternsauce.view.physics
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.event.{AbilityComponentCollision, AreaGateCollision, LeftAreaGateEvent, PhysicsEvent}
 import com.easternsauce.model.GameState
-import com.easternsauce.model.event.AreaChangeEvent
+import com.easternsauce.model.event.{AreaChangeEvent, EnemySpawnEvent}
 import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
 import com.easternsauce.view.physics.terrain.{AreaGateBody, AreaGatePair, Terrain}
 
@@ -30,14 +30,25 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
   }
 
   def update(gameState: GameState): Unit = {
-    entityBodies.values.foreach(_.update(gameState, this))
 
     gameState.events.foreach {
-      case AreaChangeEvent(creatureId, oldAreaId, newAreaId, _, _) => // TODO: should we set body x,y?
+      case AreaChangeEvent(creatureId, oldAreaId, newAreaId, _, _) =>
         terrains(oldAreaId).world.destroyBody(entityBodies(creatureId).b2Body)
         entityBodies(creatureId).init(gameState = gameState, physicsController = this, areaId = newAreaId)
+      case EnemySpawnEvent(creatureId) =>
+        entityBodies = entityBodies + (creatureId -> {
+          val entityBody = EntityBody(creatureId)
+          entityBody.init(
+            gameState = gameState,
+            physicsController = this,
+            areaId = gameState.creatures(creatureId).params.areaId
+          )
+          entityBody
+        })
       case _ =>
     }
+
+    entityBodies.values.foreach(_.update(gameState, this))
 
   }
 
