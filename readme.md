@@ -17,7 +17,6 @@ Already done:
 
 To be done:
 
-- area gates REFACTOR!,
 - enemy spawns,
 - boss arena and boss fight,
 - creature movement AI,

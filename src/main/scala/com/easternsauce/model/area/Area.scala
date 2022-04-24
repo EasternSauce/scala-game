@@ -1,3 +1,3 @@
 package com.easternsauce.model.area
 
-case class Area(creatures: List[String] = List()) {}
+case class Area(areaId: String, creatures: List[String] = List(), spawnPoints: List[EnemySpawnPoint]) {}

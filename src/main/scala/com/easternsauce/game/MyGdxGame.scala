@@ -4,15 +4,16 @@ import com.badlogic.gdx.Game
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import com.easternsauce.event.PhysicsEvent
+import com.easternsauce.json.JsonCodecs._
 import com.easternsauce.model.GameState
-import com.easternsauce.model.area.Area
+import com.easternsauce.model.area.{Area, EnemySpawnPoint}
 import com.easternsauce.model.creature.{CreatureParams, Player, Serpent, Skeleton}
 import com.easternsauce.model.event.AreaChangeEvent
 import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.physics.PhysicsController
-import com.easternsauce.view.physics.terrain.{AreaGate, Terrain}
+import com.easternsauce.view.physics.terrain.{AreaGatePair, Terrain}
 import com.easternsauce.view.renderer
 import com.easternsauce.view.renderer.RendererController
 import io.circe.parser.decode
@@ -34,9 +35,9 @@ class MyGdxGame extends Game {
   val mapsToLoad =
     Map("area1" -> "assets/areas/area1", "area2" -> "assets/areas/area2", "area3" -> "assets/areas/area3")
 
-  val areaGates: List[AreaGate] = List( // TODO: load this from file?
-    AreaGate("area1", 199.5f, 15f, "area3", 17f, 2.5f),
-    AreaGate("area1", 2f, 63f, "area2", 58f, 9f)
+  val areaGates: List[AreaGatePair] = List( // TODO: load this from file?
+    AreaGatePair("area1", 199.5f, 15f, "area3", 17f, 2.5f),
+    AreaGatePair("area1", 2f, 63f, "area2", 58f, 9f)
   )
 
   val mapLoader: TmxMapLoader = new TmxMapLoader()
@@ -101,7 +102,9 @@ class MyGdxGame extends Game {
       case (areaId, directory) => areaId -> mapLoader.load(directory + "/tile_map.tmx")
     }
 
-    val areas = maps.map { case (key, _) => (key, Area()) }
+    val areas = maps.map {
+      case (key, _) => (key, Area(areaId = key, spawnPoints = loadEnemySpawns("assets/areas/" + key)))
+    }
 
     val gameState =
       try {
@@ -145,5 +148,16 @@ class MyGdxGame extends Game {
     gameView.dispose()
     physicsController.dispose()
     playScreen.dispose()
+  }
+
+  def loadEnemySpawns(areaFilesLocation: String): List[EnemySpawnPoint] = {
+    val source = scala.io.Source.fromFile(areaFilesLocation + "/enemy_spawns.json")
+    val lines =
+      try source.mkString
+      finally source.close()
+
+    val decoded = decode[List[EnemySpawnPoint]](lines)
+
+    decoded.getOrElse(throw new RuntimeException("failed to decode spawns file"))
   }
 }

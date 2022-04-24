@@ -1,6 +1,13 @@
 package com.easternsauce.view.physics.terrain
 
-case class AreaGate(areaFrom: String, fromPosX: Float, fromPosY: Float, areaTo: String, toPosX: Float, toPosY: Float) {
+case class AreaGatePair(
+  areaFrom: String,
+  fromPosX: Float,
+  fromPosY: Float,
+  areaTo: String,
+  toPosX: Float,
+  toPosY: Float
+) {
 
   val width = 1.5f
   val height = 1.5f

@@ -4,9 +4,9 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.easternsauce.model.GameState
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
-import com.easternsauce.view.physics.terrain.AreaGate
+import com.easternsauce.view.physics.terrain.AreaGatePair
 
-case class AreaGateRenderer(areaGate: AreaGate) {
+case class AreaGateRenderer(areaGate: AreaGatePair) {
   private val downArrowImageFrom = new Image(Assets.atlas.findRegion("downarrow"))
   private val downArrowImageTo = new Image(Assets.atlas.findRegion("downarrow"))
 

@@ -5,11 +5,11 @@ import com.easternsauce.event.{AbilityComponentCollision, AreaGateCollision, Lef
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.AreaChangeEvent
 import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
-import com.easternsauce.view.physics.terrain.{AreaGate, AreaGateBody, Terrain}
+import com.easternsauce.view.physics.terrain.{AreaGateBody, AreaGatePair, Terrain}
 
 import scala.collection.mutable.ListBuffer
 
-case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[AreaGate]) {
+case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[AreaGatePair]) {
   var entityBodies: Map[String, EntityBody] = Map()
 
   def init(gameState: GameState, collisionQueue: ListBuffer[PhysicsEvent]): Unit = {

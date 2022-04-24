@@ -1,6 +1,6 @@
 package com.easternsauce.json
 
-import com.easternsauce.model.area.Area
+import com.easternsauce.model.area.{Area, EnemySpawnPoint}
 import com.easternsauce.model.creature._
 import com.easternsauce.model.creature.ability.AbilityState.AbilityState
 import com.easternsauce.model.creature.ability.ComponentType.ComponentType
@@ -85,6 +85,8 @@ object JsonCodecs {
   implicit val encodeEffect: Encoder[Effect] = deriveEncoder
   implicit val decodeThrustWeaponAbility: Decoder[ThrustWeaponAbility] = deriveDecoder
   implicit val encodeThrustWeaponAbility: Encoder[ThrustWeaponAbility] = deriveEncoder
+  implicit val decodeEnemySpawnPoint: Decoder[EnemySpawnPoint] = deriveDecoder
+  implicit val encodeEnemySpawnPoint: Encoder[EnemySpawnPoint] = deriveEncoder
 
   implicit val encodeCreature: Encoder[Creature] = Encoder.instance { c =>
     {
