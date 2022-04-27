@@ -38,7 +38,6 @@ case class RendererController(atlas: TextureAtlas) {
 
   def update(gameState: GameState): Unit = {
 
-    if (gameState.events.nonEmpty) println(gameState.events)
     gameState.events.foreach {
       case EnemySpawnEvent(creatureId) =>
         entityRenderers = entityRenderers + (creatureId -> {

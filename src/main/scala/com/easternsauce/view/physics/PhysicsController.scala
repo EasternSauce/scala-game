@@ -46,7 +46,12 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
           entityBody
         })
       case EnemyDespawnEvent(creature) =>
-        terrains(creature.params.areaId).world.destroyBody(entityBodies(creature.params.id).b2Body)
+        val world = terrains(creature.params.areaId).world
+        world.destroyBody(entityBodies(creature.params.id).b2Body)
+        entityBodies(creature.params.id).componentBodies.foreach {
+          case (_, componentBody) =>
+            if (componentBody.b2Body != null && componentBody.b2Body.isActive) world.destroyBody(componentBody.b2Body)
+        }
         entityBodies = entityBodies - creature.params.id
       case _ =>
     }
