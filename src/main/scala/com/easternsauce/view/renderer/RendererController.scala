@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.easternsauce.model.GameState
-import com.easternsauce.model.event.EnemySpawnEvent
+import com.easternsauce.model.event.{EnemyDespawnEvent, EnemySpawnEvent}
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.physics.terrain.AreaGatePair
 import com.easternsauce.view.renderer.entity.EntityRenderer
@@ -46,6 +46,8 @@ case class RendererController(atlas: TextureAtlas) {
           renderer.init(gameState)
           renderer
         })
+      case EnemyDespawnEvent(creature) =>
+        entityRenderers = entityRenderers - creature.params.id
       case _ =>
     }
 

@@ -3,7 +3,7 @@ package com.easternsauce.view.physics
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.event.{AbilityComponentCollision, AreaGateCollision, LeftAreaGateEvent, PhysicsEvent}
 import com.easternsauce.model.GameState
-import com.easternsauce.model.event.{AreaChangeEvent, EnemySpawnEvent}
+import com.easternsauce.model.event.{AreaChangeEvent, EnemyDespawnEvent, EnemySpawnEvent}
 import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
 import com.easternsauce.view.physics.terrain.{AreaGateBody, AreaGatePair, Terrain}
 
@@ -45,6 +45,9 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
           )
           entityBody
         })
+      case EnemyDespawnEvent(creature) =>
+        terrains(creature.params.areaId).world.destroyBody(entityBodies(creature.params.id).b2Body)
+        entityBodies = entityBodies - creature.params.id
       case _ =>
     }
 

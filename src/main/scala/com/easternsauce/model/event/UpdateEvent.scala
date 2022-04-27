@@ -1,5 +1,7 @@
 package com.easternsauce.model.event
 
+import com.easternsauce.model.creature.Creature
+
 sealed trait UpdateEvent
 
 case class CreatureDeathEvent(creatureId: String) extends UpdateEvent
@@ -12,3 +14,5 @@ case class AreaChangeEvent(creatureId: String, oldAreaId: String, newAreaId: Str
     extends UpdateEvent
 
 case class EnemySpawnEvent(creatureId: String) extends UpdateEvent
+
+case class EnemyDespawnEvent(creature: Creature) extends UpdateEvent

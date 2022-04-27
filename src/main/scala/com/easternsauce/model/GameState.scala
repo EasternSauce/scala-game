@@ -4,7 +4,7 @@ import com.easternsauce.event.{AbilityComponentCollision, AreaGateCollision, Lef
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.model.creature.{Creature, CreatureParams}
-import com.easternsauce.model.event.{AreaChangeEvent, CreatureDeathEvent, EnemySpawnEvent, UpdateEvent}
+import com.easternsauce.model.event._
 import com.easternsauce.system.Random
 import com.softwaremill.quicklens._
 
@@ -215,6 +215,9 @@ case class GameState(
       .modify(_.areas.at(areaId).creatures)
       .setTo(this.areas(areaId).creatures.filterNot(oldEnemiesIds.toSet) ++ newEnemies.map(_.params.id))
       .modify(_.events)
-      .setTo(this.events ++ newEnemies.map(enemy => EnemySpawnEvent(enemy.params.id)))
+      .setTo(
+        this.events ++ newEnemies.map(enemy => EnemySpawnEvent(enemy.params.id)) ++ oldEnemiesIds
+          .map(enemyId => EnemyDespawnEvent(creatures(enemyId)))
+      )
   }
 }
