@@ -6,6 +6,8 @@ import scala.util.chaining.scalaUtilChainingOps
 
 abstract class Enemy(override val params: CreatureParams) extends Creature {
 
+  override val isEnemy: Boolean = true
+
   override val isControlledAutomatically = true
 
   override def updateAutomaticControls(gameState: GameState): Enemy = {

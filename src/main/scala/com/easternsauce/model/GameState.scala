@@ -3,8 +3,9 @@ package com.easternsauce.model
 import com.easternsauce.event.{AbilityComponentCollision, AreaGateCollision, LeftAreaGateEvent, PhysicsEvent}
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
-import com.easternsauce.model.creature.{Creature, CreatureParams, Serpent}
+import com.easternsauce.model.creature.{Creature, CreatureParams}
 import com.easternsauce.model.event.{AreaChangeEvent, CreatureDeathEvent, EnemySpawnEvent, UpdateEvent}
+import com.easternsauce.system.Random
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -177,25 +178,43 @@ case class GameState(
     )
   }
 
-  def spawnEnemy(): GameState = {
-    val id = "zzzzzz543523"
-    val wolf: Serpent = Serpent(
-      CreatureParams(
-        id = id,
-        posX = player.params.posX + 3f,
-        posY = player.params.posY,
-        areaId = "area1",
-        life = 100f,
-        maxLife = 100f,
-        stamina = 100f,
-        maxStamina = 100f
+  def generateEnemy(enemyType: String, areaId: String, posX: Float, posY: Float): Creature = {
+    val creatureId = enemyType + "_" + Math.abs(Random.nextInt())
+
+    val action = Class
+      .forName("com.easternsauce.model.creature." + enemyType)
+      .getMethod("apply", classOf[CreatureParams])
+      .invoke(
+        null,
+        CreatureParams(
+          id = creatureId,
+          posX = posX,
+          posY = posY,
+          areaId = areaId,
+          life = 100f,
+          maxLife = 100f,
+          stamina = 100f,
+          maxStamina = 100f
+        )
       )
-    )
+
+    action.asInstanceOf[Creature].init()
+  }
+
+  def resetArea(areaId: String): GameState = {
+    val area = areas(areaId)
+
+    val oldEnemiesIds = area.creatures.filter(creatures(_).isEnemy)
+
+    val newEnemies =
+      area.spawnPoints.map(spawnPoint => generateEnemy(spawnPoint.enemyType, areaId, spawnPoint.x, spawnPoint.y))
 
     this
       .modify(_.nonPlayers)
-      .setTo(this.nonPlayers + (id -> wolf.init()))
+      .setTo(this.nonPlayers -- oldEnemiesIds ++ newEnemies.map(enemy => (enemy.params.id -> enemy)).toMap)
+      .modify(_.areas.at(areaId).creatures)
+      .setTo(this.areas(areaId).creatures.filterNot(oldEnemiesIds.toSet) ++ newEnemies.map(_.params.id))
       .modify(_.events)
-      .setTo(EnemySpawnEvent(id) :: this.events)
+      .setTo(this.events ++ newEnemies.map(enemy => EnemySpawnEvent(enemy.params.id)))
   }
 }

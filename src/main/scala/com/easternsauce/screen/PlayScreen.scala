@@ -146,7 +146,7 @@ class PlayScreen(
 //    }
 
     val handleDebugButton: GameState => GameState = gameState => {
-      if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) gameState.spawnEnemy()
+      if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) gameState.resetArea("area1")
       else gameState
     }
 

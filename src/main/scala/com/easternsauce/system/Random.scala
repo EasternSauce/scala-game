@@ -8,4 +8,6 @@ object Random {
   def between(minInclusive: Float, maxExclusive: Float): Float = {
     randomGenerator.between(minInclusive, maxExclusive)
   }
+
+  def nextInt(): Int = randomGenerator.nextInt()
 }

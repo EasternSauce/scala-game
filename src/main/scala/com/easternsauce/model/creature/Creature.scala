@@ -12,6 +12,7 @@ import scala.util.chaining.scalaUtilChainingOps
 
 abstract class Creature {
   val isPlayer = false
+  val isEnemy = false
 
   val params: CreatureParams
   val spriteType: String
