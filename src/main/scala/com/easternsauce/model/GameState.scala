@@ -6,6 +6,7 @@ import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.model.creature.{Creature, CreatureParams}
 import com.easternsauce.model.event._
 import com.easternsauce.system.Random
+import com.easternsauce.util.Vector2Wrapper
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -78,7 +79,12 @@ case class GameState(
             gameState =>
               if (!attackingDisallowed && !creatures(collidedCreatureId).isEffectActive("immunityFrames")) {
                 gameState
-                  .creatureTakeLifeDamage(collidedCreatureId, abilityComponent.damage)
+                  .creatureTakeLifeDamage(
+                    collidedCreatureId,
+                    abilityComponent.damage,
+                    creatures(creatureId).params.posX,
+                    creatures(creatureId).params.posY
+                  )
                   .creatureActivateEffect(collidedCreatureId, "immunityFrames", 2f)
                   .creatureActivateEffect(collidedCreatureId, "stagger", 0.35f)
               } else gameState
@@ -142,7 +148,7 @@ case class GameState(
 
   }
 
-  def creatureTakeLifeDamage(creatureId: String, damage: Float): GameState = {
+  def creatureTakeLifeDamage(creatureId: String, damage: Float, sourcePosX: Float, sourcePosY: Float): GameState = {
     val beforeLife = creatures(creatureId).params.life
 
     val actualDamage = damage * 100f / (100f + creatures(creatureId).params.totalArmor)
@@ -154,7 +160,16 @@ case class GameState(
             if (creature.params.life - actualDamage > 0)
               creature.modify(_.params.life).setTo(creature.params.life - actualDamage)
             else creature.modify(_.params.life).setTo(0f)
-        )
+        ).activateEffect("knockback", 0.15f)
+          .modify(_.params.knockbackDir)
+          .setTo(
+            Vector2Wrapper(
+              creatures(creatureId).params.posX - sourcePosX,
+              creatures(creatureId).params.posY - sourcePosY
+            ).normal
+          )
+          .modify(_.params.knockbackVelocity)
+          .setTo(10f)
       )
       .pipe(gameState => {
         val creature = gameState.creatures(creatureId)

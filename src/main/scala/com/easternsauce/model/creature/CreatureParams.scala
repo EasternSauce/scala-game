@@ -32,5 +32,7 @@ case class CreatureParams(
   effects: Map[String, Effect] = Map(),
   movingDir: Vector2Wrapper = Vector2Wrapper(1, 1),
   currentSpeed: Float = 0f,
-  passedGateRecently: Boolean = false
+  passedGateRecently: Boolean = false,
+  knockbackDir: Vector2Wrapper = Vector2Wrapper(0, 0),
+  knockbackVelocity: Float = 0f
 )

@@ -199,7 +199,8 @@ class PlayScreen(
         }
       }
 
-      val ableToMove = !gameState.player.isEffectActive("stagger") && gameState.player.isAlive
+      val ableToMove = !gameState.player.isEffectActive("stagger") &&
+        !gameState.player.isEffectActive("knockback") && gameState.player.isAlive
 
       if (ableToMove) gameState.modify(_.creatures.at(gameState.currentPlayerId)).using { player =>
         val isMoving = {
