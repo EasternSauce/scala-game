@@ -33,14 +33,18 @@ abstract class Creature {
   protected val staminaOveruseTime = 2f
   protected val staminaRegenerationDisabled = 1.2f
 
+  val defaultAbility = "swingWeapon"
+
   val speed: Float = 15f
 
   def init(): Creature = {
+    val swingWeaponAbility = SwingWeaponAbility().init()
+
+    def idAbilityPair(ability: Ability) = (ability.params.id -> ability)
+
     this
       .modify(_.params.abilities)
-      .setTo(
-        Map("defaultAbility" -> SwingWeaponAbility().init())
-      ) // TODO: what is the purpose of ability ids? can they be generated?
+      .setTo(Map(idAbilityPair(swingWeaponAbility)))
   }
 
   def update(delta: Float): Creature = {
@@ -181,7 +185,7 @@ abstract class Creature {
   }
 
   def attack(dir: Vector2Wrapper): Creature =
-    this.modify(_.params.actionDirVector).setTo(dir).performAbility("defaultAbility")
+    this.modify(_.params.actionDirVector).setTo(dir).performAbility(defaultAbility)
 
   def performAbility(abilityId: String): Creature = {
 

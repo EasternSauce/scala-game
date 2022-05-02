@@ -33,7 +33,6 @@ trait AbilityInteractions {
           .using(_.stop())
           .modify(_.params.abilityChannelAnimationTimer)
           .using(_.stop())
-          //.setDirVector(Vector2Wrapper(creature.params.dirVector.x, creature.params.dirVector.y)) TODO: this is too late to set this
           .pipe(ability.updateComponentHitbox(creature, _))
       }
   }

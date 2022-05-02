@@ -7,14 +7,14 @@ import com.easternsauce.util.Vector2Wrapper
 import com.softwaremill.quicklens._
 
 case class SwingWeaponAbility(
-  override val params: AbilityParams = AbilityParams(),
+  override val params: AbilityParams = AbilityParams(id = "swingWeapon"),
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
 
   override val specification: AbilitySpecification = AbilitySpecification(
     textureWidth = 40,
     textureHeight = 40,
-    totalActiveTime = 0.3f,
+    totalActiveTime = 3.0f,
     totalChannelTime = 0.3f,
     channelSpriteType = "slash_windup",
     activeSpriteType = "slash",
@@ -63,6 +63,7 @@ case class SwingWeaponAbility(
   }
 
   override def updateComponentHitbox(creature: Creature, component: AbilityComponent): AbilityComponent = {
+    println("updating hitbox " + creature.params.id + " " + this.params.id + " " +  component.params.componentId)
 
     val dirVector = component.params.dirVector match {
       case dirVector if dirVector.length <= 0 => Vector2Wrapper(1, 0).normal
@@ -76,6 +77,8 @@ case class SwingWeaponAbility(
 
     val attackRectX = attackShiftX + creature.params.posX
     val attackRectY = attackShiftY + creature.params.posY
+
+    println("new arrack rect = " + attackRectX + " " + attackRectY)
 
     component
       .modify(_.params.abilityHitbox)

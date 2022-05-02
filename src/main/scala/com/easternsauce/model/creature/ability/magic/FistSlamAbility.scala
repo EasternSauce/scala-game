@@ -7,7 +7,7 @@ import com.easternsauce.util.Vector2Wrapper
 import com.softwaremill.quicklens._
 
 case class FistSlamAbility(
-  override val params: AbilityParams = AbilityParams(),
+  override val params: AbilityParams = AbilityParams(id = "fistSlam"),
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
 

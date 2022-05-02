@@ -3,6 +3,7 @@ package com.easternsauce.view.physics.entity
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.model.GameState
+import com.easternsauce.model.creature.ability.AbilityState
 import com.easternsauce.model.event.CreatureDeathEvent
 import com.easternsauce.view.physics.terrain.Terrain
 import com.easternsauce.view.physics.{B2BodyFactory, PhysicsController}
@@ -27,7 +28,14 @@ case class EntityBody(creatureId: String) {
         val components = gameState.abilities(creatureId, abilityId).components
 
         components.keys.map(
-          componentId => (abilityId, componentId) -> ComponentBody(creatureId, abilityId, componentId)
+          componentId =>
+            (abilityId, componentId) -> {
+              val component = components(componentId)
+              val componentBody = ComponentBody(creatureId, abilityId, componentId)
+              if (component.params.state == AbilityState.Active) {componentBody.init(terrain.world, gameState)
+              componentBody.isActive = true}
+              componentBody
+            }
         )
     }
 

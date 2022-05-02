@@ -13,7 +13,7 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
   var b2Body: Body = _
   var world: World = _
   private val sprite = new Sprite()
-  private var isActive = false
+  var isActive = false
 
   def hitboxVertices(gameState: GameState): Array[Float] = {
     val ability = gameState.abilities(creatureId, abilityId)
@@ -66,6 +66,7 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
     val terrain: Terrain = physicsController.terrains(areaId)
 
     if (gameState.events.contains(ComponentCreateBodyEvent(creatureId, abilityId, componentId))) {
+      println("creating component: " + creatureId + " " + componentId)
       init(terrain.world, gameState)
       isActive = true
     }
@@ -77,6 +78,7 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
 
     if (isActive) {
       if (component.specification.componentType == ComponentType.MeleeAttack) {
+        println("updating comp")
         b2Body.setTransform(component.params.abilityHitbox.x, component.params.abilityHitbox.y, 0f)
       } else if (component.specification.componentType == ComponentType.RangedProjectile) {
         b2Body.setLinearVelocity(

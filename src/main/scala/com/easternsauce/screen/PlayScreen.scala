@@ -170,7 +170,7 @@ class PlayScreen(
 
         val modification: GameState => GameState =
           _.modifyGameStateCreature("player")(
-            _.modify(_.params.actionDirVector).setTo(facingVector).performAbility("defaultAbility")
+            _.modify(_.params.actionDirVector).setTo(facingVector).performAbility(gameState.creatures(gameState.currentPlayerId).defaultAbility)
           )
         modification
       } else identity
