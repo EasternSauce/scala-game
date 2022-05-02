@@ -24,9 +24,9 @@ class PlayScreen(
   val worldBatch: RendererBatch,
   val hudBatch: RendererBatch,
   val state: GameState,
-  var gameView: RendererController,
+  var gameRenderer: RendererController,
   var physicsController: PhysicsController,
-  var collisionQueue: ListBuffer[PhysicsEvent]
+  var physicsEventQueue: ListBuffer[PhysicsEvent]
 ) extends Screen {
   val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
@@ -102,31 +102,31 @@ class PlayScreen(
 
   def update(delta: Float): Unit = {
 
-    val currentArea = gameView.areaRenderers(gameState.currentAreaId)
+    val currentArea = gameRenderer.areaRenderers(gameState.currentAreaId)
     val currentTerrain = physicsController.terrains(gameState.currentAreaId)
 
     currentTerrain.step()
 
     // --- update model (can update based on player input or physical world state)
     gameState = gameState
-      .pipe(_.clearQueues())
+      .pipe(_.clearEventQueue())
       .pipe(processPlayerInput)
       .pipe(processInventoryActions)
       .pipe(updateCreatures(physicsController, delta))
-      .pipe(_.processPhysicsQueue(collisionQueue.toList))
+      .pipe(_.processPhysicsEventQueue(physicsEventQueue.toList))
       .pipe(_.processCreatureAreaChanges())
 
     // ---
 
-    collisionQueue.clear()
+    // mark all physics engine events as consumed
+    physicsEventQueue.clear()
 
-    // --- update libGDX view
-    gameView.update(gameState)
+    // --- update libGDX renderer
+    gameRenderer.update(gameState)
     // ---
 
     // --- update physics
     physicsController.update(gameState)
-    //
 
     currentArea.setView(worldCamera)
 
@@ -170,7 +170,9 @@ class PlayScreen(
 
         val modification: GameState => GameState =
           _.modifyGameStateCreature("player")(
-            _.modify(_.params.actionDirVector).setTo(facingVector).performAbility(gameState.creatures(gameState.currentPlayerId).defaultAbility)
+            _.modify(_.params.actionDirVector)
+              .setTo(facingVector)
+              .performAbility(gameState.creatures(gameState.currentPlayerId).defaultAbility)
           )
         modification
       } else identity
@@ -265,16 +267,16 @@ class PlayScreen(
     val coverageBuffer = if (Gdx.graphics.getBufferFormat.coverageSampling) GL20.GL_COVERAGE_BUFFER_BIT_NV else 0
     Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT | coverageBuffer)
 
-    val currentArea = gameView.areaRenderers(gameState.currentAreaId)
+    val currentArea = gameRenderer.areaRenderers(gameState.currentAreaId)
     val currentTerrain = physicsController.terrains(gameState.currentAreaId)
 
     currentArea.render(Array(0, 1))
 
     worldBatch.begin()
 
-    gameView.renderAreaGates(gameState, worldBatch)
+    gameRenderer.renderAreaGates(gameState, worldBatch)
 
-    gameView.renderEntities(gameState, worldBatch)
+    gameRenderer.renderEntities(gameState, worldBatch)
 
     worldBatch.end()
 
@@ -282,13 +284,13 @@ class PlayScreen(
 
     worldBatch.begin()
 
-    gameView.renderAbilities(gameState, worldBatch)
+    gameRenderer.renderAbilities(gameState, worldBatch)
 
     worldBatch.end()
 
     hudBatch.begin()
 
-    gameView.renderHud(gameState, hudBatch, mousePosWindowScaled)
+    gameRenderer.renderHud(gameState, hudBatch, mousePosWindowScaled)
 
     hudBatch.end()
 

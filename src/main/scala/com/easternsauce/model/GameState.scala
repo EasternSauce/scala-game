@@ -1,6 +1,6 @@
 package com.easternsauce.model
 
-import com.easternsauce.event.{AbilityComponentCollision, AreaGateCollision, LeftAreaGateEvent, PhysicsEvent}
+import com.easternsauce.event.{AbilityComponentCollisionEvent, AreaGateCollisionEvent, LeftAreaGateEvent, PhysicsEvent}
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.model.creature.{Creature, CreatureParams}
@@ -60,44 +60,59 @@ case class GameState(
     }
   }
 
-  def clearQueues(): GameState = {
+  def clearEventQueue(): GameState = {
     this.modify(_.events).setTo(List())
   }
 
-  def processPhysicsQueue(physicsQueue: List[PhysicsEvent]): GameState = {
-    physicsQueue.foldLeft(this) {
-      case (gameState, AbilityComponentCollision(creatureId, abilityId, componentId, collidedCreatureId)) =>
+  def processPhysicsEventQueue(physicsEventQueue: List[PhysicsEvent]): GameState = {
+    physicsEventQueue.foldLeft(this) {
+      case (gameState, AbilityComponentCollisionEvent(creatureId, abilityId, componentId, collidedCreatureId)) =>
         val abilityComponent = gameState.abilities(creatureId, abilityId).components(componentId)
 
         val attackingDisallowed =
           creatures(creatureId).isControlledAutomatically && creatures(collidedCreatureId).isControlledAutomatically
 
-        if (!attackingDisallowed && !creatures(collidedCreatureId).isEffectActive("immunityFrames")) {
-          gameState
-            .creatureTakeLifeDamage(collidedCreatureId, abilityComponent.damage)
-            .creatureActivateEffect(collidedCreatureId, "immunityFrames", 2f)
-            .creatureActivateEffect(collidedCreatureId, "stagger", 0.35f)
-        } else gameState
-      case (gameState, AreaGateCollision(creatureId, areaGate)) =>
-        if (!gameState.creatures(creatureId).params.passedGateRecently) {
-          val (fromAreaId: String, toAreaId: String, posX: Float, posY: Float) =
-            creatures(creatureId).params.areaId match {
-              case areaId if areaId == areaGate.areaFrom =>
-                (areaGate.areaFrom, areaGate.areaTo, areaGate.toPosX, areaGate.toPosY)
-              case areaId if areaId == areaGate.areaTo =>
-                (areaGate.areaTo, areaGate.areaFrom, areaGate.fromPosX, areaGate.fromPosY)
-              case _ => ("errorArea", -1, -1)
-            }
-          gameState
-            .modify(_.events)
-            .setTo(AreaChangeEvent(creatureId, fromAreaId, toAreaId, posX, posY) :: gameState.events)
-        } else gameState
+        gameState
+          .pipe(
+            gameState =>
+              if (!attackingDisallowed && !creatures(collidedCreatureId).isEffectActive("immunityFrames")) {
+                gameState
+                  .creatureTakeLifeDamage(collidedCreatureId, abilityComponent.damage)
+                  .creatureActivateEffect(collidedCreatureId, "immunityFrames", 2f)
+                  .creatureActivateEffect(collidedCreatureId, "stagger", 0.35f)
+              } else gameState
+          )
+
+      case (gameState, AreaGateCollisionEvent(creatureId, areaGate)) =>
+        gameState
+          .pipe(
+            gameState =>
+              if (!gameState.creatures(creatureId).params.passedGateRecently) {
+                val (fromAreaId: String, toAreaId: String, posX: Float, posY: Float) =
+                  creatures(creatureId).params.areaId match {
+                    case areaId if areaId == areaGate.areaFrom =>
+                      (areaGate.areaFrom, areaGate.areaTo, areaGate.toPosX, areaGate.toPosY)
+                    case areaId if areaId == areaGate.areaTo =>
+                      (areaGate.areaTo, areaGate.areaFrom, areaGate.fromPosX, areaGate.fromPosY)
+                    case _ => new RuntimeException("incorrect area for collision")
+                  }
+                gameState
+                  .modify(_.events)
+                  .setTo(
+                    List(
+                      AreaChangeEvent(creatureId, fromAreaId, toAreaId, posX, posY),
+                      UpdatePhysicsOnAreaChangeEvent(creatureId, fromAreaId, toAreaId, posX, posY)
+                    ) ::: gameState.events
+                  )
+              } else gameState
+          )
 
       case (gameState, LeftAreaGateEvent(creatureId)) =>
         gameState
-        gameState.modifyGameStateCreature(creatureId) { _.modify(_.params.passedGateRecently).setTo(false) }
+          .modifyGameStateCreature(creatureId) {
+            _.modify(_.params.passedGateRecently).setTo(false)
+          }
     }
-
   }
 
   def modifyGameStateCreature(creatureId: String)(operation: Creature => Creature): GameState = {
@@ -158,7 +173,7 @@ case class GameState(
       gameState =>
         gameState
           .modify(_.events)
-          .setTo(CreatureDeathEvent(creatureId) :: gameState.events)
+          .setTo(UpdatePhysicsOnCreatureDeathEvent(creatureId) :: gameState.events)
           .modifyGameStateCreature(creatureId)(_.onDeath())
     )
   }
@@ -194,15 +209,19 @@ case class GameState(
     val newEnemies =
       area.spawnPoints.map(spawnPoint => generateEnemy(spawnPoint.enemyType, areaId, spawnPoint.x, spawnPoint.y))
 
+    val updatePhysicsEvents = newEnemies.map(enemy => UpdatePhysicsOnEnemySpawnEvent(enemy.params.id)) ++ oldEnemiesIds
+      .map(enemyId => UpdatePhysicsOnEnemyDespawnEvent(creatures(enemyId)))
+
+    val updateRendererEvents =
+      newEnemies.map(enemy => UpdateRendererOnEnemySpawnEvent(enemy.params.id)) ++ oldEnemiesIds
+        .map(enemyId => UpdateRendererOnEnemyDespawnEvent(creatures(enemyId)))
+
     this
       .modify(_.creatures)
       .setTo(this.creatures -- oldEnemiesIds ++ newEnemies.map(enemy => (enemy.params.id -> enemy)).toMap)
       .modify(_.areas.at(areaId).creatures)
       .setTo(this.areas(areaId).creatures.filterNot(oldEnemiesIds.toSet) ++ newEnemies.map(_.params.id))
       .modify(_.events)
-      .setTo(
-        this.events ++ newEnemies.map(enemy => EnemySpawnEvent(enemy.params.id)) ++ oldEnemiesIds
-          .map(enemyId => EnemyDespawnEvent(creatures(enemyId)))
-      )
+      .setTo(this.events ++ updatePhysicsEvents ++ updateRendererEvents)
   }
 }

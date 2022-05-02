@@ -5,7 +5,7 @@ import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d.{Body, World}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.ComponentType
-import com.easternsauce.model.event.{ComponentCreateBodyEvent, ComponentDestroyBodyEvent}
+import com.easternsauce.model.event.{UpdatePhysicsOnComponentCreateBodyEvent, UpdatePhysicsOnComponentDestroyBodyEvent}
 import com.easternsauce.view.physics.terrain.Terrain
 import com.easternsauce.view.physics.{B2BodyFactory, PhysicsController}
 
@@ -65,20 +65,18 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
 
     val terrain: Terrain = physicsController.terrains(areaId)
 
-    if (gameState.events.contains(ComponentCreateBodyEvent(creatureId, abilityId, componentId))) {
-      println("creating component: " + creatureId + " " + componentId)
+    if (gameState.events.contains(UpdatePhysicsOnComponentCreateBodyEvent(creatureId, abilityId, componentId))) {
       init(terrain.world, gameState)
       isActive = true
     }
 
-    if (gameState.events.contains(ComponentDestroyBodyEvent(creatureId, abilityId, componentId))) {
+    if (gameState.events.contains(UpdatePhysicsOnComponentDestroyBodyEvent(creatureId, abilityId, componentId))) {
       destroy()
       isActive = false
     }
 
     if (isActive) {
       if (component.specification.componentType == ComponentType.MeleeAttack) {
-        println("updating comp")
         b2Body.setTransform(component.params.abilityHitbox.x, component.params.abilityHitbox.y, 0f)
       } else if (component.specification.componentType == ComponentType.RangedProjectile) {
         b2Body.setLinearVelocity(

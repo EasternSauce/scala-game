@@ -4,15 +4,29 @@ import com.easternsauce.model.creature.Creature
 
 sealed trait UpdateEvent
 
-case class CreatureDeathEvent(creatureId: String) extends UpdateEvent
+case class UpdatePhysicsOnCreatureDeathEvent(creatureId: String) extends UpdateEvent
 
-case class ComponentCreateBodyEvent(creatureId: String, abilityId: String, componentId: String) extends UpdateEvent
+case class UpdatePhysicsOnComponentCreateBodyEvent(creatureId: String, abilityId: String, componentId: String)
+    extends UpdateEvent
 
-case class ComponentDestroyBodyEvent(creatureId: String, abilityId: String, componentId: String) extends UpdateEvent
+case class UpdatePhysicsOnComponentDestroyBodyEvent(creatureId: String, abilityId: String, componentId: String)
+    extends UpdateEvent
 
 case class AreaChangeEvent(creatureId: String, oldAreaId: String, newAreaId: String, posX: Float, posY: Float)
     extends UpdateEvent
 
-case class EnemySpawnEvent(creatureId: String) extends UpdateEvent
+case class UpdatePhysicsOnAreaChangeEvent(
+  creatureId: String,
+  oldAreaId: String,
+  newAreaId: String,
+  posX: Float,
+  posY: Float
+) extends UpdateEvent
 
-case class EnemyDespawnEvent(creature: Creature) extends UpdateEvent
+case class UpdatePhysicsOnEnemySpawnEvent(creatureId: String) extends UpdateEvent
+
+case class UpdateRendererOnEnemySpawnEvent(creatureId: String) extends UpdateEvent
+
+case class UpdatePhysicsOnEnemyDespawnEvent(creature: Creature) extends UpdateEvent
+
+case class UpdateRendererOnEnemyDespawnEvent(creature: Creature) extends UpdateEvent

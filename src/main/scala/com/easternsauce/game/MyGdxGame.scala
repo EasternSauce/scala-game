@@ -8,7 +8,6 @@ import com.easternsauce.json.JsonCodecs._
 import com.easternsauce.model.GameState
 import com.easternsauce.model.area.{Area, EnemySpawnPoint}
 import com.easternsauce.model.creature.{CreatureParams, Player, Serpent, Skeleton}
-import com.easternsauce.model.event.AreaChangeEvent
 import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
@@ -48,8 +47,7 @@ class MyGdxGame extends Game {
 
   var playScreen: PlayScreen = _
 
-  var areaChangeQueue: ListBuffer[AreaChangeEvent] = ListBuffer()
-  var collisionQueue: ListBuffer[PhysicsEvent] = ListBuffer()
+  var physicsEventQueue: ListBuffer[PhysicsEvent] = ListBuffer()
 
   override def create(): Unit = {
     Assets.loadAssets()
@@ -138,10 +136,10 @@ class MyGdxGame extends Game {
 
     physicsController = PhysicsController(terrains, areaGates)
 
-    playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController, collisionQueue)
+    playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController, physicsEventQueue)
 
     gameView.init(gameState, maps, mapScale, areaGates)
-    physicsController.init(gameState, collisionQueue)
+    physicsController.init(gameState, physicsEventQueue)
 
     setScreen(playScreen)
   }

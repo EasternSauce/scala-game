@@ -1,9 +1,9 @@
 package com.easternsauce.view.physics
 
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.event.{AbilityComponentCollision, AreaGateCollision, LeftAreaGateEvent, PhysicsEvent}
+import com.easternsauce.event.{AbilityComponentCollisionEvent, AreaGateCollisionEvent, LeftAreaGateEvent, PhysicsEvent}
 import com.easternsauce.model.GameState
-import com.easternsauce.model.event.{AreaChangeEvent, EnemyDespawnEvent, EnemySpawnEvent}
+import com.easternsauce.model.event.{UpdatePhysicsOnAreaChangeEvent, UpdatePhysicsOnEnemyDespawnEvent, UpdatePhysicsOnEnemySpawnEvent}
 import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
 import com.easternsauce.view.physics.terrain.{AreaGateBody, AreaGatePair, Terrain}
 
@@ -12,11 +12,11 @@ import scala.collection.mutable.ListBuffer
 case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[AreaGatePair]) {
   var entityBodies: Map[String, EntityBody] = Map()
 
-  def init(gameState: GameState, collisionQueue: ListBuffer[PhysicsEvent]): Unit = {
+  def init(gameState: GameState, physicsEventQueue: ListBuffer[PhysicsEvent]): Unit = {
 
     terrains.values.foreach(terrain => {
       terrain.init()
-      createContactListener(terrain.world, collisionQueue)
+      createContactListener(terrain.world, physicsEventQueue)
     })
 
     entityBodies = gameState.creatures.keys.map(creatureId => creatureId -> EntityBody(creatureId)).toMap
@@ -32,10 +32,10 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
   def update(gameState: GameState): Unit = {
 
     gameState.events.foreach {
-      case AreaChangeEvent(creatureId, oldAreaId, newAreaId, _, _) =>
+      case UpdatePhysicsOnAreaChangeEvent(creatureId, oldAreaId, newAreaId, _, _) =>
         terrains(oldAreaId).world.destroyBody(entityBodies(creatureId).b2Body)
         entityBodies(creatureId).init(gameState = gameState, physicsController = this, areaId = newAreaId)
-      case EnemySpawnEvent(creatureId) =>
+      case UpdatePhysicsOnEnemySpawnEvent(creatureId) =>
         entityBodies = entityBodies + (creatureId -> {
           val entityBody = EntityBody(creatureId)
           entityBody.init(
@@ -45,7 +45,7 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
           )
           entityBody
         })
-      case EnemyDespawnEvent(creature) =>
+      case UpdatePhysicsOnEnemyDespawnEvent(creature) =>
         val world = terrains(creature.params.areaId).world
         world.destroyBody(entityBodies(creature.params.id).b2Body)
         entityBodies(creature.params.id).componentBodies.foreach {
@@ -60,7 +60,7 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
 
   }
 
-  def createContactListener(world: World, physicsQueue: ListBuffer[PhysicsEvent]): Unit = {
+  def createContactListener(world: World, physicsEventQueue: ListBuffer[PhysicsEvent]): Unit = {
     val contactListener: ContactListener = new ContactListener {
       override def beginContact(contact: Contact): Unit = {
         val objA = contact.getFixtureA.getBody.getUserData
@@ -70,8 +70,8 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
           pair match { // will run onContact twice for same type objects!
             case (entityBody: EntityBody, abilityComponentBody: ComponentBody) =>
               if (entityBody.creatureId != abilityComponentBody.creatureId) {
-                physicsQueue.prepend(
-                  AbilityComponentCollision(
+                physicsEventQueue.prepend(
+                  AbilityComponentCollisionEvent(
                     abilityComponentBody.creatureId,
                     abilityComponentBody.abilityId,
                     abilityComponentBody.componentId,
@@ -80,7 +80,7 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
                 )
               }
             case (entityBody: EntityBody, areaGateBody: AreaGateBody) =>
-              physicsQueue.prepend(AreaGateCollision(entityBody.creatureId, areaGateBody.areaGate))
+              physicsEventQueue.prepend(AreaGateCollisionEvent(entityBody.creatureId, areaGateBody.areaGate))
             case _ =>
           }
         }
@@ -96,7 +96,7 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
         def onContactEnd(pair: (AnyRef, AnyRef)): Unit = {
           pair match { // will run onContact twice for same type objects!
             case (entityBody: EntityBody, _: AreaGateBody) =>
-              physicsQueue.prepend(LeftAreaGateEvent(entityBody.creatureId))
+              physicsEventQueue.prepend(LeftAreaGateEvent(entityBody.creatureId))
             case _ =>
           }
         }

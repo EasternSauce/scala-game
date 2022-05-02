@@ -2,7 +2,7 @@ package com.easternsauce.model
 
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.creature.ability.AbilityState
-import com.easternsauce.model.event.{ComponentCreateBodyEvent, ComponentDestroyBodyEvent}
+import com.easternsauce.model.event.{UpdatePhysicsOnComponentCreateBodyEvent, UpdatePhysicsOnComponentDestroyBodyEvent}
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
 
@@ -22,7 +22,7 @@ trait AbilityInteractions {
         gameState =>
           gameState
             .modify(_.events)
-            .setTo(ComponentCreateBodyEvent(creatureId, abilityId, componentId) :: gameState.events)
+            .setTo(UpdatePhysicsOnComponentCreateBodyEvent(creatureId, abilityId, componentId) :: gameState.events)
       )
       .modifyGameStateAbilityComponent(creatureId, abilityId, componentId) {
         _.modify(_.params.abilityActiveAnimationTimer)
@@ -60,7 +60,7 @@ trait AbilityInteractions {
         gameState =>
           gameState
             .modify(_.events)
-            .setTo(ComponentDestroyBodyEvent(creatureId, abilityId, componentId) :: gameState.events)
+            .setTo(UpdatePhysicsOnComponentDestroyBodyEvent(creatureId, abilityId, componentId) :: gameState.events)
       )
       .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(
         _.modify(_.params.activeTimer)

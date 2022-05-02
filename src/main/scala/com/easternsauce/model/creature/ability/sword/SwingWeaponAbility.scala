@@ -14,7 +14,7 @@ case class SwingWeaponAbility(
   override val specification: AbilitySpecification = AbilitySpecification(
     textureWidth = 40,
     textureHeight = 40,
-    totalActiveTime = 3.0f,
+    totalActiveTime = 0.3f,
     totalChannelTime = 0.3f,
     channelSpriteType = "slash_windup",
     activeSpriteType = "slash",
@@ -63,8 +63,6 @@ case class SwingWeaponAbility(
   }
 
   override def updateComponentHitbox(creature: Creature, component: AbilityComponent): AbilityComponent = {
-    println("updating hitbox " + creature.params.id + " " + this.params.id + " " +  component.params.componentId)
-
     val dirVector = component.params.dirVector match {
       case dirVector if dirVector.length <= 0 => Vector2Wrapper(1, 0).normal
       case dirVector                          => dirVector
@@ -77,8 +75,6 @@ case class SwingWeaponAbility(
 
     val attackRectX = attackShiftX + creature.params.posX
     val attackRectY = attackShiftY + creature.params.posY
-
-    println("new arrack rect = " + attackRectX + " " + attackRectY)
 
     component
       .modify(_.params.abilityHitbox)
