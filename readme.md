@@ -13,11 +13,11 @@ Already done:
 - game save to/load from file,
 - add remaining abilities and components,
 - creature logic (temporary effects),
-- area gates.
+- area gates, 
+- enemy spawns.
 
 To be done:
 
-- enemy spawns,
 - boss arena and boss fight,
 - creature movement AI,
 - loot pick-up,
@@ -25,6 +25,4 @@ To be done:
 - main menu screen,
 - sounds and music,
 - ability usages,
-- drop tables,
-- use akka for messaging between modules,
-- allow more than 1 player.
+- drop tables.

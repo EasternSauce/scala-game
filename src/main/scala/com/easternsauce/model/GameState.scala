@@ -47,6 +47,7 @@ case class GameState(
     events.foldLeft(this) {
       case (gameState, AreaChangeEvent(creatureId, oldAreaId, newAreaId, posX, posY)) =>
         gameState
+          .resetArea(newAreaId)
           .assignCreatureToArea(creatureId, Some(oldAreaId), newAreaId)
           .modifyGameStateCreature(creatureId) {
             _.setPosition(posX, posY)
