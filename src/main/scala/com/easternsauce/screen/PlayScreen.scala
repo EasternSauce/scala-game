@@ -87,9 +87,7 @@ class PlayScreen(
     }
 
     gameState // TODO: dont update creatures outside the current area
-      .modify(_.player)
-      .using(updateCreature)
-      .modify(_.nonPlayers.each)
+      .modify(_.creatures.each)
       .using(updateCreature)
       .pipe(gameState => {
         val creatureAbilityPairs =
@@ -201,7 +199,7 @@ class PlayScreen(
 
       val ableToMove = !gameState.player.isEffectActive("stagger") && gameState.player.isAlive
 
-      if (ableToMove) gameState.modify(_.player).using { player =>
+      if (ableToMove) gameState.modify(_.creatures.at(gameState.currentPlayerId)).using { player =>
         val isMoving = {
           import Input.Keys._
           List(W, S, A, D).map(Gdx.input.isKeyPressed(_)) match {

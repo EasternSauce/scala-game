@@ -11,8 +11,8 @@ import com.softwaremill.quicklens._
 import scala.util.chaining.scalaUtilChainingOps
 
 case class GameState(
-  player: Creature,
-  nonPlayers: Map[String, Creature] = Map(),
+  currentPlayerId: String,
+  creatures: Map[String, Creature] = Map(),
   areas: Map[String, Area],
   currentAreaId: String,
   events: List[UpdateEvent] = List(),
@@ -20,7 +20,7 @@ case class GameState(
 ) extends AbilityInteractions
     with InventoryActions {
 
-  def creatures: Map[String, Creature] = nonPlayers + (player.params.id -> player)
+  def player: Creature = creatures(currentPlayerId)
 
   def abilities(creatureId: String, abilityId: String): Ability = creatures(creatureId).params.abilities(abilityId)
 
@@ -101,43 +101,28 @@ case class GameState(
   }
 
   def modifyGameStateCreature(creatureId: String)(operation: Creature => Creature): GameState = {
-    if (creatureId == player.params.id) {
-      this
-        .modify(_.player)
-        .using(operation(_))
-    } else {
-      this
-        .modify(_.nonPlayers.at(creatureId))
-        .using(operation(_))
-    }
+
+    this
+      .modify(_.creatures.at(creatureId))
+      .using(operation(_))
 
   }
 
   def modifyGameStateAbility(creatureId: String, abilityId: String)(operation: Ability => Ability): GameState = {
-    if (creatureId == player.params.id) {
-      this
-        .modify(_.player)
-        .using(_.modifyAbility(abilityId)(operation(_)))
-    } else {
-      this
-        .modify(_.nonPlayers.at(creatureId))
-        .using(_.modifyAbility(abilityId)(operation(_)))
-    }
+
+    this
+      .modify(_.creatures.at(creatureId))
+      .using(_.modifyAbility(abilityId)(operation(_)))
 
   }
 
   def modifyGameStateAbilityComponent(creatureId: String, abilityId: String, componentId: String)(
     operation: AbilityComponent => AbilityComponent
   ): GameState = {
-    if (creatureId == player.params.id) {
-      this
-        .modify(_.player)
-        .using(_.modifyAbilityComponent(abilityId, componentId)(operation(_)))
-    } else {
-      this
-        .modify(_.nonPlayers.at(creatureId))
-        .using(_.modifyAbilityComponent(abilityId, componentId)(operation(_)))
-    }
+
+    this
+      .modify(_.creatures.at(creatureId))
+      .using(_.modifyAbilityComponent(abilityId, componentId)(operation(_)))
 
   }
 
@@ -210,8 +195,8 @@ case class GameState(
       area.spawnPoints.map(spawnPoint => generateEnemy(spawnPoint.enemyType, areaId, spawnPoint.x, spawnPoint.y))
 
     this
-      .modify(_.nonPlayers)
-      .setTo(this.nonPlayers -- oldEnemiesIds ++ newEnemies.map(enemy => (enemy.params.id -> enemy)).toMap)
+      .modify(_.creatures)
+      .setTo(this.creatures -- oldEnemiesIds ++ newEnemies.map(enemy => (enemy.params.id -> enemy)).toMap)
       .modify(_.areas.at(areaId).creatures)
       .setTo(this.areas(areaId).creatures.filterNot(oldEnemiesIds.toSet) ++ newEnemies.map(_.params.id))
       .modify(_.events)

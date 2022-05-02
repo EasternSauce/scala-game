@@ -25,4 +25,6 @@ To be done:
 - main menu screen,
 - sounds and music,
 - ability usages,
-- drop tables.
+- drop tables,
+- use akka for messaging between modules,
+- allow more than 1 player.

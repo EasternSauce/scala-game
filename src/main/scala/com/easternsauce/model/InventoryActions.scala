@@ -61,7 +61,7 @@ trait InventoryActions {
               Assets.sound("coinBag").play(0.3f)
 
               gameState
-                .modify(_.player.params.inventoryItems)
+                .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
                 .using(_.removed(gameState.inventoryState.inventoryItemBeingMoved.get))
                 .modify(_.inventoryState.inventoryItemBeingMoved)
                 .setTo(None)
@@ -76,7 +76,7 @@ trait InventoryActions {
               Assets.sound("coinBag").play(0.3f)
 
               gameState
-                .modify(_.player.params.equipmentItems)
+                .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
                 .using(_.removed(gameState.inventoryState.equipmentItemBeingMoved.get))
                 .modify(_.inventoryState.equipmentItemBeingMoved)
                 .setTo(None)
@@ -96,13 +96,16 @@ trait InventoryActions {
       .pipe(
         gameState =>
           if (itemFrom.nonEmpty)
-            gameState.modify(_.player.params.inventoryItems).using(_ + (toIndex -> itemFrom.get)) //toIndex
-          else gameState.modify(_.player.params.inventoryItems).using(_.removed(toIndex))
+            gameState
+              .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
+              .using(_ + (toIndex -> itemFrom.get)) //toIndex
+          else gameState.modify(_.creatures.at(currentPlayerId).params.inventoryItems).using(_.removed(toIndex))
       )
       .pipe(
         gameState =>
-          if (temp.nonEmpty) gameState.modify(_.player.params.inventoryItems).using(_ + (fromIndex -> temp.get))
-          else gameState.modify(_.player.params.inventoryItems).using(_.removed(fromIndex))
+          if (temp.nonEmpty)
+            gameState.modify(_.creatures.at(currentPlayerId).params.inventoryItems).using(_ + (fromIndex -> temp.get))
+          else gameState.modify(_.creatures.at(currentPlayerId).params.inventoryItems).using(_.removed(fromIndex))
       )
       .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)
       .setTo(None)
@@ -129,14 +132,24 @@ trait InventoryActions {
               .pipe(
                 gameState =>
                   if (temp.nonEmpty)
-                    gameState.modify(_.player.params.inventoryItems).using(_ + (inventoryIndex -> temp.get))
-                  else gameState.modify(_.player.params.inventoryItems).using(_.removed(inventoryIndex))
+                    gameState
+                      .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
+                      .using(_ + (inventoryIndex -> temp.get))
+                  else
+                    gameState
+                      .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
+                      .using(_.removed(inventoryIndex))
               )
               .pipe(
                 gameState =>
                   if (inventoryItem.nonEmpty)
-                    gameState.modify(_.player.params.equipmentItems).using(_ + (equipmentIndex -> inventoryItem.get))
-                  else gameState.modify(_.player.params.equipmentItems).using(_.removed(equipmentIndex))
+                    gameState
+                      .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                      .using(_ + (equipmentIndex -> inventoryItem.get))
+                  else
+                    gameState
+                      .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                      .using(_.removed(equipmentIndex))
               )
 
           } else gameState
@@ -168,13 +181,19 @@ trait InventoryActions {
               .pipe(
                 gameState =>
                   if (itemFrom.nonEmpty)
-                    gameState.modify(_.player.params.equipmentItems).using(_ + (toIndex -> itemFrom.get))
-                  else gameState.modify(_.player.params.equipmentItems).using(_.removed(toIndex))
+                    gameState
+                      .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                      .using(_ + (toIndex -> itemFrom.get))
+                  else gameState.modify(_.creatures.at(currentPlayerId).params.equipmentItems).using(_.removed(toIndex))
               )
               .pipe(
                 gameState =>
-                  if (temp.nonEmpty) gameState.modify(_.player.params.equipmentItems).using(_ + (fromIndex -> temp.get))
-                  else gameState.modify(_.player.params.equipmentItems).using(_.removed(fromIndex))
+                  if (temp.nonEmpty)
+                    gameState
+                      .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                      .using(_ + (fromIndex -> temp.get))
+                  else
+                    gameState.modify(_.creatures.at(currentPlayerId).params.equipmentItems).using(_.removed(fromIndex))
               )
           } else gameState
       )

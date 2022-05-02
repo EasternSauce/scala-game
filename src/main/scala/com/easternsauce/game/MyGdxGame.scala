@@ -118,8 +118,12 @@ class MyGdxGame extends Game {
       } catch {
         case _: FileNotFoundException =>
           GameState(
-            player = player.init(), // TODO: init elsewhere?
-            nonPlayers = Map(skeleton.params.id -> skeleton.init(), wolf.params.id -> wolf.init()),
+            currentPlayerId = player.params.id,
+            creatures = Map(
+              player.params.id -> player.init(),
+              skeleton.params.id -> skeleton.init(),
+              wolf.params.id -> wolf.init()
+            ), // TODO: init elsewhere?
             currentAreaId = "area1",
             areas = areas
           )
