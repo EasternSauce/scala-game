@@ -5,6 +5,7 @@ import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.model.item.{Item, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
 import com.easternsauce.util.Vector2Wrapper
+import com.softwaremill.quicklens.ModifyPimp
 
 case class CreatureParams(
   id: String,
@@ -27,8 +28,10 @@ case class CreatureParams(
   staminaRegenerationDisabledTimer: SimpleTimer = SimpleTimer(),
   totalArmor: Float = 0f,
   equipmentItems: Map[Int, Item] = Map(),
-  inventoryItems: Map[Int, Item] =
-    Map(2 -> Item(ItemTemplate.templates("leatherArmor"))), // TODO: test item present, remove after
+  inventoryItems: Map[Int, Item] = Map(
+    2 -> Item(ItemTemplate.templates("leatherArmor")),
+    10 -> Item(ItemTemplate.templates("woodenSword")).modify(_.damage).setTo(Some(9999))
+  ), // TODO: test item present, remove after
   effects: Map[String, Effect] = Map(),
   movingDir: Vector2Wrapper = Vector2Wrapper(1, 1),
   currentSpeed: Float = 0f,

@@ -27,6 +27,8 @@ case class ThrustWeaponAbility(
     initSpeed = 30f
   )
 
+  override val isWeaponAttack = true
+
   override def onStart(creature: Creature): Ability = {
     components.keys
       .foldLeft(this)((ability, componentId) => {

@@ -69,7 +69,8 @@ case class GameState(
   def processPhysicsEventQueue(physicsEventQueue: List[PhysicsEvent]): GameState = {
     physicsEventQueue.foldLeft(this) {
       case (gameState, AbilityComponentCollisionEvent(creatureId, abilityId, componentId, collidedCreatureId)) =>
-        val abilityComponent = gameState.abilities(creatureId, abilityId).components(componentId)
+        val ability = gameState.abilities(creatureId, abilityId)
+        val abilityComponent = ability.components(componentId)
 
         val attackingDisallowed =
           creatures(creatureId).isControlledAutomatically && creatures(collidedCreatureId).isControlledAutomatically
@@ -81,7 +82,7 @@ case class GameState(
                 gameState
                   .creatureTakeLifeDamage(
                     collidedCreatureId,
-                    abilityComponent.damage,
+                    if (ability.isWeaponAttack) creatures(creatureId).weaponDamage else abilityComponent.damage,
                     creatures(creatureId).params.posX,
                     creatures(creatureId).params.posY
                   )
@@ -169,7 +170,7 @@ case class GameState(
             ).normal
           )
           .modify(_.params.knockbackVelocity)
-          .setTo(10f)
+          .setTo(30f)
       )
       .pipe(gameState => {
         val creature = gameState.creatures(creatureId)

@@ -7,6 +7,8 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
 
   val specification: AbilitySpecification
 
+  val isWeaponAttack = false
+
   val numOfComponents = 1
   val cooldownTime: Float = 1f
 

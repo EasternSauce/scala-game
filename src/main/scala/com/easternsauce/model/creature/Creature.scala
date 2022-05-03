@@ -5,7 +5,7 @@ import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, AbilityState}
 import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.util.Direction.Direction
-import com.easternsauce.util.{Direction, Vector2Wrapper}
+import com.easternsauce.util.{Direction, InventoryMapping, Vector2Wrapper}
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -36,6 +36,11 @@ abstract class Creature {
   val defaultAbility = "swingWeapon"
 
   val speed: Float = 15f
+
+  val unarmedDamage: Int = 10
+
+  def weaponDamage: Int =
+    params.equipmentItems.get(InventoryMapping.primaryWeaponIndex).flatMap(_.damage).getOrElse(unarmedDamage)
 
   def init(): Creature = {
     val swingWeaponAbility = SwingWeaponAbility().init()

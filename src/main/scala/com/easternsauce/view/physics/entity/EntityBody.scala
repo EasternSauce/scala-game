@@ -63,17 +63,19 @@ case class EntityBody(creatureId: String) {
     val vectorX = normalMovingDir.x * v
     val vectorY = normalMovingDir.y * v
 
-    if (creature.isEffectActive("knockback")) {
-      physicsController
-        .entityBodies(creatureId)
-        .setVelocity(
-          new Vector2(
-            creature.params.knockbackDir.x * creature.params.knockbackVelocity,
-            creature.params.knockbackDir.y * creature.params.knockbackVelocity
+    if (bodyCreated) {
+      if (creature.isEffectActive("knockback")) {
+        physicsController
+          .entityBodies(creatureId)
+          .setVelocity(
+            new Vector2(
+              creature.params.knockbackDir.x * creature.params.knockbackVelocity,
+              creature.params.knockbackDir.y * creature.params.knockbackVelocity
+            )
           )
-        )
-    } else if (bodyCreated && ableToMove)
-      physicsController.entityBodies(creatureId).setVelocity(new Vector2(vectorX, vectorY))
+      } else if (ableToMove)
+        physicsController.entityBodies(creatureId).setVelocity(new Vector2(vectorX, vectorY))
+    }
 
     componentBodies.values.foreach(_.update(gameState, physicsController, currentAreaId))
   }
