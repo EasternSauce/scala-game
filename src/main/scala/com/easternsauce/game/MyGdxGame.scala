@@ -12,7 +12,7 @@ import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.physics.PhysicsController
-import com.easternsauce.view.physics.terrain.{AreaGatePair, Terrain}
+import com.easternsauce.view.physics.terrain.{AreaGateBody, Terrain}
 import com.easternsauce.view.renderer
 import com.easternsauce.view.renderer.RendererController
 import io.circe.parser.decode
@@ -34,9 +34,9 @@ class MyGdxGame extends Game {
   val mapsToLoad =
     Map("area1" -> "assets/areas/area1", "area2" -> "assets/areas/area2", "area3" -> "assets/areas/area3")
 
-  val areaGates: List[AreaGatePair] = List( // TODO: load this from file?
-    AreaGatePair("area1", 199.5f, 15f, "area3", 17f, 2.5f),
-    AreaGatePair("area1", 2f, 63f, "area2", 58f, 9f)
+  val areaGates: List[AreaGateBody] = List( // TODO: load this from file?
+    AreaGateBody("area1", 199.5f, 15f, "area3", 17f, 2.5f),
+    AreaGateBody("area1", 2f, 63f, "area2", 58f, 9f)
   )
 
   val mapLoader: TmxMapLoader = new TmxMapLoader()

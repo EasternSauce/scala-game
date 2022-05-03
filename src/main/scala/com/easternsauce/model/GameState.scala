@@ -98,10 +98,10 @@ case class GameState(
               if (!gameState.creatures(creatureId).params.passedGateRecently) {
                 val (fromAreaId: String, toAreaId: String, posX: Float, posY: Float) =
                   creatures(creatureId).params.areaId match {
-                    case areaId if areaId == areaGate.areaFrom =>
-                      (areaGate.areaFrom, areaGate.areaTo, areaGate.toPosX, areaGate.toPosY)
-                    case areaId if areaId == areaGate.areaTo =>
-                      (areaGate.areaTo, areaGate.areaFrom, areaGate.fromPosX, areaGate.fromPosY)
+                    case areaId if areaId == areaGate.area1Id =>
+                      (areaGate.area1Id, areaGate.area2Id, areaGate.x2, areaGate.y2)
+                    case areaId if areaId == areaGate.area2Id =>
+                      (areaGate.area2Id, areaGate.area1Id, areaGate.x1, areaGate.y1)
                     case _ => new RuntimeException("incorrect area for collision")
                   }
                 gameState

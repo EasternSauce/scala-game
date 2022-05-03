@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.{UpdateRendererOnEnemyDespawnEvent, UpdateRendererOnEnemySpawnEvent}
 import com.easternsauce.util.RendererBatch
-import com.easternsauce.view.physics.terrain.AreaGatePair
+import com.easternsauce.view.physics.terrain.AreaGateBody
 import com.easternsauce.view.renderer.entity.EntityRenderer
 import com.easternsauce.view.renderer.hud.InventoryRenderer
 import com.easternsauce.view.renderer.terrain.{AreaGateRenderer, AreaRenderer}
@@ -20,7 +20,7 @@ case class RendererController(atlas: TextureAtlas) {
 
   var inventoryRenderer: InventoryRenderer = _
 
-  def init(gameState: GameState, maps: Map[String, TiledMap], mapScale: Float, areaGates: List[AreaGatePair]): Unit = {
+  def init(gameState: GameState, maps: Map[String, TiledMap], mapScale: Float, areaGates: List[AreaGateBody]): Unit = {
 
     entityRenderers = gameState.creatures.keys.map(creatureId => creatureId -> EntityRenderer(creatureId, atlas)).toMap
 

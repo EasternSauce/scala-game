@@ -5,11 +5,11 @@ import com.easternsauce.event.{AbilityComponentCollisionEvent, AreaGateCollision
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.{UpdatePhysicsOnAreaChangeEvent, UpdatePhysicsOnEnemyDespawnEvent, UpdatePhysicsOnEnemySpawnEvent}
 import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
-import com.easternsauce.view.physics.terrain.{AreaGateBody, AreaGatePair, Terrain}
+import com.easternsauce.view.physics.terrain.{AreaGateBody, Terrain}
 
 import scala.collection.mutable.ListBuffer
 
-case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[AreaGatePair]) {
+case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[AreaGateBody]) {
   var entityBodies: Map[String, EntityBody] = Map()
 
   def init(gameState: GameState, physicsEventQueue: ListBuffer[PhysicsEvent]): Unit = {
@@ -80,7 +80,7 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
                 )
               }
             case (entityBody: EntityBody, areaGateBody: AreaGateBody) =>
-              physicsEventQueue.prepend(AreaGateCollisionEvent(entityBody.creatureId, areaGateBody.areaGate))
+              physicsEventQueue.prepend(AreaGateCollisionEvent(entityBody.creatureId, areaGateBody))
             case _ =>
           }
         }

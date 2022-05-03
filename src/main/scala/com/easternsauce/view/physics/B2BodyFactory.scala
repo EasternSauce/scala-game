@@ -94,7 +94,7 @@ object B2BodyFactory {
     )
   }
 
-  def createAreaGateB2body(
+  def createAreaGateEntryPointB2body(
     world: World,
     areaGateBody: AreaGateBody,
     posX: Float,
