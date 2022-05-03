@@ -277,6 +277,8 @@ class PlayScreen(
 
     gameRenderer.renderAreaGates(gameState, worldBatch)
 
+    gameRenderer.renderLootPiles(gameState, worldBatch)
+
     gameRenderer.renderEntities(gameState, worldBatch)
 
     worldBatch.end()

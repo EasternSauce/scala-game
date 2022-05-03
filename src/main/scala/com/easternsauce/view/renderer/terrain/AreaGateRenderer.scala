@@ -6,7 +6,7 @@ import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.physics.terrain.AreaGateBody
 
-case class AreaGateRenderer(areaGate: AreaGateBody) {
+case class AreaGateRenderer(areaGate: AreaGateBody) { // TODO: should we read it from game state instead of passing body reference?
   private val downArrowImageFrom = new Image(Assets.atlas.findRegion("downarrow"))
   private val downArrowImageTo = new Image(Assets.atlas.findRegion("downarrow"))
 

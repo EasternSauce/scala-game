@@ -6,6 +6,7 @@ import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import com.easternsauce.event.PhysicsEvent
 import com.easternsauce.json.JsonCodecs._
 import com.easternsauce.model.GameState
+import com.easternsauce.model.area.loot.LootPile
 import com.easternsauce.model.area.{Area, EnemySpawnPoint}
 import com.easternsauce.model.creature.{CreatureParams, Player, Serpent, Skeleton}
 import com.easternsauce.screen.PlayScreen
@@ -15,10 +16,12 @@ import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.view.physics.terrain.{AreaGateBody, Terrain}
 import com.easternsauce.view.renderer
 import com.easternsauce.view.renderer.RendererController
+import com.softwaremill.quicklens._
 import io.circe.parser.decode
 
 import java.io.FileNotFoundException
 import scala.collection.mutable.ListBuffer
+import scala.util.chaining.scalaUtilChainingOps
 
 class MyGdxGame extends Game {
 
@@ -100,9 +103,25 @@ class MyGdxGame extends Game {
       case (areaId, directory) => areaId -> mapLoader.load(directory + "/tile_map.tmx")
     }
 
-    val areas = maps.map {
-      case (key, _) => (key, Area(areaId = key, spawnPoints = loadEnemySpawns("assets/areas/" + key)))
-    }
+    val areas = maps
+      .map {
+        case (key, _) => (key, Area(areaId = key, spawnPoints = loadEnemySpawns("assets/areas/" + key)))
+      }
+      .pipe(
+        areas =>
+          areas
+            .modify(_.at("area1").params.lootPiles)
+            .setTo(Map("lootPile1" -> LootPile(54, 15), "lootPile2" -> LootPile(30, 30)))
+      )
+      .pipe(
+        areas =>
+          areas
+            .modify(_.at("area2").params.lootPiles)
+            .setTo(
+              Map("lootPile3" -> LootPile(30, 30), "lootPile4" -> LootPile(30, 30), "lootPile5" -> LootPile(30, 30))
+            )
+      )
+      .pipe(areas => areas.modify(_.at("area3").params.lootPiles).setTo(Map("lootPile6" -> LootPile(30, 30))))
 
     val gameState =
       try {

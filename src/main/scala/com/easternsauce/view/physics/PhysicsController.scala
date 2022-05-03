@@ -5,12 +5,13 @@ import com.easternsauce.event.{AbilityComponentCollisionEvent, AreaGateCollision
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.{UpdatePhysicsOnAreaChangeEvent, UpdatePhysicsOnEnemyDespawnEvent, UpdatePhysicsOnEnemySpawnEvent}
 import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
-import com.easternsauce.view.physics.terrain.{AreaGateBody, Terrain}
+import com.easternsauce.view.physics.terrain.{AreaGateBody, LootPileBody, Terrain}
 
 import scala.collection.mutable.ListBuffer
 
 case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[AreaGateBody]) {
   var entityBodies: Map[String, EntityBody] = Map()
+  var lootPileBodies: List[LootPileBody] = List()
 
   def init(gameState: GameState, physicsEventQueue: ListBuffer[PhysicsEvent]): Unit = {
 
@@ -27,6 +28,17 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
 
       entityBody.init(gameState = gameState, physicsController = this, areaId = areaId)
     })
+
+    val areaLootPileCombinations: List[(String, String)] = gameState.areas.toList.foldLeft(List[(String, String)]()) {
+      case (acc, (k, v)) => acc ++ List().zipAll(v.params.lootPiles.keys.toList, k, "")
+    }
+
+    lootPileBodies = areaLootPileCombinations.map {
+      case (areaId, lootPileId) => LootPileBody(areaId, lootPileId)
+    }
+
+    lootPileBodies.foreach(_.init(terrains, gameState))
+
   }
 
   def update(gameState: GameState): Unit = {

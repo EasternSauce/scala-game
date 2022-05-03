@@ -4,7 +4,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef.BodyType
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
-import com.easternsauce.view.physics.terrain.{AreaGateBody, TerrainTileBody}
+import com.easternsauce.view.physics.terrain.{AreaGateBody, LootPileBody, TerrainTileBody}
 
 object B2BodyFactory {
   private def createB2body(
@@ -109,6 +109,19 @@ object B2BodyFactory {
       bodyType = BodyType.StaticBody,
       userData = areaGateBody,
       shape = Rectangle(width, height),
+      isSensor = true
+    )
+  }
+
+  def createLootPileB2body(world: World, lootPileBody: LootPileBody, posX: Float, posY: Float): Body = {
+    val radius = 2.5f
+    createB2body(
+      world = world,
+      posX = posX,
+      posY = posY,
+      bodyType = BodyType.StaticBody,
+      userData = lootPileBody,
+      shape = Circle(radius / 2),
       isSensor = true
     )
   }

@@ -10,7 +10,7 @@ import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.physics.terrain.AreaGateBody
 import com.easternsauce.view.renderer.entity.EntityRenderer
 import com.easternsauce.view.renderer.hud.InventoryRenderer
-import com.easternsauce.view.renderer.terrain.{AreaGateRenderer, AreaRenderer}
+import com.easternsauce.view.renderer.terrain.{AreaGateRenderer, AreaRenderer, LootPileRenderer}
 
 case class RendererController(atlas: TextureAtlas) {
 
@@ -18,9 +18,11 @@ case class RendererController(atlas: TextureAtlas) {
   var areaRenderers: Map[String, AreaRenderer] = Map()
   var areaGateRenderers: List[AreaGateRenderer] = List()
 
+  var lootPileRenderers: List[LootPileRenderer] = List()
+
   var inventoryRenderer: InventoryRenderer = _
 
-  def init(gameState: GameState, maps: Map[String, TiledMap], mapScale: Float, areaGates: List[AreaGateBody]): Unit = {
+  def init(gameState: GameState, maps: Map[String, TiledMap], mapScale: Float, areaGates: List[AreaGateBody]): Unit = { // TODO: passing physics object here! should retrieve it from game state information
 
     entityRenderers = gameState.creatures.keys.map(creatureId => creatureId -> EntityRenderer(creatureId, atlas)).toMap
 
@@ -34,6 +36,15 @@ case class RendererController(atlas: TextureAtlas) {
 
     areaGateRenderers = areaGates.map(AreaGateRenderer)
 
+    val areaLootPileCombinations: List[(String, String)] = gameState.areas.toList.foldLeft(List[(String, String)]()) {
+      case (acc, (k, v)) => acc ++ List().zipAll(v.params.lootPiles.keys.toList, k, "")
+    }
+
+    lootPileRenderers = areaLootPileCombinations.map {
+      case (areaId, lootPileId) => LootPileRenderer(areaId, lootPileId)
+    }
+
+    lootPileRenderers.foreach(_.init(gameState))
   }
 
   def update(gameState: GameState): Unit = {
@@ -112,6 +123,10 @@ case class RendererController(atlas: TextureAtlas) {
 
   def renderAreaGates(gameState: GameState, batch: RendererBatch): Unit = {
     areaGateRenderers.foreach(_.render(gameState, batch))
+  }
+
+  def renderLootPiles(gameState: GameState, batch: RendererBatch): Unit = {
+    lootPileRenderers.foreach(_.render(gameState, batch))
   }
 
   def dispose(): Unit = {
