@@ -25,4 +25,5 @@ case class GameState(
 
   def abilities(creatureId: String, abilityId: String): Ability = creatures(creatureId).params.abilities(abilityId)
 
+  def lootPilePickupMenuOpen: Boolean = lootPilePickupMenu.visibleLootPiles.nonEmpty && !inventoryWindow.inventoryOpen
 }

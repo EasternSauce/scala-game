@@ -4,6 +4,7 @@ import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, AbilityState}
 import com.easternsauce.model.creature.effect.Effect
+import com.easternsauce.model.item.{Item, ItemTemplate}
 import com.easternsauce.util.Direction.Direction
 import com.easternsauce.util.{Direction, InventoryMapping, Vector2Wrapper}
 import com.softwaremill.quicklens._
@@ -222,6 +223,65 @@ abstract class Creature {
         }
 
     } else this
+  }
+
+  def tryPickUpItem(item: Item): Boolean = { // TODO
+//    val template: ItemTemplate = item.template
+//    val stackable: Boolean = template.stackable.get
+//
+//    if (stackable) {
+//      var foundFreeSlot: Int = -1
+//      params.equipmentItems.foreach {
+//        case (key, value) =>
+//          if (foundFreeSlot == -1 && (value.template == template)) {
+//            // stackable and same type item exists in inventory
+//            foundFreeSlot = key
+//            params.equipmentItems(foundFreeSlot).quantity =
+//              params.equipmentItems(foundFreeSlot).quantity + item.quantity
+//
+//            return true
+//          }
+//      }
+//      params.inventoryItems.foreach {
+//        case (key, value) =>
+//          if (foundFreeSlot == -1 && (value.template == template)) {
+//            // stackable and same type item exists in inventory
+//            foundFreeSlot = key
+//            params.inventoryItems(foundFreeSlot).quantity =
+//              params.inventoryItems(foundFreeSlot).quantity + item.quantity
+//
+//            return true
+//          }
+//      }
+//    }
+//    for (i <- 0 until inventoryWindow.inventoryTotalSlots) {
+//      val lootPile = item.lootPile.get
+//
+//      if (!params.inventoryItems.contains(i)) { // if slot empty
+//        params.inventoryItems += (i -> item)
+//        lootPile match {
+//          //          case treasure: Treasure => //register treasure picked up, dont spawn it again for this save
+//          //            try {
+//          //              val writer: FileWriter =
+//          //                new FileWriter("saves/treasure_collected.sav", true)
+//          //              val area: Area = item.lootPileBackref.area
+//          //              writer.write(
+//          //                "treasure " + area.id + " " + area.treasureList
+//          //                  .indexOf(treasure) + "\n"
+//          //              )
+//          //              writer.close()
+//          //            } catch {
+//          //              case e: IOException =>
+//          //                e.printStackTrace()
+//          //            } TODO treasure saves
+//          case _ =>
+//        }
+//
+//        return true
+//      }
+//    }
+//    false
+    true
   }
 
   def copy(params: CreatureParams = params): Creature

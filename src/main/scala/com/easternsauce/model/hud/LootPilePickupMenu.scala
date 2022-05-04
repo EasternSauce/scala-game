@@ -1,3 +1,4 @@
 package com.easternsauce.model.hud
 
-case class LootPilePickupMenu(menuOpen: Boolean = false)
+case class LootPilePickupMenu(visibleLootPiles: List[(String, String)] = List()) {
+}

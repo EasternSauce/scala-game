@@ -27,4 +27,5 @@ case class Item(
         "\n" + "Worth " + (template.worth.get * 0.3).toInt + " Gold" + "\n"
   }
 
+  def name: String = template.name
 }

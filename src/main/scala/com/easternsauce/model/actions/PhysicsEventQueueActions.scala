@@ -70,8 +70,8 @@ trait PhysicsEventQueueActions {
           }
       case (gameState, LootPileCollisionStartEvent(creatureId, areaId, lootPileId)) =>
         gameState // TODO
-          .modify(_.lootPilePickupMenu.menuOpen)
-          .setTo(true)
+          .modify(_.lootPilePickupMenu.visibleLootPiles)
+          .setTo((areaId, lootPileId) :: gameState.lootPilePickupMenu.visibleLootPiles)
 //          .modify(_.events)
 //          .setTo(
 //            List(
@@ -81,8 +81,8 @@ trait PhysicsEventQueueActions {
 //          )
       case (gameState, LootPileCollisionEndEvent(creatureId, areaId, lootPileId)) =>
         gameState // TODO
-          .modify(_.lootPilePickupMenu.menuOpen)
-          .setTo(false)
+          .modify(_.lootPilePickupMenu.visibleLootPiles)
+          .setTo(gameState.lootPilePickupMenu.visibleLootPiles.filterNot(Set((areaId, lootPileId))))
     }
   }
 
