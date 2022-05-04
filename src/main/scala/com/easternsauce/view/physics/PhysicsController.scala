@@ -1,7 +1,7 @@
 package com.easternsauce.view.physics
 
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.event.{AbilityComponentCollisionEvent, AreaGateCollisionEvent, LeftAreaGateEvent, PhysicsEvent}
+import com.easternsauce.event._
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event._
 import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
@@ -103,7 +103,11 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
                 )
               }
             case (entityBody: EntityBody, areaGateBody: AreaGateBody) =>
-              physicsEventQueue.prepend(AreaGateCollisionEvent(entityBody.creatureId, areaGateBody))
+              physicsEventQueue.prepend(AreaGateCollisionStartEvent(entityBody.creatureId, areaGateBody))
+            case (entityBody: EntityBody, lootPileBody: LootPileBody) =>
+              physicsEventQueue.prepend(
+                LootPileCollisionStartEvent(entityBody.creatureId, lootPileBody.areaId, lootPileBody.lootPileId)
+              )
             case _ =>
           }
         }
@@ -119,7 +123,11 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
         def onContactEnd(pair: (AnyRef, AnyRef)): Unit = {
           pair match { // will run onContact twice for same type objects!
             case (entityBody: EntityBody, _: AreaGateBody) =>
-              physicsEventQueue.prepend(LeftAreaGateEvent(entityBody.creatureId))
+              physicsEventQueue.prepend(AreaGateCollisionEndEvent(entityBody.creatureId))
+            case (entityBody: EntityBody, lootPileBody: LootPileBody) =>
+              physicsEventQueue.prepend(
+                LootPileCollisionEndEvent(entityBody.creatureId, lootPileBody.areaId, lootPileBody.lootPileId)
+              )
             case _ =>
           }
         }

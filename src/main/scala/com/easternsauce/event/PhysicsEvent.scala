@@ -11,6 +11,10 @@ case class AbilityComponentCollisionEvent(
   collidedCreatureId: String
 ) extends PhysicsEvent
 
-case class AreaGateCollisionEvent(creatureId: String, areaGate: AreaGateBody) extends PhysicsEvent
+case class AreaGateCollisionStartEvent(creatureId: String, areaGate: AreaGateBody) extends PhysicsEvent
 
-case class LeftAreaGateEvent(creatureId: String) extends PhysicsEvent
+case class AreaGateCollisionEndEvent(creatureId: String) extends PhysicsEvent
+
+case class LootPileCollisionStartEvent(creatureId: String, areaId: String, lootPileId: String) extends PhysicsEvent
+
+case class LootPileCollisionEndEvent(creatureId: String, areaId: String, lootPileId: String) extends PhysicsEvent

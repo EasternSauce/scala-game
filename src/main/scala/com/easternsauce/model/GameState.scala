@@ -1,6 +1,6 @@
 package com.easternsauce.model
 
-import com.easternsauce.event.{AbilityComponentCollisionEvent, AreaGateCollisionEvent, LeftAreaGateEvent, PhysicsEvent}
+import com.easternsauce.event._
 import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.model.creature.{Creature, CreatureParams}
@@ -91,7 +91,7 @@ case class GameState(
               } else gameState
           )
 
-      case (gameState, AreaGateCollisionEvent(creatureId, areaGate)) =>
+      case (gameState, AreaGateCollisionStartEvent(creatureId, areaGate)) =>
         gameState
           .pipe(
             gameState =>
@@ -115,11 +115,23 @@ case class GameState(
               } else gameState
           )
 
-      case (gameState, LeftAreaGateEvent(creatureId)) =>
+      case (gameState, AreaGateCollisionEndEvent(creatureId)) =>
         gameState
           .modifyGameStateCreature(creatureId) {
             _.modify(_.params.passedGateRecently).setTo(false)
           }
+      case (gameState, LootPileCollisionStartEvent(creatureId, areaId, lootPileId)) =>
+        gameState // TODO
+          .modify(_.events)
+          .setTo(
+            List(
+              UpdateRendererOnLootPileDespawnEvent(areaId, lootPileId),
+              UpdatePhysicsOnLootPileDespawnEvent(areaId, lootPileId)
+            ) ::: gameState.events
+          )
+      case (gameState, LootPileCollisionEndEvent(creatureId, areaId, lootPileId)) =>
+        gameState // TODO
+
     }
   }
 
