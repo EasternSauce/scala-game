@@ -2,7 +2,7 @@ package com.easternsauce.model.actions
 
 import com.easternsauce.event._
 import com.easternsauce.model.GameState
-import com.easternsauce.model.event.{AreaChangeEvent, UpdatePhysicsOnAreaChangeEvent, UpdatePhysicsOnLootPileDespawnEvent, UpdateRendererOnLootPileDespawnEvent}
+import com.easternsauce.model.event.{AreaChangeEvent, UpdatePhysicsOnAreaChangeEvent}
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -70,16 +70,19 @@ trait PhysicsEventQueueActions {
           }
       case (gameState, LootPileCollisionStartEvent(creatureId, areaId, lootPileId)) =>
         gameState // TODO
-          .modify(_.events)
-          .setTo(
-            List(
-              UpdateRendererOnLootPileDespawnEvent(areaId, lootPileId),
-              UpdatePhysicsOnLootPileDespawnEvent(areaId, lootPileId)
-            ) ::: gameState.events
-          )
+          .modify(_.lootPilePickupMenu.menuOpen)
+          .setTo(true)
+//          .modify(_.events)
+//          .setTo(
+//            List(
+//              UpdateRendererOnLootPileDespawnEvent(areaId, lootPileId),
+//              UpdatePhysicsOnLootPileDespawnEvent(areaId, lootPileId)
+//            ) ::: gameState.events
+//          )
       case (gameState, LootPileCollisionEndEvent(creatureId, areaId, lootPileId)) =>
         gameState // TODO
-
+          .modify(_.lootPilePickupMenu.menuOpen)
+          .setTo(false)
     }
   }
 

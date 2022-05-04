@@ -1,5 +1,6 @@
 package com.easternsauce.json
 
+import com.easternsauce.model.GameState
 import com.easternsauce.model.area.loot.LootPile
 import com.easternsauce.model.area.{Area, AreaParams, EnemySpawnPoint}
 import com.easternsauce.model.creature._
@@ -10,9 +11,9 @@ import com.easternsauce.model.creature.ability.magic._
 import com.easternsauce.model.creature.ability.sword.{SwingWeaponAbility, ThrustWeaponAbility}
 import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.model.event.UpdateEvent
+import com.easternsauce.model.hud.{InventoryWindow, LootPilePickupMenu}
 import com.easternsauce.model.item.{Item, ItemParameterValue, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
-import com.easternsauce.model.{GameState, InventoryState}
 import com.easternsauce.util.Direction.Direction
 import com.easternsauce.util.{Direction, Vector2Wrapper}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
@@ -26,8 +27,8 @@ object JsonCodecs {
   implicit val encodeArea: Encoder[Area] = deriveEncoder
   implicit val decodeUpdateEvent: Decoder[UpdateEvent] = deriveDecoder
   implicit val encodeUpdateEvent: Encoder[UpdateEvent] = deriveEncoder
-  implicit val decodeInventoryState: Decoder[InventoryState] = deriveDecoder
-  implicit val encodeInventoryState: Encoder[InventoryState] = deriveEncoder
+  implicit val decodeInventoryState: Decoder[InventoryWindow] = deriveDecoder
+  implicit val encodeInventoryState: Encoder[InventoryWindow] = deriveEncoder
   implicit val decodeCreatureParams: Decoder[CreatureParams] = deriveDecoder
   implicit val encodeCreatureParams: Encoder[CreatureParams] = deriveEncoder
   implicit val decodeSimpleTimer: Decoder[SimpleTimer] = deriveDecoder
@@ -92,6 +93,8 @@ object JsonCodecs {
   implicit val encodeAreaParams: Encoder[AreaParams] = deriveEncoder
   implicit val decodeLootPile: Decoder[LootPile] = deriveDecoder
   implicit val encodeLootPile: Encoder[LootPile] = deriveEncoder
+  implicit val decodeLootPilePickupMenu: Decoder[LootPilePickupMenu] = deriveDecoder
+  implicit val encodeLootPilePickupMenu: Encoder[LootPilePickupMenu] = deriveEncoder
 
   implicit val encodeCreature: Encoder[Creature] = Encoder.instance { c =>
     {

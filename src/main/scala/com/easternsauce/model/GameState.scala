@@ -5,6 +5,7 @@ import com.easternsauce.model.area.Area
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.Ability
 import com.easternsauce.model.event._
+import com.easternsauce.model.hud.{InventoryWindow, LootPilePickupMenu}
 
 case class GameState(
   currentPlayerId: String,
@@ -12,7 +13,8 @@ case class GameState(
   areas: Map[String, Area],
   currentAreaId: String,
   events: List[UpdateEvent] = List(),
-  inventoryState: InventoryState = InventoryState()
+  inventoryWindow: InventoryWindow = InventoryWindow(),
+  lootPilePickupMenu: LootPilePickupMenu = LootPilePickupMenu()
 ) extends AbilityInteractions
     with InventoryActions
     with AreaActions

@@ -149,11 +149,11 @@ class PlayScreen(
     }
 
     val handleInventoryOpenClose: GameState => GameState = gameState => {
-      val inventoryOpen = gameState.inventoryState.inventoryOpen
+      val inventoryOpen = gameState.inventoryWindow.inventoryOpen
       if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
         if (!inventoryOpen) {
-          gameState.modify(_.inventoryState.inventoryOpen).setTo(true)
-        } else { gameState.modify(_.inventoryState.inventoryOpen).setTo(false) }
+          gameState.modify(_.inventoryWindow.inventoryOpen).setTo(true)
+        } else { gameState.modify(_.inventoryWindow.inventoryOpen).setTo(false) }
 
       } else gameState
     }
@@ -247,7 +247,7 @@ class PlayScreen(
     if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
       gameState.pipe(
         gameState =>
-          if (gameState.inventoryState.inventoryOpen) gameState.moveItemClick(mousePosWindowScaled) else gameState
+          if (gameState.inventoryWindow.inventoryOpen) gameState.moveItemClick(mousePosWindowScaled) else gameState
       )
     } else gameState
   }

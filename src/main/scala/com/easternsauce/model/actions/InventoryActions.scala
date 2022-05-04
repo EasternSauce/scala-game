@@ -29,8 +29,8 @@ trait InventoryActions {
         .foreach { case (k, _) => equipmentSlotClicked = Some(k) }
 
       (
-        inventoryState.inventoryItemBeingMoved,
-        inventoryState.equipmentItemBeingMoved,
+        inventoryWindow.inventoryItemBeingMoved,
+        inventoryWindow.equipmentItemBeingMoved,
         inventorySlotClicked,
         equipmentSlotClicked
       ) match {
@@ -40,22 +40,22 @@ trait InventoryActions {
         case (_, Some(from), _, Some(to)) => swapEquipmentSlotContent(from, to)
         case (_, _, Some(index), _) =>
           this
-            .modify(_.inventoryState.inventoryItemBeingMoved)
+            .modify(_.inventoryWindow.inventoryItemBeingMoved)
             .setToIf(player.params.inventoryItems.contains(index))(Some(index))
         case (_, _, _, Some(index)) =>
           this
-            .modify(_.inventoryState.equipmentItemBeingMoved)
+            .modify(_.inventoryWindow.equipmentItemBeingMoved)
             .setToIf(player.params.equipmentItems.contains(index))(Some(index))
         case _ =>
           this
-            .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)
+            .modifyAll(_.inventoryWindow.inventoryItemBeingMoved, _.inventoryWindow.equipmentItemBeingMoved)
             .setTo(None)
       }
     } else {
       this
         .pipe(
           gameState =>
-            if (gameState.inventoryState.inventoryItemBeingMoved.nonEmpty) {
+            if (gameState.inventoryWindow.inventoryItemBeingMoved.nonEmpty) {
               //val item = player.params.inventoryItems(gameState.inventoryState.inventoryItemBeingMoved.get)
               //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item)  TODO: spawn lootpile
 
@@ -63,14 +63,14 @@ trait InventoryActions {
 
               gameState
                 .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
-                .using(_.removed(gameState.inventoryState.inventoryItemBeingMoved.get))
-                .modify(_.inventoryState.inventoryItemBeingMoved)
+                .using(_.removed(gameState.inventoryWindow.inventoryItemBeingMoved.get))
+                .modify(_.inventoryWindow.inventoryItemBeingMoved)
                 .setTo(None)
             } else gameState
         )
         .pipe(
           gameState =>
-            if (gameState.inventoryState.equipmentItemBeingMoved.nonEmpty) {
+            if (gameState.inventoryWindow.equipmentItemBeingMoved.nonEmpty) {
               //val item = player.params.inventoryItems(gameState.inventoryState.equipmentItemBeingMoved.get)
               //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item) TODO: spawn lootpile
 
@@ -78,8 +78,8 @@ trait InventoryActions {
 
               gameState
                 .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
-                .using(_.removed(gameState.inventoryState.equipmentItemBeingMoved.get))
-                .modify(_.inventoryState.equipmentItemBeingMoved)
+                .using(_.removed(gameState.inventoryWindow.equipmentItemBeingMoved.get))
+                .modify(_.inventoryWindow.equipmentItemBeingMoved)
                 .setTo(None)
             } else gameState
         )
@@ -108,7 +108,7 @@ trait InventoryActions {
             gameState.modify(_.creatures.at(currentPlayerId).params.inventoryItems).using(_ + (fromIndex -> temp.get))
           else gameState.modify(_.creatures.at(currentPlayerId).params.inventoryItems).using(_.removed(fromIndex))
       )
-      .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)
+      .modifyAll(_.inventoryWindow.inventoryItemBeingMoved, _.inventoryWindow.equipmentItemBeingMoved)
       .setTo(None)
   }
 
@@ -156,7 +156,7 @@ trait InventoryActions {
           } else gameState
       )
       //player.promoteSecondaryToPrimaryWeapon() TODO
-      .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)
+      .modifyAll(_.inventoryWindow.inventoryItemBeingMoved, _.inventoryWindow.equipmentItemBeingMoved)
       .setTo(None)
   }
 
@@ -198,7 +198,7 @@ trait InventoryActions {
               )
           } else gameState
       )
-      .modifyAll(_.inventoryState.inventoryItemBeingMoved, _.inventoryState.equipmentItemBeingMoved)
+      .modifyAll(_.inventoryWindow.inventoryItemBeingMoved, _.inventoryWindow.equipmentItemBeingMoved)
       .setTo(None)
   }
 
