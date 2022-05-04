@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.{Rectangle, Vector2}
 import com.easternsauce.model.GameState
-import com.easternsauce.model.event.{UpdateRendererOnEnemyDespawnEvent, UpdateRendererOnEnemySpawnEvent}
+import com.easternsauce.model.event.{UpdateRendererOnEnemyDespawnEvent, UpdateRendererOnEnemySpawnEvent, UpdateRendererOnLootPileDespawnEvent, UpdateRendererOnLootPileSpawnEvent}
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.physics.terrain.AreaGateBody
 import com.easternsauce.view.renderer.entity.EntityRenderer
@@ -18,7 +18,7 @@ case class RendererController(atlas: TextureAtlas) {
   var areaRenderers: Map[String, AreaRenderer] = Map()
   var areaGateRenderers: List[AreaGateRenderer] = List()
 
-  var lootPileRenderers: List[LootPileRenderer] = List()
+  var lootPileRenderers: Map[(String, String), LootPileRenderer] = Map()
 
   var inventoryRenderer: InventoryRenderer = _
 
@@ -41,10 +41,10 @@ case class RendererController(atlas: TextureAtlas) {
     }
 
     lootPileRenderers = areaLootPileCombinations.map {
-      case (areaId, lootPileId) => LootPileRenderer(areaId, lootPileId)
-    }
+      case (areaId, lootPileId) => (areaId, lootPileId) -> LootPileRenderer(areaId, lootPileId)
+    }.toMap
 
-    lootPileRenderers.foreach(_.init(gameState))
+    lootPileRenderers.values.foreach(_.init(gameState))
   }
 
   def update(gameState: GameState): Unit = {
@@ -56,8 +56,17 @@ case class RendererController(atlas: TextureAtlas) {
           renderer.init(gameState)
           renderer
         })
-      case UpdateRendererOnEnemyDespawnEvent(creature) =>
-        entityRenderers = entityRenderers - creature.params.id
+      case UpdateRendererOnEnemyDespawnEvent(creatureId) =>
+        entityRenderers = entityRenderers - creatureId
+
+      case UpdateRendererOnLootPileSpawnEvent(areaId, lootPileId) =>
+        lootPileRenderers = lootPileRenderers + ((areaId, lootPileId) -> {
+          val renderer = LootPileRenderer(areaId, lootPileId)
+          renderer.init(gameState)
+          renderer
+        })
+      case UpdateRendererOnLootPileDespawnEvent(areaId, lootPileId) =>
+        lootPileRenderers = lootPileRenderers - ((areaId, lootPileId))
       case _ =>
     }
 
@@ -126,7 +135,7 @@ case class RendererController(atlas: TextureAtlas) {
   }
 
   def renderLootPiles(gameState: GameState, batch: RendererBatch): Unit = {
-    lootPileRenderers.foreach(_.render(gameState, batch))
+    lootPileRenderers.values.foreach(_.render(gameState, batch))
   }
 
   def dispose(): Unit = {

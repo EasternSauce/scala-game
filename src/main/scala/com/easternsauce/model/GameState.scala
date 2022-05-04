@@ -227,11 +227,11 @@ case class GameState(
       area.spawnPoints.map(spawnPoint => generateEnemy(spawnPoint.enemyType, areaId, spawnPoint.x, spawnPoint.y))
 
     val updatePhysicsEvents = newEnemies.map(enemy => UpdatePhysicsOnEnemySpawnEvent(enemy.params.id)) ++ oldEnemiesIds
-      .map(enemyId => UpdatePhysicsOnEnemyDespawnEvent(creatures(enemyId)))
+      .map(enemyId => UpdatePhysicsOnEnemyDespawnEvent(enemyId))
 
     val updateRendererEvents =
       newEnemies.map(enemy => UpdateRendererOnEnemySpawnEvent(enemy.params.id)) ++ oldEnemiesIds
-        .map(enemyId => UpdateRendererOnEnemyDespawnEvent(creatures(enemyId)))
+        .map(enemyId => UpdateRendererOnEnemyDespawnEvent(enemyId))
 
     this
       .modify(_.creatures)

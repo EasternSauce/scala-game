@@ -3,7 +3,7 @@ package com.easternsauce.view.physics
 import com.badlogic.gdx.physics.box2d._
 import com.easternsauce.event.{AbilityComponentCollisionEvent, AreaGateCollisionEvent, LeftAreaGateEvent, PhysicsEvent}
 import com.easternsauce.model.GameState
-import com.easternsauce.model.event.{UpdatePhysicsOnAreaChangeEvent, UpdatePhysicsOnEnemyDespawnEvent, UpdatePhysicsOnEnemySpawnEvent}
+import com.easternsauce.model.event._
 import com.easternsauce.view.physics.entity.{ComponentBody, EntityBody}
 import com.easternsauce.view.physics.terrain.{AreaGateBody, LootPileBody, Terrain}
 
@@ -11,7 +11,7 @@ import scala.collection.mutable.ListBuffer
 
 case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[AreaGateBody]) {
   var entityBodies: Map[String, EntityBody] = Map()
-  var lootPileBodies: List[LootPileBody] = List()
+  var lootPileBodies: Map[(String, String), LootPileBody] = Map()
 
   def init(gameState: GameState, physicsEventQueue: ListBuffer[PhysicsEvent]): Unit = {
 
@@ -34,10 +34,10 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
     }
 
     lootPileBodies = areaLootPileCombinations.map {
-      case (areaId, lootPileId) => LootPileBody(areaId, lootPileId)
-    }
+      case (areaId, lootPileId) => (areaId, lootPileId) -> LootPileBody(areaId, lootPileId)
+    }.toMap
 
-    lootPileBodies.foreach(_.init(terrains, gameState))
+    lootPileBodies.values.foreach(_.init(terrains, gameState))
 
   }
 
@@ -57,14 +57,25 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
           )
           entityBody
         })
-      case UpdatePhysicsOnEnemyDespawnEvent(creature) =>
+      case UpdatePhysicsOnEnemyDespawnEvent(creatureId) =>
+        val creature = gameState.creatures(creatureId)
         val world = terrains(creature.params.areaId).world
-        world.destroyBody(entityBodies(creature.params.id).b2Body)
-        entityBodies(creature.params.id).componentBodies.foreach {
+        world.destroyBody(entityBodies(creatureId).b2Body)
+        entityBodies(creatureId).componentBodies.foreach {
           case (_, componentBody) =>
             if (componentBody.b2Body != null && componentBody.b2Body.isActive) world.destroyBody(componentBody.b2Body)
         }
-        entityBodies = entityBodies - creature.params.id
+        entityBodies = entityBodies - creatureId
+      case UpdatePhysicsOnLootPileSpawnEvent(areaId, lootPileId) =>
+        lootPileBodies = lootPileBodies + ((areaId, lootPileId) -> {
+          val lootPileBody = LootPileBody(areaId, lootPileId)
+          lootPileBody.init(terrains, gameState)
+          lootPileBody
+        })
+      case UpdatePhysicsOnLootPileDespawnEvent(areaId, lootPileId) =>
+        val world = terrains(areaId).world
+        world.destroyBody(lootPileBodies(areaId, lootPileId).b2Body)
+
       case _ =>
     }
 
