@@ -9,7 +9,7 @@ import com.easternsauce.model.event.{UpdateRendererOnEnemyDespawnEvent, UpdateRe
 import com.easternsauce.util.RendererBatch
 import com.easternsauce.view.physics.terrain.AreaGateBody
 import com.easternsauce.view.renderer.entity.EntityRenderer
-import com.easternsauce.view.renderer.hud.InventoryRenderer
+import com.easternsauce.view.renderer.hud.{InventoryRenderer, LootPickupMenuRenderer}
 import com.easternsauce.view.renderer.terrain.{AreaGateRenderer, AreaRenderer, LootPileRenderer}
 
 case class RendererController(atlas: TextureAtlas) {
@@ -22,6 +22,8 @@ case class RendererController(atlas: TextureAtlas) {
 
   var inventoryRenderer: InventoryRenderer = _
 
+  var lootPickupMenuRenderer: LootPickupMenuRenderer = _
+
   def init(gameState: GameState, maps: Map[String, TiledMap], mapScale: Float, areaGates: List[AreaGateBody]): Unit = { // TODO: passing physics object here! should retrieve it from game state information
 
     entityRenderers = gameState.creatures.keys.map(creatureId => creatureId -> EntityRenderer(creatureId, atlas)).toMap
@@ -33,6 +35,8 @@ case class RendererController(atlas: TextureAtlas) {
     areaRenderers.values.foreach(_.init())
 
     inventoryRenderer = InventoryRenderer()
+
+    lootPickupMenuRenderer = LootPickupMenuRenderer()
 
     areaGateRenderers = areaGates.map(AreaGateRenderer)
 
@@ -94,6 +98,8 @@ case class RendererController(atlas: TextureAtlas) {
     }
 
     inventoryRenderer.render(gameState, batch, mousePosition)
+
+    lootPickupMenuRenderer.render(gameState, batch)
 
     renderLifeAndStamina()
   }

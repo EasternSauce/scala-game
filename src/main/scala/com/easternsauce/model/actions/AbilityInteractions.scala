@@ -1,12 +1,13 @@
-package com.easternsauce.model
+package com.easternsauce.model.actions
 
 import com.badlogic.gdx.math.Vector2
+import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.AbilityState
 import com.easternsauce.model.event.{UpdatePhysicsOnComponentCreateBodyEvent, UpdatePhysicsOnComponentDestroyBodyEvent}
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
 
-import scala.util.chaining._
+import scala.util.chaining.scalaUtilChainingOps
 
 trait AbilityInteractions {
   this: GameState =>

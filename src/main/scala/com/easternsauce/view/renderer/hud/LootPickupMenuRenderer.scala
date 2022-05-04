@@ -1,3 +1,8 @@
 package com.easternsauce.view.renderer.hud
 
-class LootPickupMenuRenderer {}
+import com.easternsauce.model.GameState
+import com.easternsauce.util.RendererBatch
+
+case class LootPickupMenuRenderer() {
+  def render(gameState: GameState, batch: RendererBatch): Unit = {}
+}

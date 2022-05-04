@@ -1,7 +1,8 @@
-package com.easternsauce.model
+package com.easternsauce.model.actions
 
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.inventory.InventoryData
+import com.easternsauce.model.GameState
 import com.easternsauce.system.Assets
 import com.easternsauce.util.InventoryMapping
 import com.softwaremill.quicklens._
