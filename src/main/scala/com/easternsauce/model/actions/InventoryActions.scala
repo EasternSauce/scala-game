@@ -1,6 +1,6 @@
 package com.easternsauce.model.actions
 
-import com.easternsauce.hud.InventoryData
+import com.easternsauce.hud.InventoryWindowConfig
 import com.easternsauce.model.GameState
 import com.easternsauce.system.Assets
 import com.easternsauce.util.{InventoryMapping, Vector2Wrapper}
@@ -18,12 +18,12 @@ trait InventoryActions {
     val x: Float = mousePos.x
     val y: Float = mousePos.y
 
-    if (InventoryData.backgroundOuterRect.contains(x, y)) {
-      InventoryData.inventoryRectangles
+    if (InventoryWindowConfig.backgroundOuterRect.contains(x, y)) {
+      InventoryWindowConfig.inventoryRectangles
         .filter { case (_, v) => v.contains(x, y) }
         .foreach { case (k, _) => inventorySlotClicked = Some(k) }
 
-      InventoryData.equipmentRectangles
+      InventoryWindowConfig.equipmentRectangles
         .filter { case (_, v) => v.contains(x, y) }
         .foreach { case (k, _) => equipmentSlotClicked = Some(k) }
 

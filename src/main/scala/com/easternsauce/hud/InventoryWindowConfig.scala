@@ -3,7 +3,7 @@ package com.easternsauce.hud
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Rectangle
 
-object InventoryData {
+object InventoryWindowConfig {
   private val totalRows = 5
   private val totalColumns = 8
   val inventoryTotalSlots: Int = totalRows * totalColumns
