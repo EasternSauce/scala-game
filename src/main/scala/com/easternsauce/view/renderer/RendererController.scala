@@ -3,10 +3,10 @@ package com.easternsauce.view.renderer
 import com.badlogic.gdx.graphics.Color
 import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
-import com.badlogic.gdx.math.{Rectangle, Vector2}
+import com.badlogic.gdx.math.Rectangle
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.{UpdateRendererOnEnemyDespawnEvent, UpdateRendererOnEnemySpawnEvent, UpdateRendererOnLootPileDespawnEvent, UpdateRendererOnLootPileSpawnEvent}
-import com.easternsauce.util.RendererBatch
+import com.easternsauce.util.{RendererBatch, Vector2Wrapper}
 import com.easternsauce.view.physics.terrain.AreaGateBody
 import com.easternsauce.view.renderer.entity.EntityRenderer
 import com.easternsauce.view.renderer.hud.{InventoryRenderer, LootPickupMenuRenderer}
@@ -80,7 +80,7 @@ case class RendererController(atlas: TextureAtlas) {
 
   }
 
-  def renderHud(gameState: GameState, batch: RendererBatch, mousePosition: Vector2): Unit = {
+  def renderHud(gameState: GameState, batch: RendererBatch, mousePosition: Vector2Wrapper): Unit = {
     def renderLifeAndStamina(): Unit = {
       val player = gameState.player
 

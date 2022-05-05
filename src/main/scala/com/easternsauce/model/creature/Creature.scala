@@ -4,7 +4,7 @@ import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, AbilityState}
 import com.easternsauce.model.creature.effect.Effect
-import com.easternsauce.model.item.{Item, ItemTemplate}
+import com.easternsauce.model.item.Item
 import com.easternsauce.util.Direction.Direction
 import com.easternsauce.util.{Direction, InventoryMapping, Vector2Wrapper}
 import com.softwaremill.quicklens._

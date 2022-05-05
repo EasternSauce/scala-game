@@ -51,8 +51,12 @@ case class LootPickupMenuRenderer() {
     val mouseY = Gdx.input.getY
 
     val itemOptions = gameState.lootPilePickupMenu.visibleLootPiles
-      .map { case (areaId, lootPileId) => (areaId, lootPileId, gameState.areas(areaId).params.lootPiles(lootPileId).items) }
-      .foldLeft(List[(String, String, Item)]()){case (acc, (areaId, lootPileId, items)) => acc ++ items.map(item => (areaId, lootPileId, item))}
+      .map {
+        case (areaId, lootPileId) => (areaId, lootPileId, gameState.areas(areaId).params.lootPiles(lootPileId).items)
+      }
+      .foldLeft(List[(String, String, Item)]()) {
+        case (acc, (areaId, lootPileId, items)) => acc ++ items.map(item => (areaId, lootPileId, item))
+      }
 
     val scheduledToRemove: ListBuffer[((String, String, Item), LootPile)] = ListBuffer()
 

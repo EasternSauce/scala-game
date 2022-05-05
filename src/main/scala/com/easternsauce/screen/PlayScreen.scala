@@ -111,7 +111,8 @@ class PlayScreen(
     gameState = gameState
       .pipe(_.clearEventQueue())
       .pipe(processPlayerInput)
-      .pipe(processInventoryActions)
+      .pipe(processInventoryWindowActions)
+      .pipe(processLootPileMenuActions)
       .pipe(updateCreatures(physicsController, delta))
       .pipe(_.processPhysicsEventQueue(physicsEventQueue.toList))
       .pipe(_.processCreatureAreaChanges())
@@ -242,12 +243,22 @@ class PlayScreen(
 
   }
 
-  def processInventoryActions(gameState: GameState): GameState = {
+  def processInventoryWindowActions(gameState: GameState): GameState = {
 
     if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
       gameState.pipe(
         gameState =>
           if (gameState.inventoryWindow.inventoryOpen) gameState.moveItemClick(mousePosWindowScaled) else gameState
+      )
+    } else gameState
+  }
+
+  def processLootPileMenuActions(gameState: GameState): GameState = {
+
+    if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
+      gameState.pipe(
+        gameState =>
+          if (gameState.lootPilePickupMenuOpen) gameState.lootPickupMenuClick(mousePosWindowScaled) else gameState
       )
     } else gameState
   }
@@ -326,9 +337,9 @@ class PlayScreen(
     writer.close()
   }
 
-  def mousePosWindowScaled: Vector2 = {
+  def mousePosWindowScaled: Vector2Wrapper = {
     val v = new Vector3(Gdx.input.getX.toFloat, Gdx.input.getY.toFloat, 0f)
     hudCamera.unproject(v)
-    new Vector2(v.x, v.y)
+    Vector2Wrapper(v.x, v.y)
   }
 }

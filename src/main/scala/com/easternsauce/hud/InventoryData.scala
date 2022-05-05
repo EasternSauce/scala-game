@@ -1,4 +1,4 @@
-package com.easternsauce.inventory
+package com.easternsauce.hud
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Rectangle

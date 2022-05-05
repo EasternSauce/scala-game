@@ -1,10 +1,9 @@
 package com.easternsauce.model.actions
 
-import com.badlogic.gdx.math.Vector2
-import com.easternsauce.inventory.InventoryData
+import com.easternsauce.hud.InventoryData
 import com.easternsauce.model.GameState
 import com.easternsauce.system.Assets
-import com.easternsauce.util.InventoryMapping
+import com.easternsauce.util.{InventoryMapping, Vector2Wrapper}
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -12,7 +11,7 @@ import scala.util.chaining.scalaUtilChainingOps
 trait InventoryActions {
   this: GameState =>
 
-  def moveItemClick(mousePos: Vector2): GameState = {
+  def moveItemClick(mousePos: Vector2Wrapper): GameState = {
     var inventorySlotClicked: Option[Int] = None
     var equipmentSlotClicked: Option[Int] = None
 

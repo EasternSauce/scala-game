@@ -19,7 +19,8 @@ case class GameState(
     with InventoryActions
     with AreaActions
     with CreatureActions
-    with PhysicsEventQueueActions {
+    with PhysicsEventQueueActions
+    with LootPickupMenuActions {
 
   def player: Creature = creatures(currentPlayerId)
 
