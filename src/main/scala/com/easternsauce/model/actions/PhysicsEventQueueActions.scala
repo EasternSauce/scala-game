@@ -69,20 +69,18 @@ trait PhysicsEventQueueActions {
             _.modify(_.params.passedGateRecently).setTo(false)
           }
       case (gameState, LootPileCollisionStartEvent(creatureId, areaId, lootPileId)) =>
-        gameState // TODO
+        gameState
           .modify(_.lootPilePickupMenu.visibleLootPiles)
-          .setTo((areaId, lootPileId) :: gameState.lootPilePickupMenu.visibleLootPiles)
-//          .modify(_.events)
-//          .setTo(
-//            List(
-//              UpdateRendererOnLootPileDespawnEvent(areaId, lootPileId),
-//              UpdatePhysicsOnLootPileDespawnEvent(areaId, lootPileId)
-//            ) ::: gameState.events
-//          )
+          .setToIf(
+            gameState.creatures(creatureId).isPlayer &&
+              !gameState.lootPilePickupMenu.visibleLootPiles.contains((areaId, lootPileId))
+          )((areaId, lootPileId) :: gameState.lootPilePickupMenu.visibleLootPiles)
       case (gameState, LootPileCollisionEndEvent(creatureId, areaId, lootPileId)) =>
-        gameState // TODO
+        gameState
           .modify(_.lootPilePickupMenu.visibleLootPiles)
-          .setTo(gameState.lootPilePickupMenu.visibleLootPiles.filterNot(Set((areaId, lootPileId))))
+          .setToIf(gameState.creatures(creatureId).isPlayer)(
+            gameState.lootPilePickupMenu.visibleLootPiles.filterNot(Set((areaId, lootPileId)))
+          )
     }
   }
 
