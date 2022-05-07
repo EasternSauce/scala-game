@@ -1,6 +1,6 @@
 package com.easternsauce.model.actions
 
-import com.easternsauce.hud.LootPileMenuConfig
+import com.easternsauce.helper.LootPickupMenuHelper
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.{UpdatePhysicsOnLootPileDespawnEvent, UpdateRendererOnLootPileDespawnEvent}
 import com.easternsauce.model.item.Item
@@ -22,7 +22,7 @@ trait LootPickupMenuActions {
       .zipWithIndex
 
     val clickedItem = itemOptions.find {
-      case ((_, _, _), i) => LootPileMenuConfig.menuOptionRect(i).contains(mousePos.x, mousePos.y)
+      case ((_, _, _), i) => LootPickupMenuHelper.menuOptionRect(i).contains(mousePos.x, mousePos.y)
     }
 
     // TODO: treasures

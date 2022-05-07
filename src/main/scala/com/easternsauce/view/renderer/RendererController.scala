@@ -5,12 +5,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas
 import com.badlogic.gdx.maps.tiled.TiledMap
 import com.badlogic.gdx.math.Rectangle
 import com.easternsauce.model.GameState
-import com.easternsauce.model.event.{
-  UpdateRendererOnEnemyDespawnEvent,
-  UpdateRendererOnEnemySpawnEvent,
-  UpdateRendererOnLootPileDespawnEvent,
-  UpdateRendererOnLootPileSpawnEvent
-}
+import com.easternsauce.model.event.{UpdateRendererOnEnemyDespawnEvent, UpdateRendererOnEnemySpawnEvent, UpdateRendererOnLootPileDespawnEvent, UpdateRendererOnLootPileSpawnEvent}
 import com.easternsauce.util.{RendererBatch, Vector2Wrapper}
 import com.easternsauce.view.physics.terrain.AreaGateBody
 import com.easternsauce.view.renderer.entity.EntityRenderer

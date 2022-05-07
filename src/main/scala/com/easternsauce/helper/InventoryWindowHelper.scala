@@ -1,9 +1,9 @@
-package com.easternsauce.hud
+package com.easternsauce.helper
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.math.Rectangle
 
-object InventoryWindowConfig {
+object InventoryWindowHelper {
   private val totalRows = 5
   private val totalColumns = 8
   val inventoryTotalSlots: Int = totalRows * totalColumns

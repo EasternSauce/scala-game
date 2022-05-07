@@ -111,7 +111,7 @@ class MyGdxGame extends Game {
         areas =>
           areas
             .modify(_.at("area1").params.lootPiles)
-            .setTo(Map("lootPile1" -> LootPile(54, 15), "lootPile2" -> LootPile(30, 30)))
+            .setTo(Map("lootPile1" -> LootPile(54, 15), "lootPile2" -> LootPile(54, 16)))
       )
       .pipe(
         areas =>

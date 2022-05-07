@@ -7,6 +7,7 @@ import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
 import com.badlogic.gdx.{Gdx, Input, Screen}
 import com.easternsauce.event.PhysicsEvent
+import com.easternsauce.helper.LootPickupMenuHelper
 import com.easternsauce.json.JsonCodecs
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
@@ -111,8 +112,6 @@ class PlayScreen(
     gameState = gameState
       .pipe(_.clearEventQueue())
       .pipe(processPlayerInput)
-      .pipe(processInventoryWindowActions)
-      .pipe(processLootPileMenuActions)
       .pipe(updateCreatures(physicsController, delta))
       .pipe(_.processPhysicsEventQueue(physicsEventQueue.toList))
       .pipe(_.processCreatureAreaChanges())
@@ -150,17 +149,52 @@ class PlayScreen(
     }
 
     val handleInventoryOpenClose: GameState => GameState = gameState => {
-      val inventoryOpen = gameState.inventoryWindow.inventoryOpen
+      val inventoryOpen = gameState.inventoryWindow.isOpen
       if (Gdx.input.isKeyJustPressed(Input.Keys.I)) {
         if (!inventoryOpen) {
-          gameState.modify(_.inventoryWindow.inventoryOpen).setTo(true)
-        } else { gameState.modify(_.inventoryWindow.inventoryOpen).setTo(false) }
+          gameState.modify(_.inventoryWindow.isOpen).setTo(true)
+        } else { gameState.modify(_.inventoryWindow.isOpen).setTo(false) }
+
+      } else if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+        if (inventoryOpen) {
+          gameState.modify(_.inventoryWindow.isOpen).setTo(false)
+        } else gameState
 
       } else gameState
     }
 
-    val handleLeftClickInput: GameState => GameState =
-      if (Gdx.input.isButtonJustPressed(Input.Buttons.LEFT)) {
+    def processInventoryWindowActions: GameState => GameState =
+      gameState => {
+
+        if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
+          gameState.pipe(
+            gameState =>
+              if (gameState.inventoryWindow.isOpen) gameState.moveItemClick(mousePosWindowScaled) else gameState
+          )
+        } else gameState
+      }
+
+    def processLootPileMenuActions: GameState => GameState =
+      gameState => {
+
+        if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
+          gameState.pipe(
+            gameState =>
+              if (gameState.lootPilePickupMenu.isOpen && !gameState.inventoryWindow.isOpen)
+                gameState.lootPickupMenuClick(mousePosWindowScaled)
+              else gameState
+          )
+        } else gameState
+      }
+
+    val handleAttackCommand: GameState => GameState = {
+
+      if (
+        Gdx.input.isButtonJustPressed(Input.Buttons.LEFT) && !LootPickupMenuHelper.inLootPickupMenu(
+          gameState,
+          mousePosWindowScaled
+        )
+      ) {
         val mouseX = Gdx.input.getX
         val mouseY = Gdx.input.getY
 
@@ -177,6 +211,7 @@ class PlayScreen(
           )
         modification
       } else identity
+    }
 
     val handleMovement: GameState => GameState = { gameState =>
       val (movementVectorX, movementVectorY) = {
@@ -237,30 +272,19 @@ class PlayScreen(
 
     gameState
       .pipe(handleMovement)
-      .pipe(handleLeftClickInput)
       .pipe(handleInventoryOpenClose)
       .pipe(handleDebugButton)
-
-  }
-
-  def processInventoryWindowActions(gameState: GameState): GameState = {
-
-    if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
-      gameState.pipe(
+      .pipe(
         gameState =>
-          if (gameState.inventoryWindow.inventoryOpen) gameState.moveItemClick(mousePosWindowScaled) else gameState
+          if (gameState.inventoryWindow.isOpen)
+            gameState
+              .pipe(processInventoryWindowActions)
+          else
+            gameState
+              .pipe(handleAttackCommand)
+              .pipe(processLootPileMenuActions)
       )
-    } else gameState
-  }
 
-  def processLootPileMenuActions(gameState: GameState): GameState = {
-
-    if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
-      gameState.pipe(
-        gameState =>
-          if (gameState.lootPilePickupMenuOpen) gameState.lootPickupMenuClick(mousePosWindowScaled) else gameState
-      )
-    } else gameState
   }
 
   override def render(delta: Float): Unit = {
