@@ -1,5 +1,6 @@
 package com.easternsauce.model.creature
 
+import com.easternsauce.helper.InventoryWindowHelper
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, AbilityState}
@@ -223,6 +224,23 @@ abstract class Creature {
         }
 
     } else this
+  }
+
+  def canPickUpItem(item: Item): Boolean = {
+//    val template: ItemTemplate = item.template
+//    val stackable: Boolean = template.stackable.get
+
+    val inventoryFull = (0 until InventoryWindowHelper.inventoryTotalSlots).forall(params.inventoryItems.contains)
+
+    !inventoryFull
+  }
+
+  def pickUpItem(item: Item): Creature = {
+    val freeSlot = (0 until InventoryWindowHelper.inventoryTotalSlots).find(!params.inventoryItems.contains(_))
+
+    if (freeSlot.isEmpty) throw new RuntimeException("unable to pick up item")
+
+    this.modify(_.params.inventoryItems).setTo(this.params.inventoryItems + (freeSlot.get -> item))
   }
 
   def tryPickUpItem(item: Item): Boolean = { // TODO

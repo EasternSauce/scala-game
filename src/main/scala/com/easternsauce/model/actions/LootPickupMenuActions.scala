@@ -30,7 +30,7 @@ trait LootPickupMenuActions {
     if (clickedItem.nonEmpty) {
       val ((areaId, lootPileId, item), i) = clickedItem.get
 
-      if (this.player.tryPickUpItem(item)) {
+      if (this.player.canPickUpItem(item)) {
         val lootPile = this.areas(areaId).params.lootPiles(lootPileId)
 
         this
@@ -51,6 +51,8 @@ trait LootPickupMenuActions {
                   )
               else gameState
           )
+          .modify(_.creatures.at(this.currentPlayerId))
+          .using(_.pickUpItem(item))
 
       } else this
     } else this
