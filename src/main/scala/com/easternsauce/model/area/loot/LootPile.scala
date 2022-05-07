@@ -7,8 +7,8 @@ case class LootPile(
   y: Float,
   items: List[Item] =
     List(
-      Item(ItemTemplate.templates("leatherArmor")),
+      Item(ItemTemplate.templates("healingPowder")),
       Item(ItemTemplate.templates("woodenSword"))
     ), // TODO: placed for testing purposes
   isTreasure: Boolean = false
-) {}
+)

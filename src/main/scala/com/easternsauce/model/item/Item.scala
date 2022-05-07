@@ -4,7 +4,7 @@ case class Item(
   template: ItemTemplate,
   quantity: Int = 1,
   damage: Option[Int] = None,
-  armor: Option[Int] = None /*, lootPile reference?*/
+  armor: Option[Int] = None
 ) {
   def itemInformation(trader: Boolean = false): String = {
     if (trader)

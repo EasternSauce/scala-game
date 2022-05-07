@@ -227,79 +227,47 @@ abstract class Creature {
   }
 
   def canPickUpItem(item: Item): Boolean = {
-//    val template: ItemTemplate = item.template
-//    val stackable: Boolean = template.stackable.get
+    val template = item.template
+    val stackable: Boolean = template.stackable.get
 
     val inventoryFull = (0 until InventoryWindowHelper.inventoryTotalSlots).forall(params.inventoryItems.contains)
 
-    !inventoryFull
+    val canStack = if (stackable) {
+      val itemToStack: Option[(Int, Item)] = params.inventoryItems.find {
+        case (_, item) => item.template.id == template.id
+      }
+
+      itemToStack.nonEmpty // TODO: limited quantity per slot?
+    } else false
+
+    if (inventoryFull) {
+      canStack
+    } else true
   }
 
   def pickUpItem(item: Item): Creature = {
-    val freeSlot = (0 until InventoryWindowHelper.inventoryTotalSlots).find(!params.inventoryItems.contains(_))
 
-    if (freeSlot.isEmpty) throw new RuntimeException("unable to pick up item")
+    val template = item.template
+    val stackable: Boolean = template.stackable.get
 
-    this.modify(_.params.inventoryItems).setTo(this.params.inventoryItems + (freeSlot.get -> item))
-  }
+//    val inventoryFull = (0 until InventoryWindowHelper.inventoryTotalSlots).forall(params.inventoryItems.contains)
 
-  def tryPickUpItem(item: Item): Boolean = { // TODO
-//    val template: ItemTemplate = item.template
-//    val stackable: Boolean = template.stackable.get
-//
-//    if (stackable) {
-//      var foundFreeSlot: Int = -1
-//      params.equipmentItems.foreach {
-//        case (key, value) =>
-//          if (foundFreeSlot == -1 && (value.template == template)) {
-//            // stackable and same type item exists in inventory
-//            foundFreeSlot = key
-//            params.equipmentItems(foundFreeSlot).quantity =
-//              params.equipmentItems(foundFreeSlot).quantity + item.quantity
-//
-//            return true
-//          }
-//      }
-//      params.inventoryItems.foreach {
-//        case (key, value) =>
-//          if (foundFreeSlot == -1 && (value.template == template)) {
-//            // stackable and same type item exists in inventory
-//            foundFreeSlot = key
-//            params.inventoryItems(foundFreeSlot).quantity =
-//              params.inventoryItems(foundFreeSlot).quantity + item.quantity
-//
-//            return true
-//          }
-//      }
-//    }
-//    for (i <- 0 until inventoryWindow.inventoryTotalSlots) {
-//      val lootPile = item.lootPile.get
-//
-//      if (!params.inventoryItems.contains(i)) { // if slot empty
-//        params.inventoryItems += (i -> item)
-//        lootPile match {
-//          //          case treasure: Treasure => //register treasure picked up, dont spawn it again for this save
-//          //            try {
-//          //              val writer: FileWriter =
-//          //                new FileWriter("saves/treasure_collected.sav", true)
-//          //              val area: Area = item.lootPileBackref.area
-//          //              writer.write(
-//          //                "treasure " + area.id + " " + area.treasureList
-//          //                  .indexOf(treasure) + "\n"
-//          //              )
-//          //              writer.close()
-//          //            } catch {
-//          //              case e: IOException =>
-//          //                e.printStackTrace()
-//          //            } TODO treasure saves
-//          case _ =>
-//        }
-//
-//        return true
-//      }
-//    }
-//    false
-    true
+    val itemToStack: Option[(Int, Item)] = params.inventoryItems.find {
+      case (_, item) => item.template.id == template.id
+    }
+
+    if (stackable && itemToStack.nonEmpty) { // if we can stack with existing item
+
+      val (i, _) = itemToStack.get
+      this.modify(_.params.inventoryItems.at(i).quantity).using(_ + 1)
+
+    } else {
+      val freeSlot = (0 until InventoryWindowHelper.inventoryTotalSlots).find(!params.inventoryItems.contains(_))
+
+      if (freeSlot.isEmpty) throw new RuntimeException("unable to pick up item")
+
+      this.modify(_.params.inventoryItems).setTo(this.params.inventoryItems + (freeSlot.get -> item))
+    }
   }
 
   def copy(params: CreatureParams = params): Creature
