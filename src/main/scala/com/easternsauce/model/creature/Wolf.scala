@@ -16,6 +16,14 @@ case class Wolf(override val params: CreatureParams) extends Enemy(params = para
     Map(Direction.Up -> 3, Direction.Down -> 0, Direction.Left -> 1, Direction.Right -> 2)
   override val baseLife: Float = 150f
 
+  override val dropTable = Map(
+    "ringmailGreaves" -> 0.1f,
+    "leatherArmor" -> 0.05f,
+    "hideGloves" -> 0.1f,
+    "leatherHelmet" -> 0.1f,
+    "healingPowder" -> 0.5f
+  )
+
   override def update(delta: Float): Wolf = {
     super.update(delta).asInstanceOf[Wolf]
   }

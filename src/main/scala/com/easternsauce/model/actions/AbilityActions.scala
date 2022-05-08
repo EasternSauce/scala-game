@@ -9,7 +9,7 @@ import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
 
-trait AbilityInteractions {
+trait AbilityActions {
   this: GameState =>
 
   def onAbilityComponentActiveStart(creatureId: String, abilityId: String, componentId: String): GameState = {
@@ -161,9 +161,6 @@ trait AbilityInteractions {
                 abilityId,
                 componentId
               ) // needs to be after setting hitbox so it everrides properly
-
-          case Inactive =>
-            gameState // TODO do we need update anything when inactive?
           case _ => gameState
         }).modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(ability.updateComponentTimers(_, delta))
       })

@@ -51,6 +51,10 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
     this.modify(_.params.abilityTimer).using(_.update(delta))
   }
 
+  def stop(): Ability = {
+    this.modify(_.components.each).using(_.stop())
+  }
+
   def componentsActive: Boolean = components.values.exists(component => component.params.state != AbilityState.Inactive)
 
   def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): Ability

@@ -6,9 +6,8 @@ import com.badlogic.gdx.maps.tiled.{TiledMap, TmxMapLoader}
 import com.easternsauce.event.PhysicsEvent
 import com.easternsauce.json.JsonCodecs._
 import com.easternsauce.model.GameState
-import com.easternsauce.model.area.loot.LootPile
 import com.easternsauce.model.area.{Area, EnemySpawnPoint}
-import com.easternsauce.model.creature.{CreatureParams, Player, Serpent, Skeleton}
+import com.easternsauce.model.creature.{CreatureParams, Player}
 import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
@@ -16,7 +15,6 @@ import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.view.physics.terrain.{AreaGateBody, Terrain}
 import com.easternsauce.view.renderer
 import com.easternsauce.view.renderer.RendererController
-import com.softwaremill.quicklens._
 import io.circe.parser.decode
 
 import java.io.FileNotFoundException
@@ -61,38 +59,12 @@ class MyGdxGame extends Game {
     atlas = new TextureAtlas("assets/atlas/packed_atlas.atlas")
 
     val player: Player = Player(
-      CreatureParams(
+      CreatureParams( // TODO ?
         id = "player",
         posX = 50,
         posY = 10,
         areaId = "area1",
         life = 62f,
-        maxLife = 100f,
-        stamina = 100f,
-        maxStamina = 100f
-      )
-    )
-
-    val skeleton: Skeleton = Skeleton(
-      CreatureParams(
-        id = "skel",
-        posX = 15,
-        posY = 10,
-        areaId = "area1",
-        life = 100f,
-        maxLife = 100f,
-        stamina = 100f,
-        maxStamina = 100f
-      )
-    )
-
-    val wolf: Serpent = Serpent(
-      CreatureParams(
-        id = "zzzzzz",
-        posX = 20,
-        posY = 10,
-        areaId = "area1",
-        life = 100f,
         maxLife = 100f,
         stamina = 100f,
         maxStamina = 100f
@@ -107,21 +79,21 @@ class MyGdxGame extends Game {
       .map {
         case (key, _) => (key, Area(areaId = key, spawnPoints = loadEnemySpawns("assets/areas/" + key)))
       }
-      .pipe(
-        areas =>
-          areas
-            .modify(_.at("area1").params.lootPiles)
-            .setTo(Map("lootPile1" -> LootPile(54, 15), "lootPile2" -> LootPile(54, 16)))
-      )
-      .pipe(
-        areas =>
-          areas
-            .modify(_.at("area2").params.lootPiles)
-            .setTo(
-              Map("lootPile3" -> LootPile(30, 30), "lootPile4" -> LootPile(30, 30), "lootPile5" -> LootPile(30, 30))
-            )
-      )
-      .pipe(areas => areas.modify(_.at("area3").params.lootPiles).setTo(Map("lootPile6" -> LootPile(30, 30))))
+//      .pipe(
+//        areas =>
+//          areas
+//            .modify(_.at("area1").params.lootPiles)
+//            .setTo(Map("lootPile1" -> LootPile(54, 15), "lootPile2" -> LootPile(54, 16)))
+//      )
+//      .pipe(
+//        areas =>
+//          areas
+//            .modify(_.at("area2").params.lootPiles)
+//            .setTo(
+//              Map("lootPile3" -> LootPile(30, 30), "lootPile4" -> LootPile(30, 30), "lootPile5" -> LootPile(30, 30))
+//            )
+//      )
+//      .pipe(areas => areas.modify(_.at("area3").params.lootPiles).setTo(Map("lootPile6" -> LootPile(30, 30))))
 
     val gameState =
       try {
@@ -136,14 +108,10 @@ class MyGdxGame extends Game {
         case _: FileNotFoundException =>
           GameState(
             currentPlayerId = player.params.id,
-            creatures = Map(
-              player.params.id -> player.init(),
-              skeleton.params.id -> skeleton.init(),
-              wolf.params.id -> wolf.init()
-            ), // TODO: init elsewhere?
+            creatures = Map(player.params.id -> player.init()), // TODO: init elsewhere?
             currentAreaId = "area1",
             areas = areas
-          )
+          ).pipe(gameState => gameState.resetArea(gameState.currentAreaId))
 
       }
 

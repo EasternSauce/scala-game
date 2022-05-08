@@ -15,7 +15,7 @@ case class GameState(
   events: List[UpdateEvent] = List(),
   inventoryWindow: InventoryWindow = InventoryWindow(),
   lootPilePickupMenu: LootPilePickupMenu = LootPilePickupMenu()
-) extends AbilityInteractions
+) extends AbilityActions
     with InventoryActions
     with AreaActions
     with CreatureActions

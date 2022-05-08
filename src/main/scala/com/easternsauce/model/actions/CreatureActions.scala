@@ -75,12 +75,26 @@ trait CreatureActions {
   }
 
   def creatureOnDeath(creatureId: String): GameState = {
+    val creature = creatures(creatureId)
+
+    val abilityComponentCombinations: List[(String, String)] =
+      this.creatures(creatureId).params.abilities.toList.foldLeft(List[(String, String)]()) {
+        case (acc, (k, v)) => acc ++ List().zipAll(v.components.keys.toList, k, "")
+      }
+
     this.pipe(
       gameState =>
         gameState
           .modify(_.events)
           .setTo(UpdatePhysicsOnCreatureDeathEvent(creatureId) :: gameState.events)
-          .modifyGameStateCreature(creatureId)(_.onDeath())
+          .modifyGameStateCreature(creatureId)(_.onDeath().modify(_.params.abilities.each).using(_.stop()))
+          .pipe(gameState => {
+            abilityComponentCombinations.foldLeft(gameState) {
+              case (gameState, (abilityId, componentId)) =>
+                gameState.onAbilityComponentInactiveStart(creatureId, abilityId, componentId)
+            }
+          })
+          .spawnLootPile(creature.params.areaId, creature.params.posX, creature.params.posY, creature.dropTable)
     )
   }
 }

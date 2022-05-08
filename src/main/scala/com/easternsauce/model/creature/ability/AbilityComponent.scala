@@ -22,7 +22,7 @@ case class AbilityComponent(specification: AbilitySpecification, params: Compone
   def makeActive(): AbilityComponent = this.modify(_.params.state).setTo(AbilityState.Active)
 
   def stop(): AbilityComponent = {
-    this // TODO?
+    this.makeInactive()
   }
 
   def setDirVector(dirVector: Vector2Wrapper): AbilityComponent = {

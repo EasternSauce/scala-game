@@ -70,7 +70,11 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
       isActive = true
     }
 
-    if (gameState.events.contains(UpdatePhysicsOnComponentDestroyBodyEvent(creatureId, abilityId, componentId))) {
+    if (
+      isActive && gameState.events.contains(
+        UpdatePhysicsOnComponentDestroyBodyEvent(creatureId, abilityId, componentId)
+      )
+    ) {
       destroy()
       isActive = false
     }

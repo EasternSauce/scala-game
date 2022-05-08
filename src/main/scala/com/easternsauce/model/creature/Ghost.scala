@@ -16,6 +16,16 @@ case class Ghost(override val params: CreatureParams) extends Enemy(params = par
     Map(Direction.Up -> 3, Direction.Down -> 0, Direction.Left -> 1, Direction.Right -> 2)
   override val baseLife: Float = 300f
 
+  override val dropTable = Map(
+    "ironSword" -> 0.03f,
+    "poisonDagger" -> 0.005f,
+    "healingPowder" -> 0.3f,
+    "steelArmor" -> 0.03f,
+    "steelGreaves" -> 0.05f,
+    "steelGloves" -> 0.05f,
+    "steelHelmet" -> 0.05f
+  )
+
   override def update(delta: Float): Ghost = {
     super.update(delta).asInstanceOf[Ghost]
   }

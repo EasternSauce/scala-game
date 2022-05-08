@@ -10,4 +10,6 @@ object Random {
   }
 
   def nextInt(): Int = randomGenerator.nextInt()
+
+  def nextFloat(): Float = randomGenerator.nextFloat()
 }

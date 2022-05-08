@@ -16,6 +16,16 @@ case class Goblin(override val params: CreatureParams) extends Creature {
     Map(Direction.Up -> 3, Direction.Down -> 0, Direction.Left -> 1, Direction.Right -> 2)
   override val baseLife: Float = 190f
 
+  override val dropTable = Map(
+    "ironSword" -> 0.03f,
+    "poisonDagger" -> 0.07f,
+    "healingPowder" -> 0.3f,
+    "steelArmor" -> 0.03f,
+    "steelGreaves" -> 0.05f,
+    "steelGloves" -> 0.05f,
+    "steelHelmet" -> 0.05f
+  )
+
   override def update(delta: Float): Goblin = {
     super.update(delta).asInstanceOf[Goblin]
   }

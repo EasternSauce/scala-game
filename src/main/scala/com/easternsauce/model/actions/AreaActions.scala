@@ -1,8 +1,10 @@
 package com.easternsauce.model.actions
 
 import com.easternsauce.model.GameState
+import com.easternsauce.model.area.loot.LootPile
 import com.easternsauce.model.creature.{Creature, CreatureParams}
 import com.easternsauce.model.event._
+import com.easternsauce.model.item.{Item, ItemTemplate}
 import com.easternsauce.system.Random
 import com.softwaremill.quicklens._
 
@@ -67,7 +69,7 @@ trait AreaActions {
       .modify(_.areas.at(areaId).creatures)
       .setTo(this.areas(areaId).creatures.filterNot(oldEnemiesIds.toSet) ++ newEnemies.map(_.params.id))
       .modify(_.events)
-      .setTo(this.events ++ updatePhysicsEvents ++ updateRendererEvents)
+      .setTo((updatePhysicsEvents ++ updateRendererEvents) ::: this.events)
   }
 
   def generateEnemy(enemyType: String, areaId: String, posX: Float, posY: Float): Creature = {
@@ -91,5 +93,33 @@ trait AreaActions {
       )
 
     action.asInstanceOf[Creature].init()
+  }
+
+  def spawnLootPile(areaId: String, posX: Float, posY: Float, dropTable: Map[String, Float]): GameState = {
+
+    val items = (for ((key, value) <- dropTable.toList) yield {
+      if (Random.nextFloat() < value) {
+        Some(Item(ItemTemplate.templates(key)))
+      } else None
+    }).flatten
+
+    if (items.nonEmpty) {
+      val lootPile = LootPile(posX, posY, items)
+
+      val lootPileId = "lootPile" + this.areas(areaId).params.lootPileCounter
+      this
+        .modify(_.areas.at(areaId).params.lootPiles)
+        .setTo(this.areas(areaId).params.lootPiles + (lootPileId -> lootPile))
+        .modify(_.areas.at(areaId).params.lootPileCounter)
+        .using(_ + 1)
+        .modify(_.events)
+        .setTo(
+          List(
+            UpdatePhysicsOnLootPileSpawnEvent(areaId, lootPileId),
+            UpdateRendererOnLootPileSpawnEvent(areaId, lootPileId)
+          ) ::: this.events
+        )
+    } else this
+
   }
 }

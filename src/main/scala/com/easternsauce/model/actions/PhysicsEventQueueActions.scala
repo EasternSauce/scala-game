@@ -26,7 +26,10 @@ trait PhysicsEventQueueActions {
         gameState
           .pipe(
             gameState =>
-              if (!attackingDisallowed && !creatures(collidedCreatureId).isEffectActive("immunityFrames")) {
+              if (
+                creatures(collidedCreatureId).isAlive && !attackingDisallowed && !creatures(collidedCreatureId)
+                  .isEffectActive("immunityFrames")
+              ) {
                 gameState
                   .creatureTakeLifeDamage(
                     collidedCreatureId,
