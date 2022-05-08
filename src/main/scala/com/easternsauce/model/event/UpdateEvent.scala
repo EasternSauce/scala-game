@@ -21,18 +21,18 @@ case class UpdatePhysicsOnAreaChangeEvent(
   posY: Float
 ) extends UpdateEvent
 
-case class UpdatePhysicsOnEnemySpawnEvent(creatureId: String) extends UpdateEvent
+case class UpdatePhysicsOnEnemySpawnEvent(creatureId: String, areaId: String) extends UpdateEvent
+
+case class UpdatePhysicsOnEnemyDespawnEvent(creatureId: String, areaId: String) extends UpdateEvent
 
 case class UpdateRendererOnEnemySpawnEvent(creatureId: String) extends UpdateEvent
-
-case class UpdatePhysicsOnEnemyDespawnEvent(creatureId: String) extends UpdateEvent
 
 case class UpdateRendererOnEnemyDespawnEvent(creatureId: String) extends UpdateEvent
 
 case class UpdatePhysicsOnLootPileSpawnEvent(areaId: String, lootPileId: String) extends UpdateEvent
 
-case class UpdateRendererOnLootPileSpawnEvent(areaId: String, lootPileId: String) extends UpdateEvent
-
 case class UpdatePhysicsOnLootPileDespawnEvent(areaId: String, lootPileId: String) extends UpdateEvent
+
+case class UpdateRendererOnLootPileSpawnEvent(areaId: String, lootPileId: String) extends UpdateEvent
 
 case class UpdateRendererOnLootPileDespawnEvent(areaId: String, lootPileId: String) extends UpdateEvent

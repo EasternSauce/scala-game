@@ -47,19 +47,14 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
       case UpdatePhysicsOnAreaChangeEvent(creatureId, oldAreaId, newAreaId, _, _) =>
         terrains(oldAreaId).world.destroyBody(entityBodies(creatureId).b2Body)
         entityBodies(creatureId).init(gameState = gameState, physicsController = this, areaId = newAreaId)
-      case UpdatePhysicsOnEnemySpawnEvent(creatureId) =>
+      case UpdatePhysicsOnEnemySpawnEvent(creatureId, areaId) =>
         entityBodies = entityBodies + (creatureId -> {
           val entityBody = EntityBody(creatureId)
-          entityBody.init(
-            gameState = gameState,
-            physicsController = this,
-            areaId = gameState.creatures(creatureId).params.areaId
-          )
+          entityBody.init(gameState = gameState, physicsController = this, areaId = areaId)
           entityBody
         })
-      case UpdatePhysicsOnEnemyDespawnEvent(creatureId) =>
-        val creature = gameState.creatures(creatureId)
-        val world = terrains(creature.params.areaId).world
+      case UpdatePhysicsOnEnemyDespawnEvent(creatureId, areaId) =>
+        val world = terrains(areaId).world
         world.destroyBody(entityBodies(creatureId).b2Body)
         entityBodies(creatureId).componentBodies.foreach {
           case (_, componentBody) =>
