@@ -84,8 +84,7 @@ case class EntityRenderer(creatureId: String, atlas: TextureAtlas) {
       val alpha = creature.params.effects("immunityFrames").remainingTime * 35f
       val colorComponent = 0.3f + 0.7f * (Math.sin(alpha).toFloat + 1f) / 2f
       sprite.setColor(1f, colorComponent, colorComponent, 1f)
-    }
-    else {
+    } else {
       sprite.setColor(1, 1, 1, 1)
     }
 

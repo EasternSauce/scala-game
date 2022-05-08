@@ -42,7 +42,8 @@ trait LootPickupMenuActions {
                 gameState
                   .modify(_.areas.at(areaId).params.lootPiles)
                   .using(_.removed(lootPileId))
-                  .modify(_.lootPilePickupMenu.visibleLootPiles).using(_.filterNot(Set((areaId, lootPileId))))
+                  .modify(_.lootPilePickupMenu.visibleLootPiles)
+                  .using(_.filterNot(Set((areaId, lootPileId))))
                   .modify(_.events)
                   .setTo(
                     List(

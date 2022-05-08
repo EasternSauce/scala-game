@@ -19,7 +19,6 @@ case class FireDemon(override val params: CreatureParams) extends Enemy(params =
   override val dropTable =
     Map("ironSword" -> 0.3f, "poisonDagger" -> 0.3f, "steelArmor" -> 0.8f, "steelHelmet" -> 0.5f, "thiefRing" -> 1.0f)
 
-
   override def update(delta: Float): FireDemon = {
     super.update(delta).asInstanceOf[FireDemon]
   }

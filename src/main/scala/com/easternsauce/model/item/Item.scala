@@ -1,11 +1,6 @@
 package com.easternsauce.model.item
 
-case class Item(
-  template: ItemTemplate,
-  quantity: Int = 1,
-  damage: Option[Int] = None,
-  armor: Option[Int] = None
-) {
+case class Item(template: ItemTemplate, quantity: Int = 1, damage: Option[Int] = None, armor: Option[Int] = None) {
   def itemInformation(trader: Boolean = false): String = {
     if (trader)
       (if (this.damage.nonEmpty)
