@@ -42,7 +42,6 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
   }
 
   def update(gameState: GameState): Unit = {
-
     gameState.events.foreach {
       case UpdatePhysicsOnAreaChangeEvent(creatureId, oldAreaId, newAreaId, _, _) =>
         terrains(oldAreaId).world.destroyBody(entityBodies(creatureId).b2Body)

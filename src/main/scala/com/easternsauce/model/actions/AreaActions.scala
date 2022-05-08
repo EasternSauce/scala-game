@@ -57,12 +57,14 @@ trait AreaActions {
       area.spawnPoints.map(spawnPoint => generateEnemy(spawnPoint.enemyType, areaId, spawnPoint.x, spawnPoint.y))
 
     val updatePhysicsEvents =
-      newEnemies.map(enemy => UpdatePhysicsOnEnemySpawnEvent(enemy.params.id, enemy.params.areaId)) ++ oldEnemiesIds
-        .map(enemyId => UpdatePhysicsOnEnemyDespawnEvent(enemyId, areaId))
+      oldEnemiesIds.map(enemyId => UpdatePhysicsOnEnemyDespawnEvent(enemyId, areaId)) ++ newEnemies.map(
+        enemy => UpdatePhysicsOnEnemySpawnEvent(enemy.params.id, enemy.params.areaId)
+      )
 
     val updateRendererEvents =
-      newEnemies.map(enemy => UpdateRendererOnEnemySpawnEvent(enemy.params.id)) ++ oldEnemiesIds
-        .map(enemyId => UpdateRendererOnEnemyDespawnEvent(enemyId))
+      oldEnemiesIds.map(enemyId => UpdateRendererOnEnemyDespawnEvent(enemyId)) ++ newEnemies.map(
+        enemy => UpdateRendererOnEnemySpawnEvent(enemy.params.id)
+      )
 
     this
       .modify(_.creatures)

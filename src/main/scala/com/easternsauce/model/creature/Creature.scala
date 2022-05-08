@@ -27,6 +27,7 @@ abstract class Creature {
   val neutralStanceFrame: Int
   val dirMap: Map[Direction, Int]
   val baseLife: Float
+  val baseStamina: Float = 100f
 
   val isControlledAutomatically: Boolean = false
 
@@ -54,6 +55,10 @@ abstract class Creature {
     this
       .modify(_.params.abilities)
       .setTo(Map(idAbilityPair(swingWeaponAbility)))
+      .modifyAll(_.params.maxLife, _.params.life)
+      .setTo(baseLife)
+      .modifyAll(_.params.maxStamina, _.params.stamina)
+      .setTo(baseStamina)
   }
 
   def update(delta: Float): Creature = {

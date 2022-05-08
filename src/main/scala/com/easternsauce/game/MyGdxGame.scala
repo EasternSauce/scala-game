@@ -63,11 +63,7 @@ class MyGdxGame extends Game {
         id = "player",
         posX = 50,
         posY = 10,
-        areaId = "area1",
-        life = 62f,
-        maxLife = 100f,
-        stamina = 100f,
-        maxStamina = 100f
+        areaId = "area1"
       )
     )
 

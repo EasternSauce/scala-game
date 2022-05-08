@@ -115,7 +115,7 @@ case class RendererController(atlas: TextureAtlas) {
       }
     }
 
-    gameState.creatures.keys.foreach { creatureId =>
+    gameState.creatures.filter { case (_, creature) => creature.isAlive }.keys.foreach { creatureId =>
       if (
         entityRenderers.contains(creatureId) &&
         gameState.creatures(creatureId).params.areaId == gameState.currentAreaId
@@ -137,14 +137,15 @@ case class RendererController(atlas: TextureAtlas) {
       }
     }
 
-    gameState.creatures.keys.foreach { creatureId =>
-      if (
-        entityRenderers.contains(creatureId) &&
-        gameState.creatures(creatureId).params.areaId == gameState.currentAreaId
-      ) {
-        entityRenderers(creatureId).renderLifeBar(batch, gameState)
-      }
-    }
+    // don't render life bar for dead creatures
+//    gameState.creatures.filter { case (_, creature) => !creature.isAlive }.keys.foreach { creatureId =>
+//      if (
+//        entityRenderers.contains(creatureId) &&
+//        gameState.creatures(creatureId).params.areaId == gameState.currentAreaId
+//      ) {
+//        entityRenderers(creatureId).renderLifeBar(batch, gameState)
+//      }
+//    }
 
   }
 
