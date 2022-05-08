@@ -80,6 +80,15 @@ case class EntityRenderer(creatureId: String, atlas: TextureAtlas) {
     sprite.setCenter(creature.params.posX, creature.params.posY)
     sprite.setSize(creature.width, creature.height)
 
+    if (creature.isAlive && creature.isEffectActive("immunityFrames")) {
+      val alpha = creature.params.effects("immunityFrames").remainingTime * 35f
+      val colorComponent = 0.3f + 0.7f * (Math.sin(alpha).toFloat + 1f) / 2f
+      sprite.setColor(1f, colorComponent, colorComponent, 1f)
+    }
+    else {
+      sprite.setColor(1, 1, 1, 1)
+    }
+
     if (!creature.isAlive) {
       sprite.setOriginCenter()
       sprite.setRotation(90f)

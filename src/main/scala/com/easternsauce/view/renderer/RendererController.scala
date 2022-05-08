@@ -104,9 +104,9 @@ case class RendererController(atlas: TextureAtlas) {
     renderLifeAndStamina()
   }
 
-  def renderEntities(gameState: GameState, batch: RendererBatch): Unit = {
+  def renderAliveEntities(gameState: GameState, batch: RendererBatch): Unit = {
 
-    gameState.creatures.keys.foreach { creatureId =>
+    gameState.creatures.filter{case (_, creature) => creature.isAlive}.keys.foreach { creatureId =>
       if (
         entityRenderers.contains(creatureId) &&
         gameState.creatures(creatureId).params.areaId == gameState.currentAreaId
@@ -119,6 +119,28 @@ case class RendererController(atlas: TextureAtlas) {
       if (
         entityRenderers.contains(creatureId) &&
         gameState.creatures(creatureId).params.areaId == gameState.currentAreaId
+      ) {
+        entityRenderers(creatureId).renderLifeBar(batch, gameState)
+      }
+    }
+
+  }
+
+  def renderDeadEntities(gameState: GameState, batch: RendererBatch): Unit = {
+
+    gameState.creatures.filter{case (_, creature) => !creature.isAlive}.keys.foreach { creatureId =>
+      if (
+        entityRenderers.contains(creatureId) &&
+          gameState.creatures(creatureId).params.areaId == gameState.currentAreaId
+      ) {
+        entityRenderers(creatureId).render(batch)
+      }
+    }
+
+    gameState.creatures.keys.foreach { creatureId =>
+      if (
+        entityRenderers.contains(creatureId) &&
+          gameState.creatures(creatureId).params.areaId == gameState.currentAreaId
       ) {
         entityRenderers(creatureId).renderLifeBar(batch, gameState)
       }

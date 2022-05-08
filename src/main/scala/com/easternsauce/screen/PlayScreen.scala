@@ -314,7 +314,9 @@ class PlayScreen(
 
     gameRenderer.renderLootPiles(gameState, worldBatch)
 
-    gameRenderer.renderEntities(gameState, worldBatch)
+    gameRenderer.renderDeadEntities(gameState, worldBatch)
+
+    gameRenderer.renderAliveEntities(gameState, worldBatch)
 
     worldBatch.end()
 

@@ -59,7 +59,7 @@ trait CreatureActions {
             ).normal
           )
           .modify(_.params.knockbackVelocity)
-          .setTo(30f)
+          .setTo(15f)
       )
       .pipe(gameState => {
         val creature = gameState.creatures(creatureId)

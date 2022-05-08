@@ -41,6 +41,8 @@ abstract class Creature {
 
   val unarmedDamage: Int = 10
 
+  val dropTable: Map[String, Float] = Map()
+
   def weaponDamage: Int =
     params.equipmentItems.get(InventoryMapping.primaryWeaponIndex).flatMap(_.damage).getOrElse(unarmedDamage)
 

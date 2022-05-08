@@ -34,7 +34,7 @@ trait PhysicsEventQueueActions {
                     creatures(creatureId).params.posX,
                     creatures(creatureId).params.posY
                   )
-                  .creatureActivateEffect(collidedCreatureId, "immunityFrames", 2f)
+                  .creatureActivateEffect(collidedCreatureId, "immunityFrames", 1f)
                   .creatureActivateEffect(collidedCreatureId, "stagger", 0.35f)
               } else gameState
           )
