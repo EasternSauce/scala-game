@@ -12,6 +12,9 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
   val numOfComponents = 1
   val cooldownTime: Float = 1f
 
+  val abilityChannelSoundId: Option[String] = None
+  val abilityActiveSoundId: Option[String] = Some("swoosh")
+
   def init(): Ability = {
     val components = (for (i <- 0 until numOfComponents)
       yield (i.toString, AbilityComponent(specification, ComponentParams(componentId = i.toString)))).toMap

@@ -15,6 +15,7 @@ import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.view.physics.terrain.{AreaGateBody, Terrain}
 import com.easternsauce.view.renderer
 import com.easternsauce.view.renderer.RendererController
+import com.easternsauce.view.sound.SoundManager
 import io.circe.parser.decode
 
 import java.io.FileNotFoundException
@@ -45,6 +46,8 @@ class MyGdxGame extends Game {
   var maps: Map[String, TiledMap] = _
 
   var physicsController: PhysicsController = _
+
+  var soundManager: SoundManager = _
 
   var playScreen: PlayScreen = _
 
@@ -119,7 +122,10 @@ class MyGdxGame extends Game {
 
     physicsController = PhysicsController(terrains, areaGates)
 
-    playScreen = new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController, physicsEventQueue)
+    soundManager = SoundManager()
+
+    playScreen =
+      new PlayScreen(worldBatch, hudBatch, gameState, gameView, physicsController, soundManager, physicsEventQueue)
 
     gameView.init(gameState, maps, mapScale, areaGates)
     physicsController.init(gameState, physicsEventQueue)

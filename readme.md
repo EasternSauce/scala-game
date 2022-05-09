@@ -14,15 +14,15 @@ Already done:
 - add remaining abilities and components,
 - creature logic (temporary effects),
 - area gates, 
-- enemy spawns.
+- enemy spawns,
+- loot pick-up,
+- drop tables.
 
 To be done:
 
 - boss arena and boss fight,
 - creature movement AI,
-- loot pick-up,
 - bow shooting and arrows,
 - main menu screen,
 - sounds and music,
-- ability usages,
-- drop tables.
+- ability usages.

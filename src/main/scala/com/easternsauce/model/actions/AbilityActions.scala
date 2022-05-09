@@ -3,7 +3,7 @@ package com.easternsauce.model.actions
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.AbilityState
-import com.easternsauce.model.event.{UpdatePhysicsOnComponentCreateBodyEvent, UpdatePhysicsOnComponentDestroyBodyEvent}
+import com.easternsauce.model.event.{PlaySoundEvent, UpdatePhysicsOnComponentCreateBodyEvent, UpdatePhysicsOnComponentDestroyBodyEvent}
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
 
@@ -24,6 +24,14 @@ trait AbilityActions {
           gameState
             .modify(_.events)
             .setTo(UpdatePhysicsOnComponentCreateBodyEvent(creatureId, abilityId, componentId) :: gameState.events)
+      )
+      .pipe(
+        gameState =>
+          gameState
+            .modify(_.events)
+            .setToIf(ability.abilityActiveSoundId.nonEmpty)(
+              PlaySoundEvent(ability.abilityActiveSoundId.get) :: gameState.events
+            )
       )
       .modifyGameStateAbilityComponent(creatureId, abilityId, componentId) {
         _.modify(_.params.abilityActiveAnimationTimer)

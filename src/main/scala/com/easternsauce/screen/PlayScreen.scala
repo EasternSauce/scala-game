@@ -14,6 +14,7 @@ import com.easternsauce.model.creature.Creature
 import com.easternsauce.util.{Constants, RendererBatch, Vector2Wrapper}
 import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.view.renderer.RendererController
+import com.easternsauce.view.sound.SoundManager
 import com.softwaremill.quicklens._
 import io.circe.syntax.EncoderOps
 
@@ -27,6 +28,7 @@ class PlayScreen(
   val state: GameState,
   var gameRenderer: RendererController,
   var physicsController: PhysicsController,
+  var soundManager: SoundManager,
   var physicsEventQueue: ListBuffer[PhysicsEvent]
 ) extends Screen {
   val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
@@ -127,6 +129,9 @@ class PlayScreen(
 
     // --- update physics
     physicsController.update(gameState)
+
+    // --- update sound manager
+    soundManager.update(gameState)
 
     currentArea.setView(worldCamera)
 
