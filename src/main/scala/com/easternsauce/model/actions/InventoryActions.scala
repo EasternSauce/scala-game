@@ -2,7 +2,6 @@ package com.easternsauce.model.actions
 
 import com.easternsauce.helper.InventoryWindowHelper
 import com.easternsauce.model.GameState
-import com.easternsauce.system.Assets
 import com.easternsauce.util.{InventoryMapping, Vector2Wrapper}
 import com.softwaremill.quicklens._
 
@@ -58,7 +57,7 @@ trait InventoryActions {
               //val item = player.params.inventoryItems(gameState.inventoryState.inventoryItemBeingMoved.get)
               //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item)  TODO: spawn lootpile
 
-              Assets.sound("coinBag").play(0.3f)
+//              Assets.sound("coinBag").play(0.3f) TODO
 
               gameState
                 .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
@@ -73,7 +72,7 @@ trait InventoryActions {
               //val item = player.params.inventoryItems(gameState.inventoryState.equipmentItemBeingMoved.get)
               //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item) TODO: spawn lootpile
 
-              Assets.sound("coinBag").play(0.3f)
+//              Assets.sound("coinBag").play(0.3f) TODO
 
               gameState
                 .modify(_.creatures.at(currentPlayerId).params.equipmentItems)

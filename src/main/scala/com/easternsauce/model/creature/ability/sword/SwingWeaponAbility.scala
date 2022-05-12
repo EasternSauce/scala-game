@@ -11,8 +11,6 @@ case class SwingWeaponAbility(
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
 
-  override val abilityActiveSoundId: Option[String] = Some("swoosh")
-
   override val specification: AbilitySpecification = AbilitySpecification(
     textureWidth = 40,
     textureHeight = 40,
@@ -28,6 +26,8 @@ case class SwingWeaponAbility(
     scale = 1.4f,
     initSpeed = 30f
   )
+
+  override val abilityActiveSoundId: Option[String] = Some("swoosh")
 
   override val isWeaponAttack = true
 

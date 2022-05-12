@@ -2,7 +2,7 @@ package com.easternsauce.model.actions
 
 import com.easternsauce.helper.LootPickupMenuHelper
 import com.easternsauce.model.GameState
-import com.easternsauce.model.event.{UpdatePhysicsOnLootPileDespawnEvent, UpdateRendererOnLootPileDespawnEvent}
+import com.easternsauce.model.event.{PlaySoundEvent, UpdatePhysicsOnLootPileDespawnEvent, UpdateRendererOnLootPileDespawnEvent}
 import com.easternsauce.model.item.Item
 import com.easternsauce.util.Vector2Wrapper
 import com.softwaremill.quicklens._
@@ -55,6 +55,7 @@ trait LootPickupMenuActions {
           )
           .modify(_.creatures.at(this.currentPlayerId))
           .using(_.pickUpItem(item))
+          .pipe(gameState => gameState.modify(_.events).setTo(PlaySoundEvent("coinBag") :: gameState.events))
 
       } else this
     } else this

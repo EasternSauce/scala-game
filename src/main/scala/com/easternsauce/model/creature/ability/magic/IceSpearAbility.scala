@@ -26,6 +26,8 @@ case class IceSpearAbility(
     initSpeed = 20f
   )
 
+//  override val abilityActiveSoundId: Option[String] = Some("explosion") TODO
+
   override val numOfComponents: Int = 5
   val delayBetween = 0.1f
 

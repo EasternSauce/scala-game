@@ -26,6 +26,8 @@ case class MeteorRainAbility(
     scale = 1.4f
   )
 
+  override val abilityActiveSoundId: Option[String] = Some("explosion")
+
   override val numOfComponents: Int = 18
   val delayBetween = 0.3f
 

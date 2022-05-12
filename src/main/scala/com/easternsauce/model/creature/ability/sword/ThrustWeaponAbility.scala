@@ -27,6 +27,8 @@ case class ThrustWeaponAbility(
     initSpeed = 30f
   )
 
+  override val abilityActiveSoundId: Option[String] = Some("swoosh")
+
   override val isWeaponAttack = true
 
   override def onStart(creature: Creature): Ability = {

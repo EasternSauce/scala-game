@@ -24,6 +24,8 @@ case class MeteorCrashAbility(
     scale = 2f
   )
 
+  override val abilityActiveSoundId: Option[String] = Some("explosion")
+
   override val numOfComponents: Int = 18 // divisible by 3
   val delayBetween = 0.3f
 

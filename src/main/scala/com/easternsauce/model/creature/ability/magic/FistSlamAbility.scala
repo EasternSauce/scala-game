@@ -26,6 +26,8 @@ case class FistSlamAbility(
     scale = 1.5f
   )
 
+  override val abilityActiveSoundId: Option[String] = Some("glass-break")
+
   override val numOfComponents: Int = 18
   val delayBetween = 0.3f
 
