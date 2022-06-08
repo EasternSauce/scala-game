@@ -24,10 +24,10 @@ case class Terrain(map: TiledMap, mapScale: Float) {
   val terrainTiles: ListBuffer[TerrainTileBody] = ListBuffer()
   val terrainBorders: ListBuffer[TerrainTileBody] = ListBuffer()
 
-  def init(): Unit = {
-    val widthInTiles = layer.getWidth
-    val heightInTiles = layer.getHeight
+  def widthInTiles: Int = layer.getWidth
+  def heightInTiles: Int = layer.getHeight
 
+  def init(): Unit = {
     traversable = Array.ofDim(heightInTiles, widthInTiles)
     traversableWithMargins = Array.ofDim(heightInTiles, widthInTiles)
     flyover = Array.ofDim(heightInTiles, widthInTiles)
