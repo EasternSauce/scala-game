@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.pathfinding.Astar
+import com.easternsauce.pathfinding.{Astar, Pos}
 import com.easternsauce.util.Constants
 
 import scala.collection.mutable.ListBuffer
@@ -53,9 +53,7 @@ case class Terrain(map: TiledMap, mapScale: Float) {
 
     val graph = Astar.generateGraph(this)
 
-    println(graph)
-
-
+    println(Astar.findPath(graph, Pos(10, 0), Pos(25, 18)))
   }
 
   private def createMapTerrain(widthInTiles: Int, heightInTiles: Int): Unit = {
