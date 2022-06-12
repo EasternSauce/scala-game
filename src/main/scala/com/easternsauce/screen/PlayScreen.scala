@@ -1,7 +1,7 @@
 package com.easternsauce.screen
 
 import com.badlogic.gdx.Input.Buttons
-import com.badlogic.gdx.graphics.{GL20, OrthographicCamera}
+import com.badlogic.gdx.graphics.{Color, GL20, OrthographicCamera}
 import com.badlogic.gdx.math.{Vector2, Vector3}
 import com.badlogic.gdx.physics.box2d._
 import com.badlogic.gdx.utils.viewport.{FitViewport, Viewport}
@@ -11,6 +11,7 @@ import com.easternsauce.helper.LootPickupMenuHelper
 import com.easternsauce.json.JsonCodecs
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
+import com.easternsauce.system.Assets
 import com.easternsauce.util.{Constants, RendererBatch, Vector2Wrapper}
 import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.view.renderer.RendererController
@@ -31,6 +32,8 @@ class PlayScreen(
   var soundManager: SoundManager,
   var physicsEventQueue: ListBuffer[PhysicsEvent]
 ) extends Screen {
+  import com.easternsauce.system.Assets.bitmapFontToEnrichedBitmapFont
+
   val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
   val debugRenderEnabled = true
@@ -117,6 +120,7 @@ class PlayScreen(
       .pipe(updateCreatures(physicsController, delta))
       .pipe(_.processPhysicsEventQueue(physicsEventQueue.toList))
       .pipe(_.processCreatureAreaChanges())
+      .pipe(_.processPathfinding(physicsController))
 
     // ---
 
@@ -336,6 +340,9 @@ class PlayScreen(
     hudBatch.begin()
 
     gameRenderer.renderHud(gameState, hudBatch, mousePosWindowScaled)
+
+    val fps = Gdx.graphics.getFramesPerSecond
+    Assets.defaultFont.draw(hudBatch.spriteBatch, s"$fps fps", 3, Constants.WindowHeight - 3, Color.WHITE)
 
     hudBatch.end()
 

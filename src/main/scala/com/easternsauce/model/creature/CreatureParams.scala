@@ -37,5 +37,9 @@ case class CreatureParams(
   currentSpeed: Float = 0f,
   passedGateRecently: Boolean = false,
   knockbackDir: Vector2Wrapper = Vector2Wrapper(0, 0),
-  knockbackVelocity: Float = 0f
+  knockbackVelocity: Float = 0f,
+  targetCreatureId: Option[String] = None,
+  pathTowardsTarget: Option[List[(Vector2Wrapper)]] = None,
+  forcePathCalculation: Boolean = false,
+  pathCalculationCooldownTimer: SimpleTimer = SimpleTimer()
 )

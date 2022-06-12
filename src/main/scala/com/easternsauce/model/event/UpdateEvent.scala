@@ -38,3 +38,5 @@ case class UpdateRendererOnLootPileSpawnEvent(areaId: String, lootPileId: String
 case class UpdateRendererOnLootPileDespawnEvent(areaId: String, lootPileId: String) extends UpdateEvent
 
 case class PlaySoundEvent(soundId: String) extends UpdateEvent
+
+case class PathfindingRequestEvent(creatureFromId: String) extends UpdateEvent

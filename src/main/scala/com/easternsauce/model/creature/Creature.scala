@@ -79,6 +79,8 @@ abstract class Creature {
       .using(_.update(delta))
       .modify(_.params.staminaRegenerationDisabledTimer)
       .using(_.update(delta))
+      .modify(_.params.pathCalculationCooldownTimer)
+      .using(_.update(delta))
   }
 
   def setPosition(newPosX: Float, newPosY: Float): Creature = {

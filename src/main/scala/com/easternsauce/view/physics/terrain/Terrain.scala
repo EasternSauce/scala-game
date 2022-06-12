@@ -2,15 +2,14 @@ package com.easternsauce.view.physics.terrain
 
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
-import com.badlogic.gdx.math.Vector2
+import com.badlogic.gdx.math.{Intersector, Polygon, Vector2}
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.pathfinding.{Astar, Pos}
-import com.easternsauce.util.Constants
+import com.easternsauce.util.{Constants, Vector2Wrapper}
+import com.easternsauce.view.pathfinding.{Astar, PathingNode}
 
 import scala.collection.mutable.ListBuffer
 
 case class Terrain(map: TiledMap, mapScale: Float) {
-
   val world = new World(new Vector2(0, 0), true)
 
   private val layer = map.getLayers.get(0).asInstanceOf[TiledMapTileLayer]
@@ -27,6 +26,8 @@ case class Terrain(map: TiledMap, mapScale: Float) {
 
   def widthInTiles: Int = layer.getWidth
   def heightInTiles: Int = layer.getHeight
+
+  var pathingGraph: Map[Vector2Wrapper, PathingNode] = _
 
   def init(): Unit = {
     traversable = Array.ofDim(heightInTiles, widthInTiles)
@@ -51,9 +52,9 @@ case class Terrain(map: TiledMap, mapScale: Float) {
     createMapTerrain(widthInTiles, heightInTiles)
     createBorders(widthInTiles, heightInTiles)
 
-    val graph = Astar.generateGraph(this)
+    pathingGraph = Astar.generatePathingGraph(this)
 
-    println(Astar.findPath(graph, Pos(10, 0), Pos(25, 18)))
+//    println(Astar.findPath(graph, Vector2Wrapper(10, 0), Vector2Wrapper(25, 18)))
   }
 
   private def createMapTerrain(widthInTiles: Int, heightInTiles: Int): Unit = {
@@ -123,12 +124,34 @@ case class Terrain(map: TiledMap, mapScale: Float) {
     terrainBorders.foreach(_.init(world))
   }
 
-  def getTileCenter(x: Int, y: Int): Vector2 = {
-    new Vector2(x * tileWidth + tileWidth / 2, y * tileHeight + tileHeight / 2)
+  def getTileCenter(pos: Vector2Wrapper): Vector2Wrapper = {
+    Vector2Wrapper(pos.x * tileWidth + tileWidth / 2, pos.y * tileHeight + tileHeight / 2)
   }
 
-  def getClosestTile(x: Float, y: Float): Vector2 = {
-    new Vector2(x / tileWidth, y / tileHeight)
+  def getClosestTile(pos: Vector2Wrapper): Vector2Wrapper = {
+    Vector2Wrapper((pos.x / tileWidth).toInt, (pos.y / tileHeight).toInt)
+  }
+
+  def isLineOfSight(fromPos: Vector2Wrapper, toPos: Vector2Wrapper): Boolean = {
+    val lineWidth = 0.3f
+
+    val lineOfSightRect =
+      new Polygon(
+        Array(
+          fromPos.x,
+          fromPos.y,
+          fromPos.x + lineWidth,
+          fromPos.y + lineWidth,
+          toPos.x + lineWidth,
+          toPos.y + lineWidth,
+          toPos.x,
+          toPos.y
+        )
+      )
+
+    terrainTiles
+      .map(tile => tile.polygon)
+      .forall(!Intersector.overlapConvexPolygons(_, lineOfSightRect))
   }
 
   def step(): Unit = world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2)

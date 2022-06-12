@@ -3,7 +3,7 @@ package com.easternsauce.model.creature
 import com.easternsauce.util.Direction
 import com.easternsauce.util.Direction.Direction
 
-case class Goblin(override val params: CreatureParams) extends Creature {
+case class Goblin(override val params: CreatureParams) extends Enemy(params = params) {
   override val spriteType: String = "goblin"
   override val textureWidth: Int = 32
   override val textureHeight: Int = 32

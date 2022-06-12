@@ -1,6 +1,7 @@
 package com.easternsauce.model.creature
 
 import com.easternsauce.model.GameState
+import com.softwaremill.quicklens.ModifyPimp
 
 import scala.util.chaining.scalaUtilChainingOps
 
@@ -10,27 +11,75 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
 
   override val isControlledAutomatically = true
 
+  val enemySearchDistance = 20f
+
+  def findTarget(gameState: GameState): Option[Creature] = {
+    val potentialTargets: List[Creature] = gameState.creatures.values.toList.filter(
+      target =>
+        target.params.areaId == this.params.areaId && target.isPlayer && target.pos
+          .distance(this.pos) < enemySearchDistance
+    )
+
+    potentialTargets match {
+      case List() => None
+      case target => {
+        Some(target.minBy(_.pos.distance(this.pos)))
+      }
+    }
+
+  }
+
   override def updateAutomaticControls(gameState: GameState): Enemy = {
 
-    val potentialTarget = gameState.player // TODO: look for closest target instead
+    val potentialTarget = findTarget(gameState)
+    val potentialTargetId = potentialTarget.map(_.params.id)
 
-    val vectorTowardsTarget = pos.vectorTowards(potentialTarget.pos)
+    if (potentialTarget.nonEmpty && this.isAlive && potentialTarget.get.isAlive) {
 
-    if (isAlive && potentialTarget.isAlive) {
+      val vectorTowardsTarget = pos.vectorTowards(potentialTarget.get.pos)
+
       this
         .pipe(
           creature =>
-            if (potentialTarget.pos.distance(creature.pos) > 3f && potentialTarget.pos.distance(creature.pos) < 15f)
-              creature.moveInDir(vectorTowardsTarget).asInstanceOf[Enemy]
-            else creature.stopMoving().asInstanceOf[Enemy]
+            // target changed
+            if (params.targetCreatureId.isEmpty || params.targetCreatureId != potentialTargetId) {
+              creature
+                .modify(_.params.forcePathCalculation)
+                .setTo(true)
+                .modify(_.params.targetCreatureId)
+                .setTo(potentialTargetId)
+                .modify(_.params.pathTowardsTarget)
+                .setTo(None)
+            } else creature
         )
+        //        .modify(_.params.targetCreatureId)
+        //        .setTo(potentialTarget.map(_.params.id))
+        .pipe(creature => {
+          if (
+            potentialTarget.get.pos.distance(creature.pos) > 3f && potentialTarget.get.pos
+              .distance(creature.pos) < enemySearchDistance
+          ) {
+            if (creature.params.pathTowardsTarget.nonEmpty && creature.params.pathTowardsTarget.get.nonEmpty) {
+              val path = creature.params.pathTowardsTarget.get
+              val nextNodeOnPath = path.head
+              if (creature.pos.distance(nextNodeOnPath) < 0.3f) {
+                creature.modify(_.params.pathTowardsTarget).setTo(Some(path.drop(1)))
+              } else creature.moveInDir(creature.pos.vectorTowards(nextNodeOnPath))
+            } else {
+              creature.moveInDir(vectorTowardsTarget)
+            }
+          } else {
+            creature
+          }
+        })
         .pipe(
           creature =>
-            if (potentialTarget.pos.distance(creature.pos) < 4f)
-              creature.attack(vectorTowardsTarget).asInstanceOf[Enemy]
+            if (potentialTarget.get.pos.distance(creature.pos) < 1f)
+              creature.attack(vectorTowardsTarget)
             else creature
         )
-    } else this.stopMoving().asInstanceOf[Enemy]
+        .asInstanceOf[Enemy]
+    } else this.modify(_.params.targetCreatureId).setTo(None).stopMoving().asInstanceOf[Enemy]
 
   }
 

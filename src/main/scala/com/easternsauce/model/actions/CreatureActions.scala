@@ -5,6 +5,8 @@ import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.model.event.UpdatePhysicsOnCreatureDeathEvent
 import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.view.pathfinding.Astar
+import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -96,5 +98,35 @@ trait CreatureActions {
           })
           .spawnLootPile(creature.params.areaId, creature.params.posX, creature.params.posY, creature.dropTable)
     )
+  }
+
+  def processPathfinding(physicsController: PhysicsController): GameState = {
+    creatures.values
+      .filter(
+        creature =>
+          creature.params.areaId == this.currentAreaId && creature.isEnemy && creature.params.targetCreatureId.nonEmpty &&
+            (creature.params.forcePathCalculation || creature.params.pathCalculationCooldownTimer.time > 1f)
+      )
+      .foldLeft(this) {
+        case (gameState, creature) =>
+          val target = gameState.creatures(creature.params.targetCreatureId.get)
+          val terrain = physicsController.terrains(creature.params.areaId)
+
+          val isLineOfSight = terrain.isLineOfSight(creature.pos, target.pos)
+
+          if (!isLineOfSight) {
+            println("recalculating path for " + creature.params.id)
+            gameState.modifyGameStateCreature(creature.params.id)(
+              _.modify(_.params.pathTowardsTarget)
+                .setTo(Some(Astar.findPath(terrain, creature.pos, target.pos)))
+                .modify(_.params.pathCalculationCooldownTimer)
+                .using(_.restart())
+                .modify(_.params.forcePathCalculation)
+                .setTo(false)
+            )
+          } else gameState
+
+      }
+
   }
 }
