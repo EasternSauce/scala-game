@@ -26,7 +26,7 @@ object Astar {
       weight: Float
     ): Map[Vector2Wrapper, PathingNode] = {
       if (0 <= toY && toY < terrain.heightInTiles && 0 <= toX && toX < terrain.widthInTiles) {
-        if (terrain.traversable(fromY)(fromX) && terrain.traversable(toY)(toX)) {
+        if (terrain.traversable(Vector2Wrapper(fromX, fromY)) && terrain.traversable(Vector2Wrapper(toX, toY))) {
           val targetNode = pathingNodes(Vector2Wrapper(toX, toY))
           pathingNodes.updated(
             Vector2Wrapper(fromX, fromY),
@@ -53,7 +53,7 @@ object Astar {
             pathingNodes =>
               if (
                 x - 1 >= 0 && y - 1 >= 0
-                && terrain.traversable(y)(x - 1) && terrain.traversable(y - 1)(x)
+                && terrain.traversable(Vector2Wrapper(x - 1,y)) && terrain.traversable(Vector2Wrapper(x, y - 1))
               ) tryAddingEdge(pathingNodes, terrain, x, y, x - 1, y - 1, diagonalWeight)
               else pathingNodes
           )
@@ -61,7 +61,7 @@ object Astar {
             pathingNodes =>
               if (
                 x + 1 < terrain.widthInTiles && y - 1 >= 0
-                && terrain.traversable(y)(x + 1) && terrain.traversable(y - 1)(x)
+                && terrain.traversable(Vector2Wrapper(x + 1,y)) && terrain.traversable(Vector2Wrapper(x,y - 1))
               ) tryAddingEdge(pathingNodes, terrain, x, y, x + 1, y - 1, diagonalWeight)
               else pathingNodes
           )
@@ -69,7 +69,7 @@ object Astar {
             pathingNodes =>
               if (
                 x - 1 >= 0 && y + 1 < terrain.heightInTiles
-                && terrain.traversable(y)(x - 1) && terrain.traversable(y + 1)(x)
+                && terrain.traversable(Vector2Wrapper(x - 1, y)) && terrain.traversable(Vector2Wrapper(x, y + 1))
               ) tryAddingEdge(pathingNodes, terrain, x, y, x - 1, y + 1, diagonalWeight)
               else pathingNodes
           )
@@ -77,7 +77,7 @@ object Astar {
             pathingNodes =>
               if (
                 x + 1 < terrain.widthInTiles && y + 1 < terrain.heightInTiles
-                && terrain.traversable(y)(x + 1) && terrain.traversable(y + 1)(x)
+                && terrain.traversable(Vector2Wrapper(x + 1,y)) && terrain.traversable(Vector2Wrapper(x, y + 1))
               ) tryAddingEdge(pathingNodes, terrain, x, y, x + 1, y + 1, diagonalWeight)
               else pathingNodes
           )

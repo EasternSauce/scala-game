@@ -115,7 +115,6 @@ trait CreatureActions {
           val isLineOfSight = terrain.isLineOfSight(creature.pos, target.pos)
 
           if (!isLineOfSight) {
-            println("recalculating path for " + creature.params.id)
             gameState.modifyGameStateCreature(creature.params.id)(
               _.modify(_.params.pathTowardsTarget)
                 .setTo(Some(Astar.findPath(terrain, creature.pos, target.pos)))
