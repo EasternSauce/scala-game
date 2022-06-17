@@ -1,6 +1,6 @@
 package com.easternsauce.model.creature.ability
 
-import com.easternsauce.util.{Constants, Vector2Wrapper}
+import com.easternsauce.util.{Constants, Vec2}
 import com.softwaremill.quicklens.ModifyPimp
 
 case class AbilityComponent(specification: AbilitySpecification, params: ComponentParams) {
@@ -25,7 +25,7 @@ case class AbilityComponent(specification: AbilitySpecification, params: Compone
     this.makeInactive()
   }
 
-  def setDirVector(dirVector: Vector2Wrapper): AbilityComponent = {
+  def setDirVector(dirVector: Vec2): AbilityComponent = {
     this.modify(_.params.dirVector).setTo(dirVector.rotate(params.angleDeviation))
   }
 

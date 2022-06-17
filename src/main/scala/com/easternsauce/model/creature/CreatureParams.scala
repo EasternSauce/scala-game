@@ -4,7 +4,7 @@ import com.easternsauce.model.creature.ability.Ability
 import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.model.item.{Item, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
-import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.util.Vec2
 import com.softwaremill.quicklens.ModifyPimp
 
 case class CreatureParams(
@@ -18,7 +18,7 @@ case class CreatureParams(
   stamina: Float = 0f,
   maxStamina: Float = 0f,
   abilities: Map[String, Ability] = Map(),
-  actionDirVector: Vector2Wrapper = Vector2Wrapper(0, 0),
+  actionDirVector: Vec2 = Vec2(0, 0),
   staminaOveruse: Boolean = false,
   staminaOveruseTimer: SimpleTimer = SimpleTimer(),
   staminaRegenerationTimer: SimpleTimer = SimpleTimer(isRunning = true),
@@ -33,13 +33,13 @@ case class CreatureParams(
     10 -> Item(ItemTemplate.templates("woodenSword")).modify(_.damage).setTo(Some(9999))
   ), // TODO: test item present, remove after
   effects: Map[String, Effect] = Map(),
-  movingDir: Vector2Wrapper = Vector2Wrapper(1, 1),
+  movingDir: Vec2 = Vec2(1, 1),
   currentSpeed: Float = 0f,
   passedGateRecently: Boolean = false,
-  knockbackDir: Vector2Wrapper = Vector2Wrapper(0, 0),
+  knockbackDir: Vec2 = Vec2(0, 0),
   knockbackVelocity: Float = 0f,
   targetCreatureId: Option[String] = None,
-  pathTowardsTarget: Option[List[(Vector2Wrapper)]] = None,
+  pathTowardsTarget: Option[List[Vec2]] = None,
   forcePathCalculation: Boolean = false,
   pathCalculationCooldownTimer: SimpleTimer = SimpleTimer()
 )

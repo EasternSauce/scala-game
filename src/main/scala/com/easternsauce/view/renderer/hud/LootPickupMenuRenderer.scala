@@ -5,12 +5,12 @@ import com.badlogic.gdx.math.Rectangle
 import com.easternsauce.helper.LootPickupMenuHelper
 import com.easternsauce.model.GameState
 import com.easternsauce.system.Assets
-import com.easternsauce.util.{RendererBatch, Vector2Wrapper}
+import com.easternsauce.util.{RendererBatch, Vec2}
 
 case class LootPickupMenuRenderer() {
   import com.easternsauce.system.Assets.bitmapFontToEnrichedBitmapFont
 
-  def render(gameState: GameState, batch: RendererBatch, mousePosition: Vector2Wrapper): Unit = {
+  def render(gameState: GameState, batch: RendererBatch, mousePosition: Vec2): Unit = {
 
     if (gameState.lootPilePickupMenu.isOpen && !gameState.inventoryWindow.isOpen) {
 

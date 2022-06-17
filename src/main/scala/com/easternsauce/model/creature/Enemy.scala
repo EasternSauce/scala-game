@@ -11,7 +11,7 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
 
   override val isControlledAutomatically = true
 
-  val enemySearchDistance = 20f
+  val enemySearchDistance = 30f
 
   def findTarget(gameState: GameState): Option[Creature] = {
     val potentialTargets: List[Creature] = gameState.creatures.values.toList.filter(
@@ -22,9 +22,8 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
 
     potentialTargets match {
       case List() => None
-      case target => {
+      case target =>
         Some(target.minBy(_.pos.distance(this.pos)))
-      }
     }
 
   }
@@ -62,7 +61,7 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
             if (creature.params.pathTowardsTarget.nonEmpty && creature.params.pathTowardsTarget.get.nonEmpty) {
               val path = creature.params.pathTowardsTarget.get
               val nextNodeOnPath = path.head
-              if (creature.pos.distance(nextNodeOnPath) < 0.3f) {
+              if (creature.pos.distance(nextNodeOnPath) < 2f) {
                 creature.modify(_.params.pathTowardsTarget).setTo(Some(path.drop(1)))
               } else creature.moveInDir(creature.pos.vectorTowards(nextNodeOnPath))
             } else {

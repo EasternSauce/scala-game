@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.maps.tiled.{TiledMap, TiledMapTileLayer}
 import com.badlogic.gdx.math.{Intersector, Polygon, Vector2}
 import com.badlogic.gdx.physics.box2d._
-import com.easternsauce.util.{Constants, Vector2Wrapper}
+import com.easternsauce.util.{Constants, Vec2}
 import com.easternsauce.view.pathfinding.{Astar, PathingNode}
 
 import scala.collection.mutable.ListBuffer
@@ -14,12 +14,12 @@ case class Terrain(map: TiledMap, mapScale: Float) {
 
   private val layer = map.getLayers.get(0).asInstanceOf[TiledMapTileLayer]
 
-  var traversable: Map[Vector2Wrapper, Boolean] = Map()
-  var traversableWithMargins: Map[Vector2Wrapper, Boolean] = Map()
+  var traversables: Map[Vec2, Boolean] = Map()
+  var traversableWithMargins: Map[Vec2, Boolean] = Map()
 //  var traversableWithMargins: Array[Array[Boolean]] = _
-  var flyover: Map[Vector2Wrapper, Boolean] = Map()
+  var flyover: Map[Vec2, Boolean] = Map()
 
-  var clearances: Map[Vector2Wrapper, Int] = Map()
+  var clearances: Map[Vec2, Int] = Map()
 
   val tileWidth: Float = layer.getTileWidth * mapScale / Constants.PPM
   val tileHeight: Float = layer.getTileHeight * mapScale / Constants.PPM
@@ -30,7 +30,7 @@ case class Terrain(map: TiledMap, mapScale: Float) {
   def widthInTiles: Int = layer.getWidth
   def heightInTiles: Int = layer.getHeight
 
-  var pathingGraph: Map[Vector2Wrapper, PathingNode] = _
+  var pathingGraph: Map[Vec2, PathingNode] = _
 
   def init(): Unit = {
     //traversable = Array.ofDim(heightInTiles, widthInTiles)
@@ -40,7 +40,7 @@ case class Terrain(map: TiledMap, mapScale: Float) {
     for {
       x <- 0 until widthInTiles
       y <- 0 until heightInTiles
-    } traversable = traversable + (Vector2Wrapper(x, y) -> true)
+    } traversables = traversables + (Vec2(x, y) -> true)
 
 //    traversable.
 //    while ()
@@ -48,12 +48,12 @@ case class Terrain(map: TiledMap, mapScale: Float) {
     for {
       x <- 0 until widthInTiles
       y <- 0 until heightInTiles
-    } traversableWithMargins = traversableWithMargins + (Vector2Wrapper(x, y) -> true)
+    } traversableWithMargins = traversableWithMargins + (Vec2(x, y) -> true)
 
     for {
       x <- 0 until widthInTiles
       y <- 0 until heightInTiles
-    } flyover = flyover + (Vector2Wrapper(x, y) -> true)
+    } flyover = flyover + (Vec2(x, y) -> true)
 
     createMapTerrain(widthInTiles, heightInTiles)
     createBorders(widthInTiles, heightInTiles)
@@ -81,19 +81,18 @@ case class Terrain(map: TiledMap, mapScale: Float) {
             cell.getTile.getProperties.get("flyover").asInstanceOf[Boolean]
 
           if (!isTileTraversable) {
-            traversable = traversable + (Vector2Wrapper(x, y) -> false)
+            traversables = traversables + (Vec2(x, y) -> false)
 
-            traversableWithMargins = traversableWithMargins + (Vector2Wrapper(x, y) -> false)
+            traversableWithMargins = traversableWithMargins + (Vec2(x, y) -> false)
 
             List((0, 1), (1, 0), (-1, 0), (0, -1), (1, 1), (-1, 1), (-1, -1), (1, -1))
               .filter(pair => tileExists(x + pair._1, y + pair._2))
               .foreach(
-                pair =>
-                  traversableWithMargins = traversableWithMargins + (Vector2Wrapper(y + pair._1, x + pair._2) -> false)
+                pair => traversableWithMargins = traversableWithMargins + (Vec2(y + pair._1, x + pair._2) -> false)
               )
           }
 
-          if (!isTileFlyover) flyover = flyover + (Vector2Wrapper(x, y) -> false)
+          if (!isTileFlyover) flyover = flyover + (Vec2(x, y) -> false)
         }
 
       }
@@ -103,9 +102,9 @@ case class Terrain(map: TiledMap, mapScale: Float) {
         y <- 0 until heightInTiles
       } {
 
-        if (!traversable(Vector2Wrapper(x, y))) {
+        if (!traversables(Vec2(x, y))) {
           val tile: TerrainTileBody =
-            TerrainTileBody(x, y, tileWidth, tileHeight, layerNum, flyover(Vector2Wrapper(x, y)))
+            TerrainTileBody(x, y, tileWidth, tileHeight, layerNum, flyover(Vec2(x, y)))
 
           tile.init(world)
 
@@ -115,55 +114,7 @@ case class Terrain(map: TiledMap, mapScale: Float) {
 
     }
 
-
-
-
-    def tryAddClearance(pos: Vector2Wrapper, level: Int): Unit = {
-      if (
-        !clearances.contains(
-          pos
-        ) && pos.x >= 0 && pos.y >= 0 && pos.x < widthInTiles && pos.y < heightInTiles && traversable(pos)
-      )
-        clearances = clearances + (pos -> level)
-    }
-    for {
-      x <- 0 until widthInTiles
-      y <- 0 until heightInTiles
-    } {
-      if (!traversable(Vector2Wrapper(x, y))) {
-        tryAddClearance(Vector2Wrapper(x - 1, y - 1), 1)
-        tryAddClearance(Vector2Wrapper(x, y - 1), 1)
-        tryAddClearance(Vector2Wrapper(x + 1, y - 1), 1)
-        tryAddClearance(Vector2Wrapper(x - 1, y + 1), 1)
-        tryAddClearance(Vector2Wrapper(x, y + 1), 1)
-        tryAddClearance(Vector2Wrapper(x + 1, y + 1), 1)
-        tryAddClearance(Vector2Wrapper(x - 1, y), 1)
-        tryAddClearance(Vector2Wrapper(x + 1, y), 1)
-      }
-    }
-
-    var currentLevel = 2
-    while (traversable.values.count(_ == true) != clearances.size) {
-
-      val lowerLevelClearances =
-        clearances.filter { case (_, clearanceLevel) => clearanceLevel == currentLevel - 1 }.map {
-          case (pos, _) => pos
-        }
-
-      lowerLevelClearances.foreach {
-        case Vector2Wrapper(x, y) =>
-          tryAddClearance(Vector2Wrapper(x - 1, y - 1), currentLevel)
-          tryAddClearance(Vector2Wrapper(x, y - 1), currentLevel)
-          tryAddClearance(Vector2Wrapper(x + 1, y - 1), currentLevel)
-          tryAddClearance(Vector2Wrapper(x - 1, y + 1), currentLevel)
-          tryAddClearance(Vector2Wrapper(x, y + 1), currentLevel)
-          tryAddClearance(Vector2Wrapper(x + 1, y + 1), currentLevel)
-          tryAddClearance(Vector2Wrapper(x - 1, y), currentLevel)
-          tryAddClearance(Vector2Wrapper(x + 1, y), currentLevel)
-      }
-
-      currentLevel = currentLevel + 1
-    }
+    clearances = calculateClearances(traversables, widthInTiles, heightInTiles)
   }
 
   private def createBorders(widthInTiles: Int, heightInTiles: Int): Unit = {
@@ -181,15 +132,15 @@ case class Terrain(map: TiledMap, mapScale: Float) {
     terrainBorders.foreach(_.init(world))
   }
 
-  def getTileCenter(pos: Vector2Wrapper): Vector2Wrapper = {
-    Vector2Wrapper(pos.x * tileWidth + tileWidth / 2, pos.y * tileHeight + tileHeight / 2)
+  def getTileCenter(pos: Vec2): Vec2 = {
+    Vec2(pos.x * tileWidth + tileWidth / 2, pos.y * tileHeight + tileHeight / 2)
   }
 
-  def getClosestTile(pos: Vector2Wrapper): Vector2Wrapper = {
-    Vector2Wrapper((pos.x / tileWidth).toInt, (pos.y / tileHeight).toInt)
+  def getClosestTile(pos: Vec2): Vec2 = {
+    Vec2((pos.x / tileWidth).toInt, (pos.y / tileHeight).toInt)
   }
 
-  def isLineOfSight(fromPos: Vector2Wrapper, toPos: Vector2Wrapper): Boolean = {
+  def isLineOfSight(fromPos: Vec2, toPos: Vec2): Boolean = {
     val lineWidth = 0.3f
 
     val lineOfSightRect =
@@ -209,6 +160,60 @@ case class Terrain(map: TiledMap, mapScale: Float) {
     terrainTiles
       .map(tile => tile.polygon)
       .forall(!Intersector.overlapConvexPolygons(_, lineOfSightRect))
+  }
+
+  def calculateClearances(traversables: Map[Vec2, Boolean], widthInTiles: Int, heightInTiles: Int): Map[Vec2, Int] = {
+    var clearances: Map[Vec2, Int] = Map()
+
+    def tryAddClearance(pos: Vec2, level: Int): Unit = {
+      if (
+        !clearances.contains(
+          pos
+        ) && pos.x >= 0 && pos.y >= 0 && pos.x < widthInTiles && pos.y < heightInTiles && traversables(pos)
+      )
+        clearances = clearances + (pos -> level)
+    }
+
+    for {
+      x <- 0 until widthInTiles
+      y <- 0 until heightInTiles
+    } {
+      if (!traversables(Vec2(x, y))) {
+        tryAddClearance(Vec2(x - 1, y - 1), 1)
+        tryAddClearance(Vec2(x, y - 1), 1)
+        tryAddClearance(Vec2(x + 1, y - 1), 1)
+        tryAddClearance(Vec2(x - 1, y + 1), 1)
+        tryAddClearance(Vec2(x, y + 1), 1)
+        tryAddClearance(Vec2(x + 1, y + 1), 1)
+        tryAddClearance(Vec2(x - 1, y), 1)
+        tryAddClearance(Vec2(x + 1, y), 1)
+      }
+    }
+
+    var currentLevel = 2
+    while (traversables.values.count(_ == true) != clearances.size) {
+
+      val lowerLevelClearances =
+        clearances.filter { case (_, clearanceLevel) => clearanceLevel == currentLevel - 1 }.map {
+          case (pos, _) => pos
+        }
+
+      lowerLevelClearances.foreach {
+        case Vec2(x, y) =>
+          tryAddClearance(Vec2(x - 1, y - 1), currentLevel)
+          tryAddClearance(Vec2(x, y - 1), currentLevel)
+          tryAddClearance(Vec2(x + 1, y - 1), currentLevel)
+          tryAddClearance(Vec2(x - 1, y + 1), currentLevel)
+          tryAddClearance(Vec2(x, y + 1), currentLevel)
+          tryAddClearance(Vec2(x + 1, y + 1), currentLevel)
+          tryAddClearance(Vec2(x - 1, y), currentLevel)
+          tryAddClearance(Vec2(x + 1, y), currentLevel)
+      }
+
+      currentLevel = currentLevel + 1
+    }
+
+    clearances
   }
 
   def step(): Unit = world.step(Math.min(Gdx.graphics.getDeltaTime, 0.15f), 6, 2)

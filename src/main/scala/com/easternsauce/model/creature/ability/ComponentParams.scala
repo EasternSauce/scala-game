@@ -2,7 +2,7 @@ package com.easternsauce.model.creature.ability
 
 import com.easternsauce.model.creature.ability.AbilityState.AbilityState
 import com.easternsauce.model.util.SimpleTimer
-import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.util.Vec2
 
 case class ComponentParams(
   componentId: String,
@@ -11,8 +11,8 @@ case class ComponentParams(
   channelTimer: SimpleTimer = SimpleTimer(),
   abilityChannelAnimationTimer: SimpleTimer = SimpleTimer(),
   abilityActiveAnimationTimer: SimpleTimer = SimpleTimer(),
-  dirVector: Vector2Wrapper = Vector2Wrapper(0, 0),
-  renderPos: Vector2Wrapper = Vector2Wrapper(0, 0),
+  dirVector: Vec2 = Vec2(0, 0),
+  renderPos: Vec2 = Vec2(0, 0),
   renderWidth: Float = 0f,
   renderHeight: Float = 0f,
   renderScale: Float = 1.0f,

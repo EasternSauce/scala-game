@@ -2,7 +2,7 @@ package com.easternsauce.model.creature.ability.magic
 
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability._
-import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.util.Vec2
 import com.softwaremill.quicklens._
 
 case class MeteorCrashAbility(
@@ -35,7 +35,7 @@ case class MeteorCrashAbility(
     val meteors2 = for (i <- 0 until numOfComponents / 3) yield "2_" + i.toString
     val meteors3 = for (i <- 0 until numOfComponents / 3) yield "3_" + i.toString
 
-    val components = (for (componentId <- (meteors1 ++ meteors2 ++ meteors3))
+    val components = (for (componentId <- meteors1 ++ meteors2 ++ meteors3)
       yield (componentId, AbilityComponent(specification, ComponentParams(componentId = componentId)))).toMap
 
     this
@@ -46,7 +46,7 @@ case class MeteorCrashAbility(
 
   override def onStart(creature: Creature): Ability = {
 
-    val facingVector: Vector2Wrapper = creature.params.actionDirVector
+    val facingVector: Vec2 = creature.params.actionDirVector
 
     val meteors1 = for (i <- 0 until numOfComponents / 3) yield ("1_" + i.toString, i, 0)
     val meteors2 = for (i <- 0 until numOfComponents / 3) yield ("2_" + i.toString, i, 50)
@@ -56,7 +56,7 @@ case class MeteorCrashAbility(
       val (componentId, i, angle) = meteor
 
       val component = components(componentId)
-      val vector: Vector2Wrapper = facingVector.rotate(angle.toFloat)
+      val vector: Vec2 = facingVector.rotate(angle.toFloat)
 
       val x = creature.params.posX + (3.125f * (i + 1)) * vector.x
       val y = creature.params.posY + (3.125f * (i + 1)) * vector.y
@@ -73,7 +73,7 @@ case class MeteorCrashAbility(
         .modify(_.components.at(componentId).params.abilityHitbox)
         .setTo(AbilityHitbox(x = x, y = y, width = component.width, height = component.height, scale = scale))
         .modify(_.components.at(componentId).params.renderPos)
-        .setTo(Vector2Wrapper(x = x, y = y))
+        .setTo(Vec2(x = x, y = y))
         .modify(_.components.at(componentId).params.renderWidth)
         .setTo(component.width)
         .modify(_.components.at(componentId).params.renderHeight)

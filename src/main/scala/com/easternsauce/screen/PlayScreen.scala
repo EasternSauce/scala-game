@@ -12,7 +12,7 @@ import com.easternsauce.json.JsonCodecs
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.system.Assets
-import com.easternsauce.util.{Constants, RendererBatch, Vector2Wrapper}
+import com.easternsauce.util.{Constants, RendererBatch, Vec2}
 import com.easternsauce.view.physics.PhysicsController
 import com.easternsauce.view.renderer.RendererController
 import com.easternsauce.view.sound.SoundManager
@@ -210,7 +210,7 @@ class PlayScreen(
         val centerX = Gdx.graphics.getWidth / 2f
         val centerY = Gdx.graphics.getHeight / 2f
 
-        val facingVector = Vector2Wrapper(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).normal
+        val facingVector = Vec2(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).normal
 
         val modification: GameState => GameState =
           _.modifyGameStateCreature("player")(
@@ -264,7 +264,7 @@ class PlayScreen(
 
         player
           .modify(_.params.movingDir)
-          .setTo(Vector2Wrapper(movementVectorX, movementVectorY).normal)
+          .setTo(Vec2(movementVectorX, movementVectorY).normal)
           .pipe((wasMoving, isMoving) match {
 
             case (false, true) =>
@@ -375,9 +375,9 @@ class PlayScreen(
     writer.close()
   }
 
-  def mousePosWindowScaled: Vector2Wrapper = {
+  def mousePosWindowScaled: Vec2 = {
     val v = new Vector3(Gdx.input.getX.toFloat, Gdx.input.getY.toFloat, 0f)
     hudCamera.unproject(v)
-    Vector2Wrapper(v.x, v.y)
+    Vec2(v.x, v.y)
   }
 }

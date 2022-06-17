@@ -3,7 +3,7 @@ package com.easternsauce.model.creature.ability.sword
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability._
-import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.util.Vec2
 import com.softwaremill.quicklens._
 
 case class SwingWeaponAbility(
@@ -36,7 +36,7 @@ case class SwingWeaponAbility(
     components.keys
       .foldLeft(this)((ability, componentId) => {
         val component = components(componentId)
-        val dirVector = Vector2Wrapper(creature.params.actionDirVector.x, creature.params.actionDirVector.y)
+        val dirVector = Vec2(creature.params.actionDirVector.x, creature.params.actionDirVector.y)
         val theta = dirVector.angleDeg() + component.params.angleDeviation
 
         ability
@@ -52,7 +52,7 @@ case class SwingWeaponAbility(
             )
           )
           .modify(_.components.at(componentId).params.renderPos)
-          .setTo(Vector2Wrapper(x = creature.params.posX, y = creature.params.posY))
+          .setTo(Vec2(x = creature.params.posX, y = creature.params.posY))
           .modify(_.components.at(componentId))
           .using(_.setDirVector(dirVector))
           .modify(_.components.at(componentId).params.renderWidth)
@@ -68,7 +68,7 @@ case class SwingWeaponAbility(
 
   override def updateComponentHitbox(creature: Creature, component: AbilityComponent): AbilityComponent = {
     val dirVector = component.params.dirVector match {
-      case dirVector if dirVector.length <= 0 => Vector2Wrapper(1, 0).normal
+      case dirVector if dirVector.length <= 0 => Vec2(1, 0).normal
       case dirVector                          => dirVector
     }
 
@@ -98,7 +98,7 @@ case class SwingWeaponAbility(
   override def updateRenderPos(creature: Creature, component: AbilityComponent): AbilityComponent = {
 
     val dirVector = component.params.dirVector match {
-      case dirVector if dirVector.length <= 0 => Vector2Wrapper(1, 0).normal
+      case dirVector if dirVector.length <= 0 => Vec2(1, 0).normal
       case dirVector                          => dirVector
     }
 
@@ -110,7 +110,7 @@ case class SwingWeaponAbility(
 
     component
       .modify(_.params.renderPos)
-      .setTo(Vector2Wrapper(x = attackRectX, y = attackRectY))
+      .setTo(Vec2(x = attackRectX, y = attackRectY))
   }
 
   def copy(params: AbilityParams = params, components: Map[String, AbilityComponent] = components): SwingWeaponAbility =

@@ -1,6 +1,6 @@
 package com.easternsauce.view.pathfinding
 
-import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.util.Vec2
 import com.easternsauce.view.physics.terrain.Terrain
 import com.softwaremill.quicklens._
 
@@ -9,29 +9,26 @@ import scala.collection.immutable.Map
 import scala.util.chaining.scalaUtilChainingOps
 
 object Astar {
-  def generatePathingGraph(terrain: Terrain): Map[Vector2Wrapper, PathingNode] = {
+  def generatePathingGraph(terrain: Terrain): Map[Vec2, PathingNode] = {
     val elems =
-      (for (x <- 0 until terrain.widthInTiles; y <- 0 until terrain.heightInTiles)
-        yield Vector2Wrapper(x, y) -> PathingNode(Vector2Wrapper(x, y)))
+      for (x <- 0 until terrain.widthInTiles; y <- 0 until terrain.heightInTiles)
+        yield Vec2(x, y) -> PathingNode(Vec2(x, y), terrain.clearances.getOrElse(Vec2(x, y), Int.MaxValue))
 
-    val pathingNodes: Map[Vector2Wrapper, PathingNode] = elems.toMap
+    val pathingNodes: Map[Vec2, PathingNode] = elems.toMap
 
     def tryAddingEdge(
-      pathingNodes: Map[Vector2Wrapper, PathingNode],
+      pathingNodes: Map[Vec2, PathingNode],
       terrain: Terrain,
       fromX: Int,
       fromY: Int,
       toX: Int,
       toY: Int,
       weight: Float
-    ): Map[Vector2Wrapper, PathingNode] = {
+    ): Map[Vec2, PathingNode] = {
       if (0 <= toY && toY < terrain.heightInTiles && 0 <= toX && toX < terrain.widthInTiles) {
-        if (terrain.traversable(Vector2Wrapper(fromX, fromY)) && terrain.traversable(Vector2Wrapper(toX, toY))) {
-          val targetNode = pathingNodes(Vector2Wrapper(toX, toY))
-          pathingNodes.updated(
-            Vector2Wrapper(fromX, fromY),
-            pathingNodes(Vector2Wrapper(fromX, fromY)).addEdge(weight, targetNode)
-          )
+        if (terrain.traversables(Vec2(fromX, fromY)) && terrain.traversables(Vec2(toX, toY))) {
+          val targetNode = pathingNodes(Vec2(toX, toY))
+          pathingNodes.updated(Vec2(fromX, fromY), pathingNodes(Vec2(fromX, fromY)).addEdge(weight, targetNode))
         } else pathingNodes
       } else pathingNodes
     }
@@ -53,7 +50,7 @@ object Astar {
             pathingNodes =>
               if (
                 x - 1 >= 0 && y - 1 >= 0
-                && terrain.traversable(Vector2Wrapper(x - 1,y)) && terrain.traversable(Vector2Wrapper(x, y - 1))
+                && terrain.traversables(Vec2(x - 1, y)) && terrain.traversables(Vec2(x, y - 1))
               ) tryAddingEdge(pathingNodes, terrain, x, y, x - 1, y - 1, diagonalWeight)
               else pathingNodes
           )
@@ -61,7 +58,7 @@ object Astar {
             pathingNodes =>
               if (
                 x + 1 < terrain.widthInTiles && y - 1 >= 0
-                && terrain.traversable(Vector2Wrapper(x + 1,y)) && terrain.traversable(Vector2Wrapper(x,y - 1))
+                && terrain.traversables(Vec2(x + 1, y)) && terrain.traversables(Vec2(x, y - 1))
               ) tryAddingEdge(pathingNodes, terrain, x, y, x + 1, y - 1, diagonalWeight)
               else pathingNodes
           )
@@ -69,7 +66,7 @@ object Astar {
             pathingNodes =>
               if (
                 x - 1 >= 0 && y + 1 < terrain.heightInTiles
-                && terrain.traversable(Vector2Wrapper(x - 1, y)) && terrain.traversable(Vector2Wrapper(x, y + 1))
+                && terrain.traversables(Vec2(x - 1, y)) && terrain.traversables(Vec2(x, y + 1))
               ) tryAddingEdge(pathingNodes, terrain, x, y, x - 1, y + 1, diagonalWeight)
               else pathingNodes
           )
@@ -77,7 +74,7 @@ object Astar {
             pathingNodes =>
               if (
                 x + 1 < terrain.widthInTiles && y + 1 < terrain.heightInTiles
-                && terrain.traversable(Vector2Wrapper(x + 1,y)) && terrain.traversable(Vector2Wrapper(x, y + 1))
+                && terrain.traversables(Vec2(x + 1, y)) && terrain.traversables(Vec2(x, y + 1))
               ) tryAddingEdge(pathingNodes, terrain, x, y, x + 1, y + 1, diagonalWeight)
               else pathingNodes
           )
@@ -86,7 +83,7 @@ object Astar {
   }
 
   // caution: heavy computational load!
-  def findPath(terrain: Terrain, startPos: Vector2Wrapper, finishPos: Vector2Wrapper): List[Vector2Wrapper] = {
+  def findPath(terrain: Terrain, startPos: Vec2, finishPos: Vec2, capability: Int): List[Vec2] = {
     val startTilePos = terrain.getClosestTile(startPos)
     val finishTilePos = terrain.getClosestTile(finishPos)
 
@@ -108,7 +105,7 @@ object Astar {
     def traverse(astarState: AstarState): AstarState = {
       if (astarState.openSet.nonEmpty && !astarState.foundPath) {
         val currentNode = astarState.astarGraph(astarState.openSet.minBy {
-          case Vector2Wrapper(x, y) => astarState.astarGraph(Vector2Wrapper(x, y)).f
+          case Vec2(x, y) => astarState.astarGraph(Vec2(x, y)).f
         })
         val resultingAstarState = if (currentNode.pos == finishTilePos) {
           astarState.modify(_.foundPath).setTo(true)
@@ -120,8 +117,8 @@ object Astar {
             .setTo(astarState.closedSet + currentNode.pos)
           currentNode.pathingNode.outgoingEdges
             .foldLeft(updatedAstarState) {
-              case (astarState, PathingEdge(weight, connectedNodePos)) =>
-                processConnectedNode(astarState, currentNode.pos, connectedNodePos, weight)
+              case (astarState, PathingEdge(weight, neighborPos)) =>
+                processNeighbor(astarState, currentNode.pos, neighborPos, weight)
             }
         }
 
@@ -131,20 +128,24 @@ object Astar {
       }
     }
 
-    def processConnectedNode(
+    def processNeighbor(
       astarState: AstarState,
-      originNodePos: Vector2Wrapper,
-      connectedNodePos: Vector2Wrapper,
+      originNodePos: Vec2,
+      neighborPos: Vec2,
       distanceBetweenNodes: Float
     ): AstarState = {
-      if (astarState.closedSet.contains(connectedNodePos)) {
+      if (
+        astarState.closedSet
+          .contains(neighborPos) || Astar.calculateHeuristic(originNodePos, astarState.finishPos) >= 60 && terrain
+          .clearances(neighborPos) < capability
+      ) {
         astarState
       } else {
         val originNode = astarState.astarGraph(originNodePos)
-        val connectedNode = astarState.astarGraph(connectedNodePos)
+        val neighbor = astarState.astarGraph(neighborPos)
 
         val tentativeGscore = originNode.g + distanceBetweenNodes
-        connectedNode match {
+        neighbor match {
           case node if !astarState.openSet.contains(node.pos) =>
             val updatedNode = node
               .modify(_.h)
@@ -178,7 +179,7 @@ object Astar {
 
     val lastNode = result.astarGraph(result.finishPos)
 
-    def reconstructPath(lastNode: AstarNode): List[Vector2Wrapper] = {
+    def reconstructPath(lastNode: AstarNode): List[Vec2] = {
       if (lastNode.parent.nonEmpty) {
         lastNode.pos :: reconstructPath(result.astarGraph(lastNode.parent.get))
       } else List()
@@ -187,41 +188,41 @@ object Astar {
     reconstructPath(lastNode).reverse.map(terrain.getTileCenter)
   }
 
-  def getAstarGraph(pathingGraph: Map[Vector2Wrapper, PathingNode]): Map[Vector2Wrapper, AstarNode] = {
+  def getAstarGraph(pathingGraph: Map[Vec2, PathingNode]): Map[Vec2, AstarNode] = {
     pathingGraph.view.mapValues(AstarNode(_)).toMap
   }
 
-  def calculateHeuristic(startPos: Vector2Wrapper, finishPos: Vector2Wrapper): Double = {
+  def calculateHeuristic(startPos: Vec2, finishPos: Vec2): Double = {
     (Math.abs(finishPos.x - startPos.x) + Math.abs(finishPos.y - startPos.y)) * 10
   }
 
 }
 
-case class PathingNode(pos: Vector2Wrapper, outgoingEdges: List[PathingEdge] = List()) {
+case class PathingNode(pos: Vec2, clearance: Int, outgoingEdges: List[PathingEdge] = List()) {
   def addEdge(weight: Float, node: PathingNode): PathingNode = {
     val newEdge = PathingEdge(weight, node.pos)
-    PathingNode(pos, newEdge :: outgoingEdges)
+    PathingNode(pos, clearance, newEdge :: outgoingEdges)
   }
 
   override def toString: String = "(" + pos.x + ", " + pos.y + ":" + outgoingEdges.size + ")"
 }
 
-case class PathingEdge(weight: Float, connectedNodePos: Vector2Wrapper)
+case class PathingEdge(weight: Float, neighborPos: Vec2)
 
 case class AstarNode(
   pathingNode: PathingNode,
-  parent: Option[Vector2Wrapper] = None,
+  parent: Option[Vec2] = None,
   f: Double = Double.MaxValue,
   g: Double = Double.MaxValue,
   h: Double = Double.MaxValue
 ) {
-  def pos: Vector2Wrapper = pathingNode.pos
+  def pos: Vec2 = pathingNode.pos
 }
 
 case class AstarState(
-  astarGraph: Map[Vector2Wrapper, AstarNode],
-  openSet: Set[Vector2Wrapper],
-  closedSet: Set[Vector2Wrapper],
-  finishPos: Vector2Wrapper,
+  astarGraph: Map[Vec2, AstarNode],
+  openSet: Set[Vec2],
+  closedSet: Set[Vec2],
+  finishPos: Vec2,
   foundPath: Boolean
 )

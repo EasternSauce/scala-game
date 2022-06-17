@@ -15,7 +15,7 @@ import com.easternsauce.model.hud.{InventoryWindow, LootPilePickupMenu}
 import com.easternsauce.model.item.{Item, ItemParameterValue, ItemTemplate}
 import com.easternsauce.model.util.SimpleTimer
 import com.easternsauce.util.Direction.Direction
-import com.easternsauce.util.{Direction, Vector2Wrapper}
+import com.easternsauce.util.{Direction, Vec2}
 import io.circe.generic.semiauto.{deriveDecoder, deriveEncoder}
 import io.circe.syntax.EncoderOps
 import io.circe.{Decoder, Encoder}
@@ -53,8 +53,8 @@ object JsonCodecs {
   implicit val encodeAbilityHitbox: Encoder[AbilityHitbox] = deriveEncoder
   implicit val decodeAbilityState: Decoder[AbilityState] = Decoder.decodeEnumeration(AbilityState)
   implicit val encodeAbilityState: Encoder[AbilityState] = Encoder.encodeEnumeration(AbilityState)
-  implicit val decodeVector2Wrapper: Decoder[Vector2Wrapper] = deriveDecoder
-  implicit val encodeVector2Wrapper: Encoder[Vector2Wrapper] = deriveEncoder
+  implicit val decodeVector2Wrapper: Decoder[Vec2] = deriveDecoder
+  implicit val encodeVector2Wrapper: Encoder[Vec2] = deriveEncoder
   implicit val decodeDirection: Decoder[Direction] = Decoder.decodeEnumeration(Direction)
   implicit val encodeDirection: Encoder[Direction] = Encoder.encodeEnumeration(Direction)
   implicit val decodeSkeleton: Decoder[Skeleton] = deriveDecoder

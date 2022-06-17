@@ -3,7 +3,7 @@ package com.easternsauce.model.creature.ability.magic
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability._
 import com.easternsauce.system.Random
-import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.util.Vec2
 import com.softwaremill.quicklens._
 
 case class MeteorRainAbility(
@@ -59,7 +59,7 @@ case class MeteorRainAbility(
             AbilityHitbox(x = x, y = y, width = component.width, height = component.height, scale = component.scale)
           )
           .modify(_.components.at(componentId).params.renderPos)
-          .setTo(Vector2Wrapper(x = x, y = y))
+          .setTo(Vec2(x = x, y = y))
           .modify(_.components.at(componentId).params.renderWidth)
           .setTo(component.width)
           .modify(_.components.at(componentId).params.renderHeight)

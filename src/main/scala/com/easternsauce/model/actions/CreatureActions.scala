@@ -4,7 +4,7 @@ import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.model.event.UpdatePhysicsOnCreatureDeathEvent
-import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.util.Vec2
 import com.easternsauce.view.pathfinding.Astar
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
@@ -55,10 +55,7 @@ trait CreatureActions {
         ).activateEffect("knockback", 0.15f)
           .modify(_.params.knockbackDir)
           .setTo(
-            Vector2Wrapper(
-              creatures(creatureId).params.posX - sourcePosX,
-              creatures(creatureId).params.posY - sourcePosY
-            ).normal
+            Vec2(creatures(creatureId).params.posX - sourcePosX, creatures(creatureId).params.posY - sourcePosY).normal
           )
           .modify(_.params.knockbackVelocity)
           .setTo(15f)
@@ -104,7 +101,9 @@ trait CreatureActions {
     creatures.values
       .filter(
         creature =>
-          creature.params.areaId == this.currentAreaId && creature.isEnemy && creature.params.targetCreatureId.nonEmpty &&
+          creature.params.areaId == this.currentAreaId &&
+            creature.isEnemy &&
+            creature.params.targetCreatureId.nonEmpty &&
             (creature.params.forcePathCalculation || creature.params.pathCalculationCooldownTimer.time > 1f)
       )
       .foldLeft(this) {
@@ -115,15 +114,17 @@ trait CreatureActions {
           val isLineOfSight = terrain.isLineOfSight(creature.pos, target.pos)
 
           if (!isLineOfSight) {
+            val path = Astar.findPath(terrain, creature.pos, target.pos, creature.capability)
+
             gameState.modifyGameStateCreature(creature.params.id)(
               _.modify(_.params.pathTowardsTarget)
-                .setTo(Some(Astar.findPath(terrain, creature.pos, target.pos)))
+                .setTo(Some(path))
                 .modify(_.params.pathCalculationCooldownTimer)
                 .using(_.restart())
                 .modify(_.params.forcePathCalculation)
                 .setTo(false)
             )
-          } else gameState
+          } else gameState.modifyGameStateCreature(creature.params.id)(_.modify(_.params.pathTowardsTarget).setTo(None))
 
       }
 

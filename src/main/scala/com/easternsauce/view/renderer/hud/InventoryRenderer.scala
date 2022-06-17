@@ -6,7 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image
 import com.easternsauce.helper.InventoryWindowHelper
 import com.easternsauce.model.GameState
 import com.easternsauce.system.Assets
-import com.easternsauce.util.{InventoryMapping, RendererBatch, Vector2Wrapper}
+import com.easternsauce.util.{InventoryMapping, RendererBatch, Vec2}
 
 case class InventoryRenderer() {
   import com.easternsauce.system.Assets.bitmapFontToEnrichedBitmapFont
@@ -22,7 +22,7 @@ case class InventoryRenderer() {
     InventoryWindowHelper.backgroundOuterRect.height
   )
 
-  def render(gameState: GameState, batch: RendererBatch, mousePosition: Vector2Wrapper): Unit = {
+  def render(gameState: GameState, batch: RendererBatch, mousePosition: Vec2): Unit = {
     if (gameState.inventoryWindow.isOpen) {
       backgroundImage.draw(batch.spriteBatch, 1.0f)
 
@@ -51,7 +51,7 @@ case class InventoryRenderer() {
 
   }
 
-  def renderPlayerItems(gameState: GameState, batch: RendererBatch, mousePosition: Vector2Wrapper): Unit = {
+  def renderPlayerItems(gameState: GameState, batch: RendererBatch, mousePosition: Vec2): Unit = {
     val player = gameState.player
 
     val inventory = player.params.inventoryItems
@@ -124,7 +124,7 @@ case class InventoryRenderer() {
     }
   }
 
-  def renderDescription(gameState: GameState, batch: RendererBatch, mousePosition: Vector2Wrapper): Unit = {
+  def renderDescription(gameState: GameState, batch: RendererBatch, mousePosition: Vec2): Unit = {
     val player = gameState.player
 
     val x: Float = mousePosition.x

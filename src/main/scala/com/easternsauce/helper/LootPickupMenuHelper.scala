@@ -3,7 +3,7 @@ package com.easternsauce.helper
 import com.badlogic.gdx.math.Rectangle
 import com.easternsauce.model.GameState
 import com.easternsauce.model.item.Item
-import com.easternsauce.util.{Constants, Vector2Wrapper}
+import com.easternsauce.util.{Constants, Vec2}
 
 object LootPickupMenuHelper {
   def menuOptionPosX(i: Int): Float = Constants.WindowWidth / 2 - 100f
@@ -21,7 +21,7 @@ object LootPickupMenuHelper {
       case (areaId, lootPileId) => gameState.areas(areaId).params.lootPiles(lootPileId).items
     }.zipWithIndex
 
-  def inLootPickupMenu(gameState: GameState, mousePos: Vector2Wrapper): Boolean = {
+  def inLootPickupMenu(gameState: GameState, mousePos: Vec2): Boolean = {
     val mousePosX = mousePos.x
     val mousePosY = mousePos.y
     !LootPickupMenuHelper.lootPickupMenuItems(gameState).forall {

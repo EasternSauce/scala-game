@@ -7,7 +7,7 @@ import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, Abili
 import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.model.item.Item
 import com.easternsauce.util.Direction.Direction
-import com.easternsauce.util.{Direction, InventoryMapping, Vector2Wrapper}
+import com.easternsauce.util.{Direction, InventoryMapping, Vec2}
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -50,7 +50,7 @@ abstract class Creature {
   def init(): Creature = {
     val swingWeaponAbility = SwingWeaponAbility().init()
 
-    def idAbilityPair(ability: Ability) = (ability.params.id -> ability)
+    def idAbilityPair(ability: Ability) = ability.params.id -> ability
 
     this
       .modify(_.params.abilities)
@@ -91,7 +91,7 @@ abstract class Creature {
       .setTo(newPosY)
   }
 
-  def pos: Vector2Wrapper = Vector2Wrapper(params.posX, params.posY)
+  def pos: Vec2 = Vec2(params.posX, params.posY)
 
   def takeStaminaDamage(staminaDamage: Float): Creature = {
     if (params.stamina - staminaDamage > 0) this.modify(_.params.stamina).setTo(this.params.stamina - staminaDamage)
@@ -184,7 +184,7 @@ abstract class Creature {
 
   def stopMoving(): Creature = this.modify(_.params.currentSpeed).setTo(0f)
 
-  def moveInDir(dir: Vector2Wrapper): Creature = this.modify(_.params.movingDir).setTo(dir).startMoving()
+  def moveInDir(dir: Vec2): Creature = this.modify(_.params.movingDir).setTo(dir).startMoving()
 
   def isMoving: Boolean = this.params.currentSpeed > 0f
 
@@ -200,7 +200,7 @@ abstract class Creature {
     }
   }
 
-  def attack(dir: Vector2Wrapper): Creature =
+  def attack(dir: Vec2): Creature =
     this.modify(_.params.actionDirVector).setTo(dir).performAbility(defaultAbility)
 
   def performAbility(abilityId: String): Creature = {
@@ -277,6 +277,13 @@ abstract class Creature {
 
       this.modify(_.params.inventoryItems).setTo(this.params.inventoryItems + (freeSlot.get -> item))
     }
+  }
+
+  def capability: Int = {
+    if (width >= 0 && width < 2) 1
+    else if (width >=2 && width <= 4) 2
+    else if (width >=4 && width <= 6) 3
+    else 4
   }
 
   def copy(params: CreatureParams = params): Creature

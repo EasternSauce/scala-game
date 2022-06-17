@@ -4,7 +4,7 @@ import com.easternsauce.helper.LootPickupMenuHelper
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.{PlaySoundEvent, UpdatePhysicsOnLootPileDespawnEvent, UpdateRendererOnLootPileDespawnEvent}
 import com.easternsauce.model.item.Item
-import com.easternsauce.util.Vector2Wrapper
+import com.easternsauce.util.Vec2
 import com.softwaremill.quicklens._
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -12,11 +12,11 @@ import scala.util.chaining.scalaUtilChainingOps
 trait LootPickupMenuActions {
   this: GameState =>
 
-  def lootPickupMenuClick(mousePos: Vector2Wrapper): GameState = {
+  def lootPickupMenuClick(mousePos: Vec2): GameState = {
 
     val itemOptions: List[((String, String, Item), Int)] = this.lootPilePickupMenu.visibleLootPiles
       .map { case (areaId, lootPileId) => (areaId, lootPileId, this.areas(areaId).params.lootPiles(lootPileId).items) }
-      .foldLeft(List[((String, String, Item))]()) {
+      .foldLeft(List[(String, String, Item)]()) {
         case (acc, (areaId, lootPileId, items)) => acc ++ items.map(item => (areaId, lootPileId, item))
       }
       .zipWithIndex
