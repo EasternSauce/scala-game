@@ -16,12 +16,12 @@ Already done:
 - area gates, 
 - enemy spawns,
 - loot pick-up,
-- drop tables.
+- drop tables,
+- creature movement AI.
 
 To be done:
 
 - boss arena and boss fight,
-- creature movement AI,
 - bow shooting and arrows,
 - main menu screen,
 - sounds and music,

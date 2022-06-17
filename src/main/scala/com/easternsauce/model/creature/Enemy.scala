@@ -73,7 +73,7 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
         })
         .pipe(
           creature =>
-            if (potentialTarget.get.pos.distance(creature.pos) < 1f)
+            if (potentialTarget.get.pos.distance(creature.pos) < 3f)
               creature.attack(vectorTowardsTarget)
             else creature
         )

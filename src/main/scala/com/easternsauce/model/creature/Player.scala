@@ -21,6 +21,8 @@ case class Player(override val params: CreatureParams) extends Creature {
 
   override val speed: Float = 25f
 
+  override val onGettingHitSoundId: Option[String] = Some("pain")
+
   override def update(delta: Float): Player = {
     super.update(delta).asInstanceOf[Player]
   }

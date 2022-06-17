@@ -3,7 +3,7 @@ package com.easternsauce.model.actions
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
-import com.easternsauce.model.event.UpdatePhysicsOnCreatureDeathEvent
+import com.easternsauce.model.event.{PlaySoundEvent, UpdatePhysicsOnCreatureDeathEvent}
 import com.easternsauce.util.Vec2
 import com.easternsauce.view.pathfinding.Astar
 import com.easternsauce.view.physics.PhysicsController
@@ -45,20 +45,26 @@ trait CreatureActions {
 
     val actualDamage = damage * 100f / (100f + creatures(creatureId).params.totalArmor)
 
+    val creature = this.creatures(creatureId)
+
     this
+      .modify(_.events)
+      .setToIf(creature.onGettingHitSoundId.nonEmpty)(
+        PlaySoundEvent(creature.onGettingHitSoundId.get) :: this.events
+      )
       .modifyGameStateCreature(creatureId)(
         _.pipe(
           creature =>
             if (creature.params.life - actualDamage > 0)
               creature.modify(_.params.life).setTo(creature.params.life - actualDamage)
             else creature.modify(_.params.life).setTo(0f)
-        ).activateEffect("knockback", 0.15f)
+        ).activateEffect("knockback", 0.02f)
           .modify(_.params.knockbackDir)
           .setTo(
             Vec2(creatures(creatureId).params.posX - sourcePosX, creatures(creatureId).params.posY - sourcePosY).normal
           )
           .modify(_.params.knockbackVelocity)
-          .setTo(15f)
+          .setTo(20f)
       )
       .pipe(gameState => {
         val creature = gameState.creatures(creatureId)

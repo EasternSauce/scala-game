@@ -1,5 +1,6 @@
 package com.easternsauce.model.creature
 
+import com.badlogic.gdx.audio.Sound
 import com.easternsauce.helper.InventoryWindowHelper
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
@@ -43,6 +44,8 @@ abstract class Creature {
   val unarmedDamage: Int = 10
 
   val dropTable: Map[String, Float] = Map()
+
+  val onGettingHitSoundId: Option[String] = None
 
   def weaponDamage: Int =
     params.equipmentItems.get(InventoryMapping.primaryWeaponIndex).flatMap(_.damage).getOrElse(unarmedDamage)
