@@ -41,5 +41,6 @@ case class CreatureParams(
   targetCreatureId: Option[String] = None,
   pathTowardsTarget: Option[List[Vec2]] = None,
   forcePathCalculation: Boolean = false,
-  pathCalculationCooldownTimer: SimpleTimer = SimpleTimer()
+  pathCalculationCooldownTimer: SimpleTimer = SimpleTimer(),
+  useAbilityTimer: SimpleTimer = SimpleTimer(time = 4f, isRunning = true)
 )

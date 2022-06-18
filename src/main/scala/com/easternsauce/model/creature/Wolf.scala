@@ -1,5 +1,8 @@
 package com.easternsauce.model.creature
 
+import com.easternsauce.model.creature.ability.Ability
+import com.easternsauce.model.creature.ability.magic.IceSpearAbility
+import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
 import com.easternsauce.util.Direction
 import com.easternsauce.util.Direction.Direction
 
@@ -15,6 +18,13 @@ case class Wolf(override val params: CreatureParams) extends Enemy(params = para
   override val dirMap: Map[Direction, Int] =
     Map(Direction.Up -> 3, Direction.Down -> 0, Direction.Left -> 1, Direction.Right -> 2)
   override val baseLife: Float = 150f
+
+  override val onGettingHitSoundId: Option[String] = Some("dogWhine")
+
+  override val abilityUsages: Map[String, AbilityUsage] =
+    Map("iceSpear" -> AbilityUsage(weight = 100f, minimumDistance = 8f))
+
+  override val abilities: List[Ability] = List(SwingWeaponAbility(), IceSpearAbility())
 
   override val dropTable = Map(
     "ringmailGreaves" -> 0.1f,

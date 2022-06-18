@@ -77,8 +77,48 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
               creature.attack(vectorTowardsTarget)
             else creature
         )
+        .pipe(creature => {
+          val pickedAbilityId = pickAbilityToUse(gameState)
+          if (params.useAbilityTimer.time > useAbilityTimeout && abilityUsages.nonEmpty && pickedAbilityId.nonEmpty) {
+            creature
+            .modify(_.params.actionDirVector).setTo(this.pos.vectorTowards(potentialTarget.get.pos))
+              .performAbility(pickedAbilityId.get)
+              .pipe(_.modify(_.params.useAbilityTimer).using(_.restart()))
+          } else creature
+        })
         .asInstanceOf[Enemy]
     } else this.modify(_.params.targetCreatureId).setTo(None).stopMoving().asInstanceOf[Enemy]
+
+  }
+
+  def pickAbilityToUse(gameState: GameState): Option[String] = {
+
+    if (params.targetCreatureId.nonEmpty) {
+      val targetCreature = gameState.creatures(params.targetCreatureId.get)
+
+      val filteredAbilityUsages = abilityUsages.filter {
+        case (abilityId, usage) =>
+          params.life / params.maxLife <= usage.lifeThreshold && pos.distance(
+            targetCreature.pos
+          ) > usage.minimumDistance && pos.distance(targetCreature.pos) < usage.maximumDistance && !gameState
+            .abilities(params.id, abilityId)
+            .onCooldown
+      }
+
+      var completeWeight = 0.0f
+      for (abilityUsage <- filteredAbilityUsages.values) {
+        completeWeight += abilityUsage.weight
+      }
+      val r = Math.random * completeWeight
+      var countWeight = 0.0
+      for (abilityUsage <- filteredAbilityUsages) {
+        val (key, value) = abilityUsage
+        countWeight += value.weight
+        if (countWeight > r) return Some(key)
+
+      }
+      None
+    } else None
 
   }
 

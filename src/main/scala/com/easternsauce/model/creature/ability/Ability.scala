@@ -1,6 +1,7 @@
 package com.easternsauce.model.creature.ability
 
 import com.easternsauce.model.creature.Creature
+import com.easternsauce.util.Vec2
 import com.softwaremill.quicklens._
 
 abstract class Ability(val params: AbilityParams, val components: Map[String, AbilityComponent]) {
@@ -36,7 +37,11 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
 
   def updateComponentHitbox(creature: Creature, component: AbilityComponent): AbilityComponent = component
 
-  def updateRenderPos(creature: Creature, component: AbilityComponent): AbilityComponent = component
+  def updateRenderPos(creature: Creature, component: AbilityComponent): AbilityComponent = {
+    component
+      .modify(_.params.renderPos)
+      .setTo(Vec2(x = component.params.abilityHitbox.x, y = component.params.abilityHitbox.y))
+  }
 
   def updateComponentTimers(component: AbilityComponent, delta: Float): AbilityComponent = {
     component

@@ -124,6 +124,14 @@ case class RendererController(atlas: TextureAtlas) {
       }
     }
 
+    // TODO: only in debug mode
+    gameState.creatures.foreach { case (_, creature) =>
+      if (gameState.currentAreaId == creature.params.areaId && creature.params.pathTowardsTarget.nonEmpty) {
+        batch.shapeDrawer.setColor(Color.CORAL)
+        creature.params.pathTowardsTarget.get.foreach(elem => batch.shapeDrawer.filledCircle(elem.vector2, 0.2f))
+      }
+    }
+
   }
 
   def renderDeadEntities(gameState: GameState, batch: RendererBatch): Unit = {

@@ -47,21 +47,27 @@ abstract class Creature {
 
   val onGettingHitSoundId: Option[String] = None
 
+  val abilityUsages: Map[String, AbilityUsage] = Map()
+
+  var useAbilityTimeout: Float = 4
+
+  val abilities: List[Ability] = List(SwingWeaponAbility())
+
   def weaponDamage: Int =
     params.equipmentItems.get(InventoryMapping.primaryWeaponIndex).flatMap(_.damage).getOrElse(unarmedDamage)
 
   def init(): Creature = {
-    val swingWeaponAbility = SwingWeaponAbility().init()
-
-    def idAbilityPair(ability: Ability) = ability.params.id -> ability
-
     this
-      .modify(_.params.abilities)
-      .setTo(Map(idAbilityPair(swingWeaponAbility)))
+      .initAbilities(abilities)
       .modifyAll(_.params.maxLife, _.params.life)
       .setTo(baseLife)
       .modifyAll(_.params.maxStamina, _.params.stamina)
       .setTo(baseStamina)
+  }
+
+  def initAbilities(abilities: List[Ability]): Creature = {
+    this.modify(_.params.abilities)
+      .setTo(abilities.map(ability => ability.params.id -> ability.init()).toMap)
   }
 
   def update(delta: Float): Creature = {
@@ -83,6 +89,8 @@ abstract class Creature {
       .modify(_.params.staminaRegenerationDisabledTimer)
       .using(_.update(delta))
       .modify(_.params.pathCalculationCooldownTimer)
+      .using(_.update(delta))
+      .modify(_.params.useAbilityTimer)
       .using(_.update(delta))
   }
 
@@ -292,3 +300,10 @@ abstract class Creature {
   def copy(params: CreatureParams = params): Creature
 
 }
+
+case class AbilityUsage(
+                         weight: Float,
+                         minimumDistance: Float = 0f,
+                         maximumDistance: Float = Float.MaxValue,
+                         lifeThreshold: Float = 1.0f
+                       )

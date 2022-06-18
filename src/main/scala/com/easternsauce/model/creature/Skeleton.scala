@@ -17,6 +17,8 @@ case class Skeleton(override val params: CreatureParams) extends Enemy(params = 
     Map(Direction.Up -> 0, Direction.Down -> 2, Direction.Left -> 1, Direction.Right -> 3)
   override val baseLife: Float = 200f
 
+  override val onGettingHitSoundId: Option[String] = Some("boneClick")
+
   override val dropTable = Map(
     "ringmailGreaves" -> 0.1f,
     "leatherArmor" -> 0.05f,

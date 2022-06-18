@@ -46,7 +46,6 @@ case class ComponentRenderer(creatureId: String, abilityId: String, componentId:
       abilityComponent.specification.activeFrameDuration / abilityComponent.params.speed,
       activeFrames: _*
     )
-
   }
 
   def update(gameState: GameState): Unit = {

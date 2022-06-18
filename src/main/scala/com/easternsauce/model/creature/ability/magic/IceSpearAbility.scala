@@ -54,6 +54,9 @@ case class IceSpearAbility(
       .foldLeft(this)((ability, componentId) => {
         val component = components(componentId)
         val dirVector = Vec2(creature.params.actionDirVector.x, creature.params.actionDirVector.y)
+
+        if (dirVector == Vec2(0,0)) throw new RuntimeException("ability with zero vector not allowed")
+
         val theta = dirVector.angleDeg() + component.params.angleDeviation
 
         ability
