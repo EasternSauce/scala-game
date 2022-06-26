@@ -117,8 +117,13 @@ case class EntityRenderer(creatureId: String, atlas: TextureAtlas) {
 
     batch
       .filledRectangle(new Rectangle(barPosX, barPosY, lifeBarWidth, lifeBarHeight), Color.ORANGE)
-    batch
-      .filledRectangle(new Rectangle(barPosX, barPosY, currentLifeBarWidth, lifeBarHeight), Color.RED)
+    if (creature.params.life <= creature.params.maxLife) {
+      batch
+        .filledRectangle(new Rectangle(barPosX, barPosY, currentLifeBarWidth, lifeBarHeight), Color.RED)
+    } else {
+      batch
+        .filledRectangle(new Rectangle(barPosX, barPosY, lifeBarWidth, lifeBarHeight), Color.ROYAL)
+    }
 
   }
 }

@@ -36,7 +36,7 @@ class PlayScreen(
 
   val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
-  val debugRenderEnabled = true
+  val debugRenderEnabled = false
 
   val worldCamera: OrthographicCamera = new OrthographicCamera()
   val hudCamera: OrthographicCamera = {
@@ -154,6 +154,12 @@ class PlayScreen(
 
     val handleDebugButton: GameState => GameState = gameState => {
       if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) gameState.resetArea("area1")
+      else gameState
+    }
+
+    val handleCheatsButton: GameState => GameState = gameState => {
+      if (Gdx.input.isKeyJustPressed(Input.Keys.F12))
+        gameState.modifyGameStateCreature(gameState.currentPlayerId)(_.modify(_.params.life).setTo(Float.MaxValue))
       else gameState
     }
 
@@ -283,6 +289,7 @@ class PlayScreen(
       .pipe(handleMovement)
       .pipe(handleInventoryOpenClose)
       .pipe(handleDebugButton)
+      .pipe(handleCheatsButton)
       .pipe(
         gameState =>
           if (gameState.inventoryWindow.isOpen)
@@ -325,7 +332,7 @@ class PlayScreen(
 
     gameRenderer.renderDeadEntities(gameState, worldBatch)
 
-    gameRenderer.renderAliveEntities(gameState, worldBatch)
+    gameRenderer.renderAliveEntities(gameState, worldBatch, debugRenderEnabled)
 
     worldBatch.end()
 

@@ -92,7 +92,13 @@ case class RendererController(atlas: TextureAtlas) {
         new Rectangle(10, 25, 100 * player.params.stamina / player.params.maxStamina, 10)
 
       batch.shapeDrawer.filledRectangle(maxLifeRect, Color.ORANGE)
-      batch.shapeDrawer.filledRectangle(lifeRect, Color.RED)
+
+      if (player.params.life <= player.params.maxLife) {
+        batch.shapeDrawer.filledRectangle(lifeRect, Color.RED)
+      } else {
+        batch.shapeDrawer.filledRectangle(maxLifeRect, Color.ROYAL)
+      }
+
       batch.shapeDrawer.filledRectangle(maxStaminaRect, Color.ORANGE)
       batch.shapeDrawer.filledRectangle(staminaRect, Color.GREEN)
     }
@@ -104,7 +110,7 @@ case class RendererController(atlas: TextureAtlas) {
     renderLifeAndStamina()
   }
 
-  def renderAliveEntities(gameState: GameState, batch: RendererBatch): Unit = {
+  def renderAliveEntities(gameState: GameState, batch: RendererBatch, debugEnabled: Boolean): Unit = {
 
     gameState.creatures.filter { case (_, creature) => creature.isAlive }.keys.foreach { creatureId =>
       if (
@@ -124,11 +130,13 @@ case class RendererController(atlas: TextureAtlas) {
       }
     }
 
-    // TODO: only in debug mode
-    gameState.creatures.foreach { case (_, creature) =>
-      if (gameState.currentAreaId == creature.params.areaId && creature.params.pathTowardsTarget.nonEmpty) {
-        batch.shapeDrawer.setColor(Color.CORAL)
-        creature.params.pathTowardsTarget.get.foreach(elem => batch.shapeDrawer.filledCircle(elem.vector2, 0.2f))
+    if (debugEnabled) {
+      gameState.creatures.foreach {
+        case (_, creature) =>
+          if (gameState.currentAreaId == creature.params.areaId && creature.params.pathTowardsTarget.nonEmpty) {
+            batch.shapeDrawer.setColor(Color.CORAL)
+            creature.params.pathTowardsTarget.get.foreach(elem => batch.shapeDrawer.filledCircle(elem.vector2, 0.2f))
+          }
       }
     }
 

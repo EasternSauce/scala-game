@@ -81,7 +81,8 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
           val pickedAbilityId = pickAbilityToUse(gameState)
           if (params.useAbilityTimer.time > useAbilityTimeout && abilityUsages.nonEmpty && pickedAbilityId.nonEmpty) {
             creature
-            .modify(_.params.actionDirVector).setTo(this.pos.vectorTowards(potentialTarget.get.pos))
+              .modify(_.params.actionDirVector)
+              .setTo(this.pos.vectorTowards(potentialTarget.get.pos))
               .performAbility(pickedAbilityId.get)
               .pipe(_.modify(_.params.useAbilityTimer).using(_.restart()))
           } else creature

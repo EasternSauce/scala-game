@@ -11,6 +11,8 @@ object DesktopApplication {
     val config = new Lwjgl3ApplicationConfiguration
     config.setWindowedMode(Constants.WindowWidth, Constants.WindowHeight)
     config.setTitle("game")
+    //config.setForegroundFPS(144)
+    config.useVsync(false)
 
     new Lwjgl3Application(new MyGdxGame, config)
   }

@@ -1,6 +1,5 @@
 package com.easternsauce.model.creature
 
-import com.badlogic.gdx.audio.Sound
 import com.easternsauce.helper.InventoryWindowHelper
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
@@ -66,7 +65,8 @@ abstract class Creature {
   }
 
   def initAbilities(abilities: List[Ability]): Creature = {
-    this.modify(_.params.abilities)
+    this
+      .modify(_.params.abilities)
       .setTo(abilities.map(ability => ability.params.id -> ability.init()).toMap)
   }
 
@@ -292,8 +292,8 @@ abstract class Creature {
 
   def capability: Int = {
     if (width >= 0 && width < 2) 1
-    else if (width >=2 && width <= 4) 2
-    else if (width >=4 && width <= 6) 3
+    else if (width >= 2 && width <= 4) 2
+    else if (width >= 4 && width <= 6) 3
     else 4
   }
 
@@ -302,8 +302,8 @@ abstract class Creature {
 }
 
 case class AbilityUsage(
-                         weight: Float,
-                         minimumDistance: Float = 0f,
-                         maximumDistance: Float = Float.MaxValue,
-                         lifeThreshold: Float = 1.0f
-                       )
+  weight: Float,
+  minimumDistance: Float = 0f,
+  maximumDistance: Float = Float.MaxValue,
+  lifeThreshold: Float = 1.0f
+)

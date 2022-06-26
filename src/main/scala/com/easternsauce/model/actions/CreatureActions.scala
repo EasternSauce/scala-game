@@ -49,9 +49,7 @@ trait CreatureActions {
 
     this
       .modify(_.events)
-      .setToIf(creature.onGettingHitSoundId.nonEmpty)(
-        PlaySoundEvent(creature.onGettingHitSoundId.get) :: this.events
-      )
+      .setToIf(creature.onGettingHitSoundId.nonEmpty)(PlaySoundEvent(creature.onGettingHitSoundId.get) :: this.events)
       .modifyGameStateCreature(creatureId)(
         _.pipe(
           creature =>
