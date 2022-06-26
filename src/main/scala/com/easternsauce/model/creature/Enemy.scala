@@ -1,6 +1,7 @@
 package com.easternsauce.model.creature
 
 import com.easternsauce.model.GameState
+import com.easternsauce.system.Random
 import com.softwaremill.quicklens.ModifyPimp
 
 import scala.util.chaining.scalaUtilChainingOps
@@ -79,12 +80,14 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
         )
         .pipe(creature => {
           val pickedAbilityId = pickAbilityToUse(gameState)
-          if (params.useAbilityTimer.time > useAbilityTimeout && abilityUsages.nonEmpty && pickedAbilityId.nonEmpty) {
+          if (params.useAbilityTimer.time > useAbilityTimeout + creature.params.inbetweenAbilitiesTime && abilityUsages.nonEmpty && pickedAbilityId.nonEmpty) {
             creature
               .modify(_.params.actionDirVector)
               .setTo(this.pos.vectorTowards(potentialTarget.get.pos))
               .performAbility(pickedAbilityId.get)
               .pipe(_.modify(_.params.useAbilityTimer).using(_.restart()))
+              .modify(_.params.inbetweenAbilitiesTime)
+              .setTo(Random.between(2f, 6f))
           } else creature
         })
         .asInstanceOf[Enemy]
@@ -101,7 +104,8 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
         case (abilityId, usage) =>
           params.life / params.maxLife <= usage.lifeThreshold && pos.distance(
             targetCreature.pos
-          ) > usage.minimumDistance && pos.distance(targetCreature.pos) < usage.maximumDistance && !gameState
+          ) > usage.minimumDistance &&
+            pos.distance(targetCreature.pos) < usage.maximumDistance && !gameState
             .abilities(params.id, abilityId)
             .onCooldown
       }

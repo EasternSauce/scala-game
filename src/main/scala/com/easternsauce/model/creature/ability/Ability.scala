@@ -16,6 +16,8 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
   val abilityChannelSoundId: Option[String] = None
   val abilityActiveSoundId: Option[String] = Some("swoosh")
 
+  val isDestroyOnCollision: Boolean = false
+
   def init(): Ability = {
     val components = (for (i <- 0 until numOfComponents)
       yield (i.toString, AbilityComponent(specification, ComponentParams(componentId = i.toString)))).toMap
@@ -62,6 +64,8 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
   def stop(): Ability = {
     this.modify(_.components.each).using(_.stop())
   }
+
+  def onCollision(): Ability = this
 
   def componentsActive: Boolean = components.values.exists(component => component.params.state != AbilityState.Inactive)
 

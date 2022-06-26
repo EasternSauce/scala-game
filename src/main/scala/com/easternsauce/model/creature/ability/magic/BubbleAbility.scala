@@ -29,6 +29,8 @@ case class BubbleAbility(
 
   //  override val abilityActiveSoundId: Option[String] = Some("explosion") TODO
 
+  override val isDestroyOnCollision: Boolean = true
+
   override val numOfComponents: Int = 3
   val delayBetween = 0.8f
 

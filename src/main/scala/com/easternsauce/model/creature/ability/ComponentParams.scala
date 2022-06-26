@@ -22,5 +22,6 @@ case class ComponentParams(
   angleDeviation: Float = 0f,
   delay: Float = 0f,
   speed: Float = 1.0f, // cannot be zero!
-  range: Float = 0f
+  range: Float = 0f,
+  forceStopped: Boolean = false
 )

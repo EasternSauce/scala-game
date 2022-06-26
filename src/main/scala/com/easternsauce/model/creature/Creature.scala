@@ -6,6 +6,7 @@ import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, AbilityState}
 import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.model.item.Item
+import com.easternsauce.system.Random
 import com.easternsauce.util.Direction.Direction
 import com.easternsauce.util.{Direction, InventoryMapping, Vec2}
 import com.softwaremill.quicklens._
@@ -62,6 +63,8 @@ abstract class Creature {
       .setTo(baseLife)
       .modifyAll(_.params.maxStamina, _.params.stamina)
       .setTo(baseStamina)
+      .modify(_.params.inbetweenAbilitiesTime)
+      .setTo(Random.between(2f, 6f))
   }
 
   def initAbilities(abilities: List[Ability]): Creature = {

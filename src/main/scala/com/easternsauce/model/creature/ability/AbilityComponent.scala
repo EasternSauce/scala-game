@@ -29,4 +29,6 @@ case class AbilityComponent(specification: AbilitySpecification, params: Compone
     this.modify(_.params.dirVector).setTo(dirVector.rotate(params.angleDeviation))
   }
 
+  def forceStop(): AbilityComponent = this.modify(_.params.forceStopped).setTo(true)
+
 }

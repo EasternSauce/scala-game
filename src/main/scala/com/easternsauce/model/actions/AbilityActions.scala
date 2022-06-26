@@ -3,7 +3,11 @@ package com.easternsauce.model.actions
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.AbilityState
-import com.easternsauce.model.event.{PlaySoundEvent, UpdatePhysicsOnComponentCreateBodyEvent, UpdatePhysicsOnComponentDestroyBodyEvent}
+import com.easternsauce.model.event.{
+  PlaySoundEvent,
+  UpdatePhysicsOnComponentCreateBodyEvent,
+  UpdatePhysicsOnComponentDestroyBodyEvent
+}
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
 
@@ -43,6 +47,8 @@ trait AbilityActions {
           .modify(_.params.abilityChannelAnimationTimer)
           .using(_.stop())
           .pipe(ability.updateComponentHitbox(creature, _))
+          .modify(_.params.forceStopped)
+          .setTo(false)
       }
   }
 
@@ -150,7 +156,8 @@ trait AbilityActions {
 
             gameState
               .pipe {
-                case state if activeTimer.time > component.specification.totalActiveTime / component.params.speed =>
+                case state
+                    if activeTimer.time > component.specification.totalActiveTime / component.params.speed || component.params.forceStopped =>
                   state
                     .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeInactive())
                     .onAbilityComponentInactiveStart(creatureId, abilityId, componentId)
@@ -174,6 +181,16 @@ trait AbilityActions {
       })
       .modifyGameStateAbility(creatureId, abilityId)(_.updateTimers(delta))
 
+  }
+
+  def onAbilityComponentCollision(creatureId: String, abilityId: String, componentId: String): GameState = {
+    if (abilities(creatureId, abilityId).isDestroyOnCollision) {
+      this.modifyGameStateAbility(creatureId, abilityId)(
+        _.onCollision().modify(_.components.at(componentId)).using(_.forceStop())
+      )
+    } else {
+      this.modifyGameStateAbility(creatureId, abilityId)(_.onCollision())
+    }
   }
 
 }

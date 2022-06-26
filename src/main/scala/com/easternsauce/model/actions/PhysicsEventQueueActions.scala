@@ -40,6 +40,7 @@ trait PhysicsEventQueueActions {
                     )
                     .creatureActivateEffect(collidedCreatureId, "immunityFrames", 1f)
                     .creatureActivateEffect(collidedCreatureId, "stagger", 0.35f)
+                    .onAbilityComponentCollision(creatureId, abilityId, componentId)
                 } else gameState
             )
         } else gameState
