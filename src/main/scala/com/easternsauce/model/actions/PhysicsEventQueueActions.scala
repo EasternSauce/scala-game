@@ -3,9 +3,8 @@ package com.easternsauce.model.actions
 import com.easternsauce.event._
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.{AreaChangeEvent, UpdatePhysicsOnAreaChangeEvent}
+import com.easternsauce.model.util.EnhancedChainingSyntax.enhancedScalaUtilChainingOps
 import com.softwaremill.quicklens._
-
-import scala.util.chaining.scalaUtilChainingOps
 
 trait PhysicsEventQueueActions {
   this: GameState =>
@@ -25,23 +24,18 @@ trait PhysicsEventQueueActions {
             creatures(creatureId).isControlledAutomatically && creatures(collidedCreatureId).isControlledAutomatically
 
           gameState
-            .pipe(
-              gameState =>
-                if (
-                  creatures(collidedCreatureId).isAlive && !attackingDisallowed && !creatures(collidedCreatureId)
-                    .isEffectActive("immunityFrames")
-                ) {
-                  gameState
-                    .creatureTakeLifeDamage(
-                      collidedCreatureId,
-                      if (ability.isWeaponAttack) creatures(creatureId).weaponDamage else abilityComponent.damage,
-                      creatures(creatureId).params.posX,
-                      creatures(creatureId).params.posY
-                    )
-                    .creatureActivateEffect(collidedCreatureId, "immunityFrames", 1f)
-                    .creatureActivateEffect(collidedCreatureId, "stagger", 0.35f)
-                    .onAbilityComponentCollision(creatureId, abilityId, componentId)
-                } else gameState
+            .pipeIf(
+              creatures(collidedCreatureId).isAlive && !attackingDisallowed && !creatures(collidedCreatureId)
+                .isEffectActive("immunityFrames")
+            )(
+              _.creatureTakeLifeDamage(
+                collidedCreatureId,
+                if (ability.isWeaponAttack) creatures(creatureId).weaponDamage else abilityComponent.damage,
+                creatures(creatureId).params.posX,
+                creatures(creatureId).params.posY
+              ).creatureActivateEffect(collidedCreatureId, "immunityFrames", 1f)
+                .creatureActivateEffect(collidedCreatureId, "stagger", 0.35f)
+                .onAbilityComponentCollision(creatureId, abilityId, componentId)
             )
         } else gameState
 
@@ -61,11 +55,13 @@ trait PhysicsEventQueueActions {
             }
           gameState
             .modify(_.events)
-            .setTo(
-              List(
-                AreaChangeEvent(creatureId, fromAreaId, toAreaId, posX, posY),
-                UpdatePhysicsOnAreaChangeEvent(creatureId, fromAreaId, toAreaId, posX, posY)
-              ) ::: gameState.events
+            .using(
+              _.prependedAll(
+                List(
+                  AreaChangeEvent(creatureId, fromAreaId, toAreaId, posX, posY),
+                  UpdatePhysicsOnAreaChangeEvent(creatureId, fromAreaId, toAreaId, posX, posY)
+                )
+              )
             )
         } else gameState
 

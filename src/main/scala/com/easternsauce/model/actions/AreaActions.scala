@@ -72,7 +72,7 @@ trait AreaActions {
       .modify(_.areas.at(areaId).creatures)
       .setTo(this.areas(areaId).creatures.filterNot(oldEnemiesIds.toSet) ++ newEnemies.map(_.params.id))
       .modify(_.events)
-      .setTo((updatePhysicsEvents ++ updateRendererEvents) ::: this.events)
+      .using(_.prependedAll(updatePhysicsEvents ++ updateRendererEvents))
   }
 
   def generateEnemy(enemyType: String, areaId: String, posX: Float, posY: Float): Creature = {
@@ -116,11 +116,13 @@ trait AreaActions {
         .modify(_.areas.at(areaId).params.lootPileCounter)
         .using(_ + 1)
         .modify(_.events)
-        .setTo(
-          List(
-            UpdatePhysicsOnLootPileSpawnEvent(areaId, lootPileId),
-            UpdateRendererOnLootPileSpawnEvent(areaId, lootPileId)
-          ) ::: this.events
+        .using(
+          _.prependedAll(
+            List(
+              UpdatePhysicsOnLootPileSpawnEvent(areaId, lootPileId),
+              UpdateRendererOnLootPileSpawnEvent(areaId, lootPileId)
+            )
+          )
         )
     } else this
 

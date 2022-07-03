@@ -1,10 +1,9 @@
 package com.easternsauce.model.creature
 
 import com.easternsauce.model.GameState
+import com.easternsauce.model.util.EnhancedChainingSyntax.enhancedScalaUtilChainingOps
 import com.easternsauce.system.Random
 import com.softwaremill.quicklens.ModifyPimp
-
-import scala.util.chaining.scalaUtilChainingOps
 
 abstract class Enemy(override val params: CreatureParams) extends Creature {
 
@@ -38,48 +37,38 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
 
       val vectorTowardsTarget = pos.vectorTowards(potentialTarget.get.pos)
 
+      val creature = gameState.creatures(creatureId)
+
       gameState
         .modifyGameStateCreature(creatureId) {
-          _.pipe(
-            creature =>
-              // target changed
-              if (params.targetCreatureId.isEmpty || params.targetCreatureId != potentialTargetId) {
-                creature
-                  .modify(_.params.forcePathCalculation)
-                  .setTo(true)
-                  .modify(_.params.targetCreatureId)
-                  .setTo(potentialTargetId)
-                  .modify(_.params.pathTowardsTarget)
-                  .setTo(None)
-              } else creature
+          _.pipeIf(params.targetCreatureId.isEmpty || params.targetCreatureId != potentialTargetId)(
+            _.modify(_.params.forcePathCalculation)
+              .setTo(true)
+              .modify(_.params.targetCreatureId)
+              .setTo(potentialTargetId)
+              .modify(_.params.pathTowardsTarget)
+              .setTo(None)
           )
           //        .modify(_.params.targetCreatureId)
           //        .setTo(potentialTarget.map(_.params.id))
-            .pipe(creature => {
-              if (
-                potentialTarget.get.pos.distance(creature.pos) > 3f && potentialTarget.get.pos
-                  .distance(creature.pos) < enemySearchDistance
-              ) {
-                if (creature.params.pathTowardsTarget.nonEmpty && creature.params.pathTowardsTarget.get.nonEmpty) {
-                  val path = creature.params.pathTowardsTarget.get
-                  val nextNodeOnPath = path.head
-                  if (creature.pos.distance(nextNodeOnPath) < 2f) {
-                    creature.modify(_.params.pathTowardsTarget).setTo(Some(path.drop(1)))
-                  } else creature.moveInDir(creature.pos.vectorTowards(nextNodeOnPath))
-                } else {
-                  creature.moveInDir(vectorTowardsTarget)
-                }
+            .pipeIf(
+              potentialTarget.get.pos.distance(creature.pos) > 3f && potentialTarget.get.pos
+                .distance(creature.pos) < enemySearchDistance
+            ) { creature =>
+              if (creature.params.pathTowardsTarget.nonEmpty && creature.params.pathTowardsTarget.get.nonEmpty) {
+                val path = creature.params.pathTowardsTarget.get
+                val nextNodeOnPath = path.head
+                if (creature.pos.distance(nextNodeOnPath) < 2f) {
+                  creature.modify(_.params.pathTowardsTarget).setTo(Some(path.drop(1)))
+                } else creature.moveInDir(creature.pos.vectorTowards(nextNodeOnPath))
               } else {
-                creature
+                creature.moveInDir(vectorTowardsTarget)
               }
-            })
+            }
         }
-        .pipe(gameState => {
-          val creature = gameState.creatures(creatureId)
-          if (potentialTarget.get.pos.distance(creature.pos) < 3f)
-            creature.attack(gameState, vectorTowardsTarget)
-          else gameState
-        })
+        .pipeIf(potentialTarget.get.pos.distance(creature.pos) < 3f) { gameState =>
+          gameState.creatures(creatureId).attack(gameState, vectorTowardsTarget)
+        }
         .pipe(gameState => {
           val creature = gameState.creatures(creatureId)
 
@@ -138,6 +127,6 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
 
   override def copy(params: CreatureParams): Enemy = {
     // unreachable, always overriden; needed for quicklens to work in abstract class
-    ???
+    this
   }
 }

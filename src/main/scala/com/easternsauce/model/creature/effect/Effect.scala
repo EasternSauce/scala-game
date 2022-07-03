@@ -1,20 +1,15 @@
 package com.easternsauce.model.creature.effect
 
+import com.easternsauce.model.util.EnhancedChainingSyntax.enhancedScalaUtilChainingOps
 import com.easternsauce.model.util.SimpleTimer
 import com.softwaremill.quicklens.ModifyPimp
-
-import scala.util.chaining.scalaUtilChainingOps
 
 case class Effect(name: String, endTime: Float = 0f, timer: SimpleTimer = SimpleTimer(), isActive: Boolean = false) {
   def update(delta: Float): Effect = {
     this
       .modify(_.timer)
       .using(_.update(delta))
-      .pipe(
-        effect =>
-          if (effect.isActive && effect.timer.time > effect.endTime) effect.modify(_.isActive).setTo(false) else effect
-      )
-
+      .pipeIf(this.isActive && this.timer.time > this.endTime)(_.modify(_.isActive).setTo(false))
   }
 
   def stop(): Effect = {

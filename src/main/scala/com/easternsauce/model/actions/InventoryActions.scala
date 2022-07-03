@@ -2,10 +2,9 @@ package com.easternsauce.model.actions
 
 import com.easternsauce.helper.InventoryWindowHelper
 import com.easternsauce.model.GameState
+import com.easternsauce.model.util.EnhancedChainingSyntax.enhancedScalaUtilChainingOps
 import com.easternsauce.util.{InventoryMapping, Vec2}
 import com.softwaremill.quicklens._
-
-import scala.util.chaining.scalaUtilChainingOps
 
 trait InventoryActions {
   this: GameState =>
@@ -51,35 +50,25 @@ trait InventoryActions {
       }
     } else {
       this
-        .pipe(
-          gameState =>
-            if (gameState.inventoryWindow.inventoryItemBeingMoved.nonEmpty) {
-              //val item = player.params.inventoryItems(gameState.inventoryState.inventoryItemBeingMoved.get)
-              //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item)  TODO: spawn lootpile
+        .pipeIf(this.inventoryWindow.inventoryItemBeingMoved.nonEmpty)(
+          //val item = player.params.inventoryItems(gameState.inventoryState.inventoryItemBeingMoved.get)
+          //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item)  TODO: spawn lootpile
 
 //              Assets.sound("coinBag").play(0.3f) TODO
-
-              gameState
-                .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
-                .using(_.removed(gameState.inventoryWindow.inventoryItemBeingMoved.get))
-                .modify(_.inventoryWindow.inventoryItemBeingMoved)
-                .setTo(None)
-            } else gameState
+          _.modify(_.creatures.at(currentPlayerId).params.inventoryItems)
+            .using(_.removed(this.inventoryWindow.inventoryItemBeingMoved.get))
+            .modify(_.inventoryWindow.inventoryItemBeingMoved)
+            .setTo(None)
         )
-        .pipe(
-          gameState =>
-            if (gameState.inventoryWindow.equipmentItemBeingMoved.nonEmpty) {
-              //val item = player.params.inventoryItems(gameState.inventoryState.equipmentItemBeingMoved.get)
-              //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item) TODO: spawn lootpile
+        .pipeIf(this.inventoryWindow.equipmentItemBeingMoved.nonEmpty)(
+          //val item = player.params.inventoryItems(gameState.inventoryState.equipmentItemBeingMoved.get)
+          //areaMap(currentAreaId.get).spawnLootPile(player.pos.x, player.pos.y, item) TODO: spawn lootpile
 
 //              Assets.sound("coinBag").play(0.3f) TODO
-
-              gameState
-                .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
-                .using(_.removed(gameState.inventoryWindow.equipmentItemBeingMoved.get))
-                .modify(_.inventoryWindow.equipmentItemBeingMoved)
-                .setTo(None)
-            } else gameState
+          _.modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+            .using(_.removed(this.inventoryWindow.equipmentItemBeingMoved.get))
+            .modify(_.inventoryWindow.equipmentItemBeingMoved)
+            .setTo(None)
         )
       //player.promoteSecondaryToPrimaryWeapon() TODO: promote weapon
     }
@@ -124,34 +113,28 @@ trait InventoryActions {
         .get == InventoryMapping.equipmentTypes(equipmentIndex)
 
     this
-      .pipe(
-        gameState =>
-          if (inventoryItem.isEmpty || equipmentTypeMatches) {
-            gameState
-              .pipe(
-                gameState =>
-                  if (temp.nonEmpty)
-                    gameState
-                      .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
-                      .using(_ + (inventoryIndex -> temp.get))
-                  else
-                    gameState
-                      .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
-                      .using(_.removed(inventoryIndex))
-              )
-              .pipe(
-                gameState =>
-                  if (inventoryItem.nonEmpty)
-                    gameState
-                      .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
-                      .using(_ + (equipmentIndex -> inventoryItem.get))
-                  else
-                    gameState
-                      .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
-                      .using(_.removed(equipmentIndex))
-              )
-
-          } else gameState
+      .pipeIf(inventoryItem.isEmpty || equipmentTypeMatches)(
+        _.pipe(
+          gameState =>
+            if (temp.nonEmpty)
+              gameState
+                .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
+                .using(_ + (inventoryIndex -> temp.get))
+            else
+              gameState
+                .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
+                .using(_.removed(inventoryIndex))
+        ).pipe(
+            gameState =>
+              if (inventoryItem.nonEmpty)
+                gameState
+                  .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                  .using(_ + (equipmentIndex -> inventoryItem.get))
+              else
+                gameState
+                  .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                  .using(_.removed(equipmentIndex))
+          )
       )
       //player.promoteSecondaryToPrimaryWeapon() TODO
       .modifyAll(_.inventoryWindow.inventoryItemBeingMoved, _.inventoryWindow.equipmentItemBeingMoved)
@@ -173,28 +156,23 @@ trait InventoryActions {
         .equipmentTypes(fromIndex)
 
     this
-      .pipe(
-        gameState =>
-          if (fromEquipmentTypeMatches && toEquipmentTypeMatches) {
-            gameState
-              .pipe(
-                gameState =>
-                  if (itemFrom.nonEmpty)
-                    gameState
-                      .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
-                      .using(_ + (toIndex -> itemFrom.get))
-                  else gameState.modify(_.creatures.at(currentPlayerId).params.equipmentItems).using(_.removed(toIndex))
-              )
-              .pipe(
-                gameState =>
-                  if (temp.nonEmpty)
-                    gameState
-                      .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
-                      .using(_ + (fromIndex -> temp.get))
-                  else
-                    gameState.modify(_.creatures.at(currentPlayerId).params.equipmentItems).using(_.removed(fromIndex))
-              )
-          } else gameState
+      .pipeIf(fromEquipmentTypeMatches && toEquipmentTypeMatches)(
+        _.pipe(
+          gameState =>
+            if (itemFrom.nonEmpty)
+              gameState
+                .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                .using(_ + (toIndex -> itemFrom.get))
+            else gameState.modify(_.creatures.at(currentPlayerId).params.equipmentItems).using(_.removed(toIndex))
+        ).pipe(
+            gameState =>
+              if (temp.nonEmpty)
+                gameState
+                  .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                  .using(_ + (fromIndex -> temp.get))
+              else
+                gameState.modify(_.creatures.at(currentPlayerId).params.equipmentItems).using(_.removed(fromIndex))
+          )
       )
       .modifyAll(_.inventoryWindow.inventoryItemBeingMoved, _.inventoryWindow.equipmentItemBeingMoved)
       .setTo(None)

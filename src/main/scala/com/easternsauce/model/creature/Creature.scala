@@ -132,30 +132,25 @@ abstract class Creature {
 
   def updateStamina(delta: Float): Creature = {
     this
-      .pipe(
-        creature =>
-          if (creature.params.isSprinting && creature.params.stamina > 0) {
-            creature.modify(_.params.staminaDrainTimer).using(_.update(delta))
-          } else creature
+      .pipeIf(this.params.isSprinting && this.params.stamina > 0)(
+        _.modify(_.params.staminaDrainTimer).using(_.update(delta))
       )
-      .pipe(
+      .pipeIf(!params.isStaminaRegenerationDisabled && !this.params.isSprinting)(
         creature =>
-          if (!params.isStaminaRegenerationDisabled && !creature.params.isSprinting) {
-            if (
-              creature.params.staminaRegenerationTimer.time > creature.staminaRegenerationTickTime /* && !abilityActive */ && !creature.params.staminaOveruse
-            ) {
-              creature
-                .pipe(creature => {
-                  val afterRegeneration = creature.params.stamina + creature.staminaRegeneration
-                  creature
-                    .modify(_.params.stamina)
-                    .setToIf(creature.params.stamina < creature.params.maxStamina)(
-                      Math.min(afterRegeneration, creature.params.maxStamina)
-                    )
-                })
-                .modify(_.params.staminaRegenerationTimer)
-                .using(_.restart())
-            } else creature
+          if (
+            creature.params.staminaRegenerationTimer.time > creature.staminaRegenerationTickTime /* && !abilityActive */ && !creature.params.staminaOveruse
+          ) {
+            creature
+              .pipe(creature => {
+                val afterRegeneration = creature.params.stamina + creature.staminaRegeneration
+                creature
+                  .modify(_.params.stamina)
+                  .setToIf(creature.params.stamina < creature.params.maxStamina)(
+                    Math.min(afterRegeneration, creature.params.maxStamina)
+                  )
+              })
+              .modify(_.params.staminaRegenerationTimer)
+              .using(_.restart())
 
           } else creature
       )

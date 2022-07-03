@@ -8,6 +8,7 @@ import com.easternsauce.json.JsonCodecs._
 import com.easternsauce.model.GameState
 import com.easternsauce.model.area.{Area, EnemySpawnPoint}
 import com.easternsauce.model.creature.{CreatureParams, Player}
+import com.easternsauce.model.util.EnhancedChainingSyntax.enhancedScalaUtilChainingOps
 import com.easternsauce.screen.PlayScreen
 import com.easternsauce.system.Assets
 import com.easternsauce.util.RendererBatch
@@ -20,7 +21,6 @@ import io.circe.parser.decode
 
 import java.io.FileNotFoundException
 import scala.collection.mutable.ListBuffer
-import scala.util.chaining.scalaUtilChainingOps
 
 class MyGdxGame extends Game {
 

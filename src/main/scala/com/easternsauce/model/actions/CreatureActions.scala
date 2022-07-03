@@ -4,12 +4,11 @@ import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent}
 import com.easternsauce.model.event.{PlaySoundEvent, UpdatePhysicsOnCreatureDeathEvent}
+import com.easternsauce.model.util.EnhancedChainingSyntax.enhancedScalaUtilChainingOps
 import com.easternsauce.util.Vec2
 import com.easternsauce.view.pathfinding.Astar
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
-
-import scala.util.chaining.scalaUtilChainingOps
 
 trait CreatureActions {
   this: GameState =>
@@ -49,7 +48,7 @@ trait CreatureActions {
 
     this
       .modify(_.events)
-      .setToIf(creature.onGettingHitSoundId.nonEmpty)(PlaySoundEvent(creature.onGettingHitSoundId.get) :: this.events)
+      .usingIf(creature.onGettingHitSoundId.nonEmpty)(_.prepended(PlaySoundEvent(creature.onGettingHitSoundId.get)))
       .modifyGameStateCreature(creatureId)(
         _.pipe(
           creature =>
@@ -64,12 +63,7 @@ trait CreatureActions {
           .modify(_.params.knockbackVelocity)
           .setTo(20f)
       )
-      .pipe(gameState => {
-        val creature = gameState.creatures(creatureId)
-        if (beforeLife > 0f && creature.params.life <= 0f) {
-          gameState.creatureOnDeath(creatureId)
-        } else gameState
-      })
+      .pipeIf(beforeLife > 0f && creature.params.life <= 0f)(_.creatureOnDeath(creatureId))
   }
 
   def creatureActivateEffect(creatureId: String, effectName: String, effectTime: Float): GameState = {
@@ -85,20 +79,17 @@ trait CreatureActions {
         case (acc, (k, v)) => acc ++ List().zipAll(v.components.keys.toList, k, "")
       }
 
-    this.pipe(
-      gameState =>
-        gameState
-          .modify(_.events)
-          .setTo(UpdatePhysicsOnCreatureDeathEvent(creatureId) :: gameState.events)
-          .modifyGameStateCreature(creatureId)(_.onDeath().modify(_.params.abilities.each).using(_.stop()))
-          .pipe(gameState => {
-            abilityComponentCombinations.foldLeft(gameState) {
-              case (gameState, (abilityId, componentId)) =>
-                gameState.onAbilityComponentInactiveStart(creatureId, abilityId, componentId)
-            }
-          })
-          .spawnLootPile(creature.params.areaId, creature.params.posX, creature.params.posY, creature.dropTable)
-    )
+    this
+      .modify(_.events)
+      .using(_.prepended(UpdatePhysicsOnCreatureDeathEvent(creatureId)))
+      .modifyGameStateCreature(creatureId)(_.onDeath().modify(_.params.abilities.each).using(_.stop()))
+      .pipe(gameState => {
+        abilityComponentCombinations.foldLeft(gameState) {
+          case (gameState, (abilityId, componentId)) =>
+            gameState.onAbilityComponentInactiveStart(creatureId, abilityId, componentId)
+        }
+      })
+      .spawnLootPile(creature.params.areaId, creature.params.posX, creature.params.posY, creature.dropTable)
   }
 
   def processPathfinding(physicsController: PhysicsController): GameState = {

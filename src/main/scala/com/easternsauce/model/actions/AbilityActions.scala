@@ -2,12 +2,11 @@ package com.easternsauce.model.actions
 
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.GameState
-import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, AbilityState}
+import com.easternsauce.model.creature.ability.{Ability, AbilityState}
 import com.easternsauce.model.event.{PlaySoundEvent, UpdatePhysicsOnComponentCreateBodyEvent, UpdatePhysicsOnComponentDestroyBodyEvent}
+import com.easternsauce.model.util.EnhancedChainingSyntax.enhancedScalaUtilChainingOps
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
-
-import scala.util.chaining.scalaUtilChainingOps
 
 trait AbilityActions {
   this: GameState =>
@@ -20,18 +19,11 @@ trait AbilityActions {
 
     this
       .pipe(
-        gameState =>
-          gameState
-            .modify(_.events)
-            .setTo(UpdatePhysicsOnComponentCreateBodyEvent(creatureId, abilityId, componentId) :: gameState.events)
+        _.modify(_.events)
+          .using(_.prepended(UpdatePhysicsOnComponentCreateBodyEvent(creatureId, abilityId, componentId)))
       )
-      .pipe(
-        gameState =>
-          gameState
-            .modify(_.events)
-            .setToIf(ability.abilityActiveSoundId.nonEmpty)(
-              PlaySoundEvent(ability.abilityActiveSoundId.get) :: gameState.events
-            )
+      .pipeIf(ability.abilityActiveSoundId.nonEmpty)(
+        _.modify(_.events)(_.prepended(PlaySoundEvent(ability.abilityActiveSoundId.get)))
       )
       .modifyGameStateAbilityComponent(creatureId, abilityId, componentId) {
         _.modify(_.params.abilityActiveAnimationTimer)
@@ -68,10 +60,8 @@ trait AbilityActions {
 
     this
       .pipe(
-        gameState =>
-          gameState
-            .modify(_.events)
-            .setTo(UpdatePhysicsOnComponentDestroyBodyEvent(creatureId, abilityId, componentId) :: gameState.events)
+        _.modify(_.events)
+          .using(_.prepended(UpdatePhysicsOnComponentDestroyBodyEvent(creatureId, abilityId, componentId)))
       )
       .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(
         _.modify(_.params.activeTimer)
@@ -118,24 +108,17 @@ trait AbilityActions {
         import com.easternsauce.model.creature.ability.AbilityState._
         (component.params.state match {
           case DelayedStart =>
-            gameState.pipe {
-              case gameState if ability.params.abilityTimer.time > component.params.delay =>
-                gameState
-                  .onAbilityComponentChannelStart(creatureId, abilityId, componentId)
-                  .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(
-                    _.modify(_.params.state).setTo(AbilityState.Channel)
-                  )
-              case gameState => gameState
+            gameState.pipeIf(ability.params.abilityTimer.time > component.params.delay) {
+              _.onAbilityComponentChannelStart(creatureId, abilityId, componentId)
+                .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(
+                  _.modify(_.params.state).setTo(AbilityState.Channel)
+                )
             }
           case Channel =>
             gameState
-              .pipe {
-                case gameState
-                    if channelTimer.time > component.specification.totalChannelTime / component.params.speed =>
-                  gameState
-                    .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeActive())
-                    .onAbilityComponentActiveStart(creatureId, abilityId, componentId)
-                case gameState => gameState
+              .pipeIf(channelTimer.time > component.specification.totalChannelTime / component.params.speed) {
+                _.modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeActive())
+                  .onAbilityComponentActiveStart(creatureId, abilityId, componentId)
               }
               .onAbilityComponentChannelUpdate(creatureId, abilityId, componentId)
           case Active =>
@@ -151,14 +134,11 @@ trait AbilityActions {
                 new Vector2(component.params.abilityHitbox.x, component.params.abilityHitbox.y)
 
             gameState
-              .pipe {
-                case state
-                    if activeTimer.time > component.specification.totalActiveTime / component.params.speed || component.params.forceStopped =>
-                  state
-                    .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeInactive())
-                    .onAbilityComponentInactiveStart(creatureId, abilityId, componentId)
-
-                case state => state
+              .pipeIf(
+                activeTimer.time > component.specification.totalActiveTime / component.params.speed || component.params.forceStopped
+              ) {
+                _.modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(_.stop().makeInactive())
+                  .onAbilityComponentInactiveStart(creatureId, abilityId, componentId)
               }
               // set hitbox x and y to body x and y
               .modifyGameStateAbilityComponent(creatureId, abilityId, componentId)(
@@ -223,7 +203,9 @@ trait AbilityActions {
     } else this
   }
 
-  def modifyEachAbilityComponent(creatureId: String, abilityId: String)(modification: (Ability, String) => Ability): GameState = {
+  def modifyEachAbilityComponent(creatureId: String, abilityId: String)(
+    modification: (Ability, String) => Ability
+  ): GameState = {
     this.modifyGameStateAbility(creatureId, abilityId) { ability =>
       ability.components.keys
         .foldLeft(ability)(modification)

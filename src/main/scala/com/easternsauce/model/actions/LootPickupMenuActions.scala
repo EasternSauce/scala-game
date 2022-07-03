@@ -4,10 +4,9 @@ import com.easternsauce.helper.LootPickupMenuHelper
 import com.easternsauce.model.GameState
 import com.easternsauce.model.event.{PlaySoundEvent, UpdatePhysicsOnLootPileDespawnEvent, UpdateRendererOnLootPileDespawnEvent}
 import com.easternsauce.model.item.Item
+import com.easternsauce.model.util.EnhancedChainingSyntax.enhancedScalaUtilChainingOps
 import com.easternsauce.util.Vec2
 import com.softwaremill.quicklens._
-
-import scala.util.chaining.scalaUtilChainingOps
 
 trait LootPickupMenuActions {
   this: GameState =>
@@ -36,26 +35,24 @@ trait LootPickupMenuActions {
         this
           .modify(_.areas.at(areaId).params.lootPiles.at(lootPileId).items)
           .using(_.filterNot(Set(item)))
-          .pipe(
-            gameState =>
-              if (lootPile.items.size == 1)
-                gameState
-                  .modify(_.areas.at(areaId).params.lootPiles)
-                  .using(_.removed(lootPileId))
-                  .modify(_.lootPilePickupMenu.visibleLootPiles)
-                  .using(_.filterNot(Set((areaId, lootPileId))))
-                  .modify(_.events)
-                  .setTo(
-                    List(
-                      UpdateRendererOnLootPileDespawnEvent(areaId, lootPileId),
-                      UpdatePhysicsOnLootPileDespawnEvent(areaId, lootPileId)
-                    ) ::: gameState.events
+          .pipeIf(lootPile.items.size == 1)(
+            _.modify(_.areas.at(areaId).params.lootPiles)
+              .using(_.removed(lootPileId))
+              .modify(_.lootPilePickupMenu.visibleLootPiles)
+              .using(_.filterNot(Set((areaId, lootPileId))))
+              .modify(_.events)
+              .using(
+                _.prependedAll(
+                  List(
+                    UpdateRendererOnLootPileDespawnEvent(areaId, lootPileId),
+                    UpdatePhysicsOnLootPileDespawnEvent(areaId, lootPileId)
                   )
-              else gameState
+                )
+              )
           )
           .modify(_.creatures.at(this.currentPlayerId))
           .using(_.pickUpItem(item))
-          .pipe(gameState => gameState.modify(_.events).setTo(PlaySoundEvent("coinBag") :: gameState.events))
+          .pipe(_.modify(_.events).using(_.prepended(PlaySoundEvent("coinBag"))))
 
       } else this
     } else this

@@ -189,10 +189,7 @@ class PlayScreen(
       gameState => {
 
         if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
-          gameState.pipe(
-            gameState =>
-              if (gameState.inventoryWindow.isOpen) gameState.moveItemClick(mousePosWindowScaled) else gameState
-          )
+          gameState.pipeIf(gameState.inventoryWindow.isOpen)(_.moveItemClick(mousePosWindowScaled))
         } else gameState
       }
 
@@ -200,11 +197,8 @@ class PlayScreen(
       gameState => {
 
         if (Gdx.input.isButtonJustPressed(Buttons.LEFT)) {
-          gameState.pipe(
-            gameState =>
-              if (gameState.lootPilePickupMenu.isOpen && !gameState.inventoryWindow.isOpen)
-                gameState.lootPickupMenuClick(mousePosWindowScaled)
-              else gameState
+          gameState.pipeIf(gameState.lootPilePickupMenu.isOpen && !gameState.inventoryWindow.isOpen)(
+            _.lootPickupMenuClick(mousePosWindowScaled)
           )
         } else gameState
       }
