@@ -125,16 +125,16 @@ trait InventoryActions {
                 .modify(_.creatures.at(currentPlayerId).params.inventoryItems)
                 .using(_.removed(inventoryIndex))
         ).pipe(
-            gameState =>
-              if (inventoryItem.nonEmpty)
-                gameState
-                  .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
-                  .using(_ + (equipmentIndex -> inventoryItem.get))
-              else
-                gameState
-                  .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
-                  .using(_.removed(equipmentIndex))
-          )
+          gameState =>
+            if (inventoryItem.nonEmpty)
+              gameState
+                .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                .using(_ + (equipmentIndex -> inventoryItem.get))
+            else
+              gameState
+                .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                .using(_.removed(equipmentIndex))
+        )
       )
       //player.promoteSecondaryToPrimaryWeapon() TODO
       .modifyAll(_.inventoryWindow.inventoryItemBeingMoved, _.inventoryWindow.equipmentItemBeingMoved)
@@ -165,14 +165,14 @@ trait InventoryActions {
                 .using(_ + (toIndex -> itemFrom.get))
             else gameState.modify(_.creatures.at(currentPlayerId).params.equipmentItems).using(_.removed(toIndex))
         ).pipe(
-            gameState =>
-              if (temp.nonEmpty)
-                gameState
-                  .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
-                  .using(_ + (fromIndex -> temp.get))
-              else
-                gameState.modify(_.creatures.at(currentPlayerId).params.equipmentItems).using(_.removed(fromIndex))
-          )
+          gameState =>
+            if (temp.nonEmpty)
+              gameState
+                .modify(_.creatures.at(currentPlayerId).params.equipmentItems)
+                .using(_ + (fromIndex -> temp.get))
+            else
+              gameState.modify(_.creatures.at(currentPlayerId).params.equipmentItems).using(_.removed(fromIndex))
+        )
       )
       .modifyAll(_.inventoryWindow.inventoryItemBeingMoved, _.inventoryWindow.equipmentItemBeingMoved)
       .setTo(None)

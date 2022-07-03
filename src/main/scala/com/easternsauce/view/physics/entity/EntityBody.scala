@@ -47,7 +47,6 @@ case class EntityBody(creatureId: String) {
   }
 
   def update(gameState: GameState, physicsController: PhysicsController): Unit = {
-
     if (gameState.events.contains(UpdatePhysicsOnCreatureDeathEvent(creatureId))) {
       b2Body.getFixtureList.get(0).setSensor(true)
     }

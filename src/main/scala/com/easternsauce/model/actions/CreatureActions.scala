@@ -63,7 +63,12 @@ trait CreatureActions {
           .modify(_.params.knockbackVelocity)
           .setTo(20f)
       )
-      .pipeIf(beforeLife > 0f && creature.params.life <= 0f)(_.creatureOnDeath(creatureId))
+      .pipe(gameState => {
+        val creature = gameState.creatures(creatureId)
+        if (beforeLife > 0f && creature.params.life <= 0f) {
+          gameState.creatureOnDeath(creatureId)
+        } else gameState
+      })
   }
 
   def creatureActivateEffect(creatureId: String, effectName: String, effectTime: Float): GameState = {
