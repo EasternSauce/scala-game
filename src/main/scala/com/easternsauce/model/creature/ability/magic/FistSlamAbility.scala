@@ -45,35 +45,32 @@ case class FistSlamAbility(
   }
 
   override def onStart(creatureId: String): GameState => GameState = { gameState =>
-    gameState.modifyGameStateAbility(creatureId, abilityId) { ability =>
-      val creature = gameState.creatures(creatureId)
-      ability.components.keys
-        .foldLeft(this)((ability, componentId) => {
-          val component = components(componentId)
-          val x = creature.params.posX + Random.between(-component.params.range, component.params.range)
-          val y = creature.params.posY + Random.between(-component.params.range, component.params.range)
+    val creature = gameState.creatures(creatureId)
+    gameState.modifyEachAbilityComponent(creatureId, abilityId) { (ability, componentId) =>
+      val component = components(componentId)
+      val x = creature.params.posX + Random.between(-component.params.range, component.params.range)
+      val y = creature.params.posY + Random.between(-component.params.range, component.params.range)
 
-          ability
-            .modify(_.components.at(componentId).params.abilityHitbox)
-            .setTo(
-              AbilityHitbox(
-                x = x,
-                y = y - component.height / 4 * component.scale, // shift hitbox downwards
-                width = component.width,
-                height = component.height / 2,
-                scale = component.scale
-              )
-            )
-            .modify(_.components.at(componentId).params.renderPos)
-            .setTo(Vec2(x = x, y = y))
-            .modify(_.components.at(componentId).params.renderWidth)
-            .setTo(component.width)
-            .modify(_.components.at(componentId).params.renderHeight)
-            .setTo(component.height)
-            .modify(_.components.at(componentId).params.renderScale)
-            .setTo(component.scale)
+      ability
+        .modify(_.components.at(componentId).params.abilityHitbox)
+        .setTo(
+          AbilityHitbox(
+            x = x,
+            y = y - component.height / 4 * component.scale, // shift hitbox downwards
+            width = component.width,
+            height = component.height / 2,
+            scale = component.scale
+          )
+        )
+        .modify(_.components.at(componentId).params.renderPos)
+        .setTo(Vec2(x = x, y = y))
+        .modify(_.components.at(componentId).params.renderWidth)
+        .setTo(component.width)
+        .modify(_.components.at(componentId).params.renderHeight)
+        .setTo(component.height)
+        .modify(_.components.at(componentId).params.renderScale)
+        .setTo(component.scale)
 
-        })
     }
   }
 

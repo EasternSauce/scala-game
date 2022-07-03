@@ -54,7 +54,7 @@ case class MeteorCrashAbility(
       val meteors2 = for (i <- 0 until numOfComponents / 3) yield ("2_" + i.toString, i, 50)
       val meteors3 = for (i <- 0 until numOfComponents / 3) yield ("3_" + i.toString, i, -50)
 
-      (meteors1 ++ meteors2 ++ meteors3).foldLeft(this)((ability, meteor) => {
+      (meteors1 ++ meteors2 ++ meteors3).foldLeft(ability)((ability, meteor) => {
         val (componentId, i, angle) = meteor
 
         val component = components(componentId)

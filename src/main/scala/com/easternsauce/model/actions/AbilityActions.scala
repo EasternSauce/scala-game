@@ -2,7 +2,7 @@ package com.easternsauce.model.actions
 
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.GameState
-import com.easternsauce.model.creature.ability.AbilityState
+import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, AbilityState}
 import com.easternsauce.model.event.{PlaySoundEvent, UpdatePhysicsOnComponentCreateBodyEvent, UpdatePhysicsOnComponentDestroyBodyEvent}
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
@@ -223,4 +223,10 @@ trait AbilityActions {
     } else this
   }
 
+  def modifyEachAbilityComponent(creatureId: String, abilityId: String)(modification: (Ability, String) => Ability): GameState = {
+    this.modifyGameStateAbility(creatureId, abilityId) { ability =>
+      ability.components.keys
+        .foldLeft(ability)(modification)
+    }
+  }
 }

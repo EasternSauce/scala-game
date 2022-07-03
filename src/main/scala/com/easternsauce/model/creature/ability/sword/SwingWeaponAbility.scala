@@ -33,39 +33,36 @@ case class SwingWeaponAbility(
   override val isWeaponAttack = true
 
   override def onStart(creatureId: String): GameState => GameState = { gameState =>
-    gameState.modifyGameStateAbility(creatureId, abilityId) { ability =>
-      val creature = gameState.creatures(creatureId)
-      ability.components.keys
-        .foldLeft(this)((ability, componentId) => {
-          val component = components(componentId)
-          val dirVector = Vec2(creature.params.actionDirVector.x, creature.params.actionDirVector.y)
-          val theta = dirVector.angleDeg() + component.params.angleDeviation
+    val creature = gameState.creatures(creatureId)
+    gameState.modifyEachAbilityComponent(creatureId, abilityId) { (ability, componentId) =>
+      val component = components(componentId)
+      val dirVector = Vec2(creature.params.actionDirVector.x, creature.params.actionDirVector.y)
+      val theta = dirVector.angleDeg() + component.params.angleDeviation
 
-          ability
-            .modify(_.components.at(componentId).params.abilityHitbox)
-            .setTo(
-              AbilityHitbox(
-                x = creature.params.posX,
-                y = creature.params.posY,
-                width = component.width,
-                height = component.height,
-                rotationAngle = theta,
-                scale = component.scale
-              )
-            )
-            .modify(_.components.at(componentId).params.renderPos)
-            .setTo(Vec2(x = creature.params.posX, y = creature.params.posY))
-            .modify(_.components.at(componentId))
-            .using(_.setDirVector(dirVector))
-            .modify(_.components.at(componentId).params.renderWidth)
-            .setTo(component.width)
-            .modify(_.components.at(componentId).params.renderHeight)
-            .setTo(component.height)
-            .modify(_.components.at(componentId).params.renderScale)
-            .setTo(component.scale)
-            .modify(_.components.at(componentId).params.renderRotation)
-            .setTo(theta)
-        })
+      ability
+        .modify(_.components.at(componentId).params.abilityHitbox)
+        .setTo(
+          AbilityHitbox(
+            x = creature.params.posX,
+            y = creature.params.posY,
+            width = component.width,
+            height = component.height,
+            rotationAngle = theta,
+            scale = component.scale
+          )
+        )
+        .modify(_.components.at(componentId).params.renderPos)
+        .setTo(Vec2(x = creature.params.posX, y = creature.params.posY))
+        .modify(_.components.at(componentId))
+        .using(_.setDirVector(dirVector))
+        .modify(_.components.at(componentId).params.renderWidth)
+        .setTo(component.width)
+        .modify(_.components.at(componentId).params.renderHeight)
+        .setTo(component.height)
+        .modify(_.components.at(componentId).params.renderScale)
+        .setTo(component.scale)
+        .modify(_.components.at(componentId).params.renderRotation)
+        .setTo(theta)
     }
   }
 
