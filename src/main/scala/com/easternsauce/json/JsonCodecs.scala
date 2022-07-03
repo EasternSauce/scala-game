@@ -95,6 +95,8 @@ object JsonCodecs {
   implicit val encodeLootPile: Encoder[LootPile] = deriveEncoder
   implicit val decodeLootPilePickupMenu: Decoder[LootPilePickupMenu] = deriveDecoder
   implicit val encodeLootPilePickupMenu: Encoder[LootPilePickupMenu] = deriveEncoder
+  implicit val decodeDashAbility: Decoder[DashAbility] = deriveDecoder
+  implicit val encodeDashAbility: Encoder[DashAbility] = deriveEncoder
 
   implicit val encodeCreature: Encoder[Creature] = Encoder.instance { c =>
     {
@@ -147,6 +149,8 @@ object JsonCodecs {
           Map("MeteorCrashAbility" -> v).asJson
         case v: ThrustWeaponAbility =>
           Map("ThrustWeaponAbility" -> v).asJson
+        case v: DashAbility =>
+          Map("DashAbility" -> v).asJson
       }
     }
   }
@@ -161,6 +165,7 @@ object JsonCodecs {
       case "MeteorCrashAbility"  => c.downField(fname).as[MeteorCrashAbility]
       case "ThrustWeaponAbility" => c.downField(fname).as[ThrustWeaponAbility]
       case "SwingWeaponAbility"  => c.downField(fname).as[SwingWeaponAbility]
+      case "DashAbility"         => c.downField(fname).as[DashAbility]
     }
   })
 }

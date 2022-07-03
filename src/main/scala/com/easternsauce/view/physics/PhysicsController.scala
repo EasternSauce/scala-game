@@ -45,6 +45,7 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
     gameState.events.foreach {
       case UpdatePhysicsOnAreaChangeEvent(creatureId, oldAreaId, newAreaId, _, _) =>
         terrains(oldAreaId).world.destroyBody(entityBodies(creatureId).b2Body)
+        entityBodies(creatureId).b2Body = null
         entityBodies(creatureId).init(gameState = gameState, physicsController = this, areaId = newAreaId)
       case UpdatePhysicsOnEnemySpawnEvent(creatureId, areaId) =>
         println("spawning...")
@@ -57,9 +58,13 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
         println("despawning")
         val world = terrains(areaId).world
         world.destroyBody(entityBodies(creatureId).b2Body)
+        entityBodies(creatureId).b2Body = null
         entityBodies(creatureId).componentBodies.foreach {
           case (_, componentBody) =>
-            if (componentBody.b2Body != null && componentBody.b2Body.isActive) world.destroyBody(componentBody.b2Body)
+            if (componentBody.b2Body != null && componentBody.b2Body.isActive) {
+              world.destroyBody(componentBody.b2Body)
+              componentBody.b2Body = null
+            }
         }
         entityBodies = entityBodies - creatureId
       case UpdatePhysicsOnLootPileSpawnEvent(areaId, lootPileId) =>
@@ -71,6 +76,7 @@ case class PhysicsController(terrains: Map[String, Terrain], areaGates: List[Are
       case UpdatePhysicsOnLootPileDespawnEvent(areaId, lootPileId) =>
         val world = terrains(areaId).world
         world.destroyBody(lootPileBodies(areaId, lootPileId).b2Body)
+        lootPileBodies(areaId, lootPileId).b2Body = null
 
       case _ =>
     }

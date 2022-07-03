@@ -53,8 +53,6 @@ case class EntityBody(creatureId: String) {
 
     val creature = gameState.creatures(creatureId)
 
-    val ableToMove = !creature.isEffectActive("stagger") && !creature.isEffectActive("knockback") && creature.isAlive
-
     val bodyCreated = physicsController.entityBodies.contains(creatureId)
 
     val v = creature.params.currentSpeed
@@ -72,7 +70,16 @@ case class EntityBody(creatureId: String) {
               creature.params.knockbackDir.y * creature.params.knockbackVelocity
             )
           )
-      } else if (ableToMove)
+      } else if (creature.isEffectActive("dash")) {
+        physicsController
+          .entityBodies(creatureId)
+          .setVelocity(
+            new Vector2(
+              creature.params.dashDir.x * creature.params.dashVelocity,
+              creature.params.dashDir.y * creature.params.dashVelocity
+            )
+          )
+      } else if (creature.ableToMove)
         physicsController.entityBodies(creatureId).setVelocity(new Vector2(vectorX, vectorY))
     }
 

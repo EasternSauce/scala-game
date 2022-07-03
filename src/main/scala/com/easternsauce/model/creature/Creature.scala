@@ -186,6 +186,8 @@ abstract class Creature {
     params.effects.contains(effect) && params.effects(effect).isActive
   }
 
+  def ableToMove: Boolean = !this.isEffectActive("stagger") && !this.isEffectActive("knockback") && this.isAlive
+
   def startMoving(): Creature =
     this.modify(_.params.currentSpeed).setTo(this.speed).modify(_.params.animationTimer).using(_.restart())
 
@@ -217,7 +219,7 @@ abstract class Creature {
     val ability = this.params.abilities(abilityId)
 
     if (
-      this.params.stamina > 0 && !ability.componentsActive && !ability.onCooldown
+      this.params.stamina > 0 && (ability.specification.isEmpty || !ability.componentsActive) && !ability.onCooldown
       /*&& !creature.abilityActive*/
     ) {
       ability.components.keys

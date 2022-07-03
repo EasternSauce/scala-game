@@ -160,7 +160,7 @@ class PlayScreen(
 //    }
 
     val handleDebugButton: GameState => GameState = gameState => {
-      if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE)) gameState.resetArea("area1")
+      if (Gdx.input.isKeyJustPressed(Input.Keys.F6)) gameState.resetArea("area1")
       else gameState
     }
 
@@ -224,6 +224,36 @@ class PlayScreen(
             gameState
               .creatures(gameState.currentPlayerId)
               .attack(gameState, facingVector)
+        modification
+      } else identity
+    }
+
+    val handleDashCommand: GameState => GameState = {
+
+      if (
+        Gdx.input
+          .isKeyJustPressed(Input.Keys.SPACE) && !LootPickupMenuHelper.inLootPickupMenu(gameState, mousePosWindowScaled)
+      ) {
+        val mouseX = Gdx.input.getX
+        val mouseY = Gdx.input.getY
+
+        val centerX = Gdx.graphics.getWidth / 2f
+        val centerY = Gdx.graphics.getHeight / 2f
+
+        val facingVector = Vec2(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).normal
+
+        //    gameState
+        //      .modifyGameStateCreature(creatureId)(_.modify(_.params.actionDirVector).setTo(dir))
+        //      .pipe(gameState => gameState.performAbility(creatureId, defaultAbilityId))
+
+        val modification: GameState => GameState =
+          gameState =>
+            gameState
+              .modifyGameStateCreature(gameState.currentPlayerId)(
+                _.modify(_.params.actionDirVector).setTo(facingVector)
+              )
+              .pipe(gameState => gameState.creatures(gameState.currentPlayerId).performAbility(gameState, "dash"))
+
         modification
       } else identity
     }
@@ -298,6 +328,7 @@ class PlayScreen(
           else
             gameState
               .pipe(handleAttackCommand)
+              .pipe(handleDashCommand)
               .pipe(processLootPileMenuActions)
       )
 

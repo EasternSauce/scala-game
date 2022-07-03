@@ -11,19 +11,21 @@ case class MeteorRainAbility(
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
 
-  override val specification: AbilitySpecification = AbilitySpecification(
-    textureWidth = 64,
-    textureHeight = 64,
-    totalActiveTime = 0.5f,
-    totalChannelTime = 0.5f,
-    channelSpriteType = "explosion_windup",
-    activeSpriteType = "explosion",
-    channelFrameCount = 7,
-    activeFrameCount = 14,
-    channelFrameDuration = 0.071428f,
-    activeFrameDuration = 0.035714f,
-    componentType = ComponentType.RainingProjectile,
-    scale = 1.4f
+  override val specification: Option[AbilitySpecification] = Some(
+    AbilitySpecification(
+      textureWidth = 64,
+      textureHeight = 64,
+      totalActiveTime = 0.5f,
+      totalChannelTime = 0.5f,
+      channelSpriteType = "explosion_windup",
+      activeSpriteType = "explosion",
+      channelFrameCount = 7,
+      activeFrameCount = 14,
+      channelFrameDuration = 0.071428f,
+      activeFrameDuration = 0.035714f,
+      componentType = ComponentType.RainingProjectile,
+      scale = 1.4f
+    )
   )
 
   override val abilityActiveSoundId: Option[String] = Some("explosion")
@@ -36,7 +38,10 @@ case class MeteorRainAbility(
     val components = (for (i <- 0 until numOfComponents)
       yield (
         i.toString,
-        AbilityComponent(specification, ComponentParams(componentId = i.toString, delay = i * delayBetween, range = 8f))
+        AbilityComponent(
+          specification.get,
+          ComponentParams(componentId = i.toString, delay = i * delayBetween, range = 8f)
+        )
       )).toMap
 
     this

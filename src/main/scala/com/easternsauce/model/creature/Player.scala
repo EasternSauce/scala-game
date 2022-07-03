@@ -1,5 +1,8 @@
 package com.easternsauce.model.creature
 
+import com.easternsauce.model.creature.ability.Ability
+import com.easternsauce.model.creature.ability.magic.DashAbility
+import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
 import com.easternsauce.util.Direction
 import com.easternsauce.util.Direction.Direction
 
@@ -22,6 +25,8 @@ case class Player(override val params: CreatureParams) extends Creature {
   override val speed: Float = 25f
 
   override val onGettingHitSoundId: Option[String] = Some("pain")
+
+  override val abilities: List[Ability] = List(SwingWeaponAbility(), DashAbility())
 
   override def update(delta: Float): Player = {
     super.update(delta).asInstanceOf[Player]

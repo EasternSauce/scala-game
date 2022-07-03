@@ -43,5 +43,7 @@ case class CreatureParams(
   forcePathCalculation: Boolean = false,
   pathCalculationCooldownTimer: SimpleTimer = SimpleTimer(),
   useAbilityTimer: SimpleTimer = SimpleTimer(time = 4f, isRunning = true),
-  inbetweenAbilitiesTime: Float = 0f
+  inbetweenAbilitiesTime: Float = 0f,
+  dashDir: Vec2 = Vec2(0, 0),
+  dashVelocity: Float = 0f
 )

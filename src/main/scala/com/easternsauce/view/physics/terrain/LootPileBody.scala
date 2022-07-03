@@ -20,6 +20,7 @@ case class LootPileBody(areaId: String, lootPileId: String) {
 
   def destroy(world: World): Unit = {
     world.destroyBody(b2Body)
+    b2Body = null
   }
 
 }

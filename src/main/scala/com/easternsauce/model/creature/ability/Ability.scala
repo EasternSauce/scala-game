@@ -7,7 +7,7 @@ import com.softwaremill.quicklens._
 
 abstract class Ability(val params: AbilityParams, val components: Map[String, AbilityComponent]) {
 
-  val specification: AbilitySpecification
+  val specification: Option[AbilitySpecification]
 
   val isWeaponAttack = false
 
@@ -22,12 +22,14 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
   def abilityId: String = this.params.id
 
   def init(): Ability = {
-    val components = (for (i <- 0 until numOfComponents)
-      yield (i.toString, AbilityComponent(specification, ComponentParams(componentId = i.toString)))).toMap
+    if (specification.nonEmpty) {
+      val components = (for (i <- 0 until numOfComponents)
+        yield (i.toString, AbilityComponent(specification.get, ComponentParams(componentId = i.toString)))).toMap
 
-    this
-      .modify(_.components)
-      .setTo(components)
+      this
+        .modify(_.components)
+        .setTo(components)
+    } else this
   }
 
   def onStart(creatureId: String): GameState => GameState = gameState => gameState

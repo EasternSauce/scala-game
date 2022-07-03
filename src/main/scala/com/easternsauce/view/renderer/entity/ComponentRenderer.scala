@@ -63,23 +63,26 @@ case class ComponentRenderer(creatureId: String, abilityId: String, componentId:
     }
 
     if (abilityState == AbilityState.Channel) {
-      val texture =
-        channelAnimation.getKeyFrame(
-          abilityComponent.params.abilityChannelAnimationTimer.time,
-          ability.specification.channelAnimationLooping
-        )
-      updateSprite(texture)
+      if (ability.specification.nonEmpty) {
+        val texture =
+          channelAnimation.getKeyFrame(
+            abilityComponent.params.abilityChannelAnimationTimer.time,
+            ability.specification.get.channelAnimationLooping
+          )
+        updateSprite(texture)
+      }
 
     }
 
     if (abilityState == AbilityState.Active) {
-      val texture =
-        activeAnimation.getKeyFrame(
-          abilityComponent.params.abilityActiveAnimationTimer.time,
-          ability.specification.activeAnimationLooping
-        )
-      updateSprite(texture)
-
+      if (ability.specification.nonEmpty) {
+        val texture =
+          activeAnimation.getKeyFrame(
+            abilityComponent.params.abilityActiveAnimationTimer.time,
+            ability.specification.get.activeAnimationLooping
+          )
+        updateSprite(texture)
+      }
     }
 
   }

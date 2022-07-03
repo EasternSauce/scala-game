@@ -19,6 +19,8 @@ case class AreaGateBody(area1Id: String, x1: Float, y1: Float, area2Id: String, 
   def destroy(): Unit = {
     entryPoint1Body.getWorld.destroyBody(entryPoint1Body)
     entryPoint2Body.getWorld.destroyBody(entryPoint2Body)
+    entryPoint1Body = null
+    entryPoint2Body = null
   }
 
   def initEntryPointBody(world: World, x: Float, y: Float, width: Float, height: Float): Body = {

@@ -97,6 +97,7 @@ case class ComponentBody(creatureId: String, abilityId: String, componentId: Str
 
   def destroy(): Unit = {
     world.destroyBody(b2Body)
+    b2Body = null
   }
 
 }

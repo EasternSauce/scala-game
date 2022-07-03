@@ -12,20 +12,22 @@ case class ThrustWeaponAbility(
   override val components: Map[String, AbilityComponent] = Map()
 ) extends Ability(params = params, components = components) {
 
-  override val specification: AbilitySpecification = AbilitySpecification(
-    textureWidth = 64,
-    textureHeight = 32,
-    totalActiveTime = 0.275f,
-    totalChannelTime = 0.595f,
-    channelSpriteType = "trident_thrust_windup",
-    activeSpriteType = "trident_thrust",
-    channelFrameCount = 7,
-    activeFrameCount = 11,
-    channelFrameDuration = 0.085f,
-    activeFrameDuration = 0.025f,
-    componentType = ComponentType.MeleeAttack,
-    scale = 1.4f,
-    initSpeed = 30f
+  override val specification: Option[AbilitySpecification] = Some(
+    AbilitySpecification(
+      textureWidth = 64,
+      textureHeight = 32,
+      totalActiveTime = 0.275f,
+      totalChannelTime = 0.595f,
+      channelSpriteType = "trident_thrust_windup",
+      activeSpriteType = "trident_thrust",
+      channelFrameCount = 7,
+      activeFrameCount = 11,
+      channelFrameDuration = 0.085f,
+      activeFrameDuration = 0.025f,
+      componentType = ComponentType.MeleeAttack,
+      scale = 1.4f,
+      initSpeed = 30f
+    )
   )
 
   override val abilityActiveSoundId: Option[String] = Some("swoosh")
