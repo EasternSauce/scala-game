@@ -1,5 +1,6 @@
 package com.easternsauce.model.creature.ability
 
+import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
 import com.easternsauce.util.Vec2
 import com.softwaremill.quicklens._
@@ -18,6 +19,8 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
 
   val isDestroyOnCollision: Boolean = false
 
+  def abilityId: String = this.params.id
+
   def init(): Ability = {
     val components = (for (i <- 0 until numOfComponents)
       yield (i.toString, AbilityComponent(specification, ComponentParams(componentId = i.toString)))).toMap
@@ -27,7 +30,7 @@ abstract class Ability(val params: AbilityParams, val components: Map[String, Ab
       .setTo(components)
   }
 
-  def onStart(creature: Creature): Ability = this
+  def onStart(creatureId: String): GameState => GameState = gameState => gameState
 
 //  def scale: Float = {
 //    //if (creature.isWeaponEquipped) creature.currentWeapon.template.attackScale.get

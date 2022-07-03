@@ -6,12 +6,11 @@ import com.easternsauce.model.creature.ability.sword.SwingWeaponAbility
 import com.easternsauce.model.creature.ability.{Ability, AbilityComponent, AbilityState}
 import com.easternsauce.model.creature.effect.Effect
 import com.easternsauce.model.item.Item
+import com.easternsauce.model.util.EnhancedChainingSyntax.enhancedScalaUtilChainingOps
 import com.easternsauce.system.Random
 import com.easternsauce.util.Direction.Direction
 import com.easternsauce.util.{Direction, InventoryMapping, Vec2}
 import com.softwaremill.quicklens._
-
-import scala.util.chaining.scalaUtilChainingOps
 
 abstract class Creature {
   val isPlayer = false
@@ -37,7 +36,9 @@ abstract class Creature {
   protected val staminaOveruseTime = 2f
   protected val staminaRegenerationDisabled = 1.2f
 
-  val defaultAbility = "swingWeapon"
+  def creatureId: String = this.params.id
+
+  val defaultAbilityId = "swingWeapon"
 
   val speed: Float = 15f
 
@@ -83,17 +84,14 @@ abstract class Creature {
 
   def updateTimers(delta: Float): Creature = {
     this
-      .modify(_.params.animationTimer)
-      .using(_.update(delta))
-      .modify(_.params.staminaOveruseTimer)
-      .using(_.update(delta))
-      .modify(_.params.staminaRegenerationTimer)
-      .using(_.update(delta))
-      .modify(_.params.staminaRegenerationDisabledTimer)
-      .using(_.update(delta))
-      .modify(_.params.pathCalculationCooldownTimer)
-      .using(_.update(delta))
-      .modify(_.params.useAbilityTimer)
+      .modifyAll(
+        _.params.animationTimer,
+        _.params.staminaOveruseTimer,
+        _.params.staminaRegenerationTimer,
+        _.params.staminaRegenerationDisabledTimer,
+        _.params.pathCalculationCooldownTimer,
+        _.params.useAbilityTimer
+      )
       .using(_.update(delta))
   }
 
@@ -202,7 +200,7 @@ abstract class Creature {
 
   def isMoving: Boolean = this.params.currentSpeed > 0f
 
-  def updateAutomaticControls(gameState: GameState): Creature = this
+  def updateAutomaticControls(gameState: GameState): GameState = gameState
 
   def facingDirection: Direction = {
     val movingDir = params.movingDir
@@ -214,10 +212,12 @@ abstract class Creature {
     }
   }
 
-  def attack(dir: Vec2): Creature =
-    this.modify(_.params.actionDirVector).setTo(dir).performAbility(defaultAbility)
+  def attack(gameState: GameState, dir: Vec2): GameState =
+    gameState
+      .modifyGameStateCreature(creatureId)(_.modify(_.params.actionDirVector).setTo(dir))
+      .pipe(gameState => gameState.performAbility(creatureId, defaultAbilityId))
 
-  def performAbility(abilityId: String): Creature = {
+  def performAbility(gameState: GameState, abilityId: String): GameState = {
 
     val ability = this.params.abilities(abilityId)
 
@@ -226,27 +226,29 @@ abstract class Creature {
       /*&& !creature.abilityActive*/
     ) {
       ability.components.keys
-        .foldLeft(this)((creature, componentId) => {
-          creature
-            .modifyAbilityComponent(abilityId, componentId) {
+        .foldLeft(gameState)((gameState, componentId) => {
+          gameState
+            .modifyGameStateAbilityComponent(creatureId, abilityId, componentId) {
               _.modify(_.params.channelTimer)
                 .using(_.restart())
                 .modify(_.params.state)
                 .setTo(AbilityState.DelayedStart)
             }
         })
-        .modify(_.params.staminaRegenerationDisabledTimer)
-        .using(_.restart())
-        .modify(_.params.isStaminaRegenerationDisabled)
-        .setTo(true)
-        .takeStaminaDamage(15f)
-        .modifyAbility(abilityId) {
-          _.onStart(this)
-            .modify(_.params.abilityTimer)
+        .modifyGameStateCreature(creatureId = creatureId) {
+          _.modify(_.params.staminaRegenerationDisabledTimer)
             .using(_.restart())
+            .modify(_.params.isStaminaRegenerationDisabled)
+            .setTo(true)
+            .takeStaminaDamage(15f)
+            .modifyAbility(abilityId) {
+              _.modify(_.params.abilityTimer)
+                .using(_.restart())
+            }
         }
+        .pipe(gameState.abilities(creatureId, abilityId).onStart(creatureId))
 
-    } else this
+    } else gameState
   }
 
   def canPickUpItem(item: Item): Boolean = {

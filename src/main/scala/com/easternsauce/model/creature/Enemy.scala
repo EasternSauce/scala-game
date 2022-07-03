@@ -29,7 +29,7 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
 
   }
 
-  override def updateAutomaticControls(gameState: GameState): Enemy = {
+  override def updateAutomaticControls(gameState: GameState): GameState = {
 
     val potentialTarget = findTarget(gameState)
     val potentialTargetId = potentialTarget.map(_.params.id)
@@ -38,60 +38,69 @@ abstract class Enemy(override val params: CreatureParams) extends Creature {
 
       val vectorTowardsTarget = pos.vectorTowards(potentialTarget.get.pos)
 
-      this
-        .pipe(
-          creature =>
-            // target changed
-            if (params.targetCreatureId.isEmpty || params.targetCreatureId != potentialTargetId) {
-              creature
-                .modify(_.params.forcePathCalculation)
-                .setTo(true)
-                .modify(_.params.targetCreatureId)
-                .setTo(potentialTargetId)
-                .modify(_.params.pathTowardsTarget)
-                .setTo(None)
-            } else creature
-        )
-        //        .modify(_.params.targetCreatureId)
-        //        .setTo(potentialTarget.map(_.params.id))
-        .pipe(creature => {
-          if (
-            potentialTarget.get.pos.distance(creature.pos) > 3f && potentialTarget.get.pos
-              .distance(creature.pos) < enemySearchDistance
-          ) {
-            if (creature.params.pathTowardsTarget.nonEmpty && creature.params.pathTowardsTarget.get.nonEmpty) {
-              val path = creature.params.pathTowardsTarget.get
-              val nextNodeOnPath = path.head
-              if (creature.pos.distance(nextNodeOnPath) < 2f) {
-                creature.modify(_.params.pathTowardsTarget).setTo(Some(path.drop(1)))
-              } else creature.moveInDir(creature.pos.vectorTowards(nextNodeOnPath))
-            } else {
-              creature.moveInDir(vectorTowardsTarget)
-            }
-          } else {
-            creature
-          }
+      gameState
+        .modifyGameStateCreature(creatureId) {
+          _.pipe(
+            creature =>
+              // target changed
+              if (params.targetCreatureId.isEmpty || params.targetCreatureId != potentialTargetId) {
+                creature
+                  .modify(_.params.forcePathCalculation)
+                  .setTo(true)
+                  .modify(_.params.targetCreatureId)
+                  .setTo(potentialTargetId)
+                  .modify(_.params.pathTowardsTarget)
+                  .setTo(None)
+              } else creature
+          )
+          //        .modify(_.params.targetCreatureId)
+          //        .setTo(potentialTarget.map(_.params.id))
+            .pipe(creature => {
+              if (
+                potentialTarget.get.pos.distance(creature.pos) > 3f && potentialTarget.get.pos
+                  .distance(creature.pos) < enemySearchDistance
+              ) {
+                if (creature.params.pathTowardsTarget.nonEmpty && creature.params.pathTowardsTarget.get.nonEmpty) {
+                  val path = creature.params.pathTowardsTarget.get
+                  val nextNodeOnPath = path.head
+                  if (creature.pos.distance(nextNodeOnPath) < 2f) {
+                    creature.modify(_.params.pathTowardsTarget).setTo(Some(path.drop(1)))
+                  } else creature.moveInDir(creature.pos.vectorTowards(nextNodeOnPath))
+                } else {
+                  creature.moveInDir(vectorTowardsTarget)
+                }
+              } else {
+                creature
+              }
+            })
+        }
+        .pipe(gameState => {
+          val creature = gameState.creatures(creatureId)
+          if (potentialTarget.get.pos.distance(creature.pos) < 3f)
+            creature.attack(gameState, vectorTowardsTarget)
+          else gameState
         })
-        .pipe(
-          creature =>
-            if (potentialTarget.get.pos.distance(creature.pos) < 3f)
-              creature.attack(vectorTowardsTarget)
-            else creature
-        )
-        .pipe(creature => {
+        .pipe(gameState => {
+          val creature = gameState.creatures(creatureId)
+
           val pickedAbilityId = pickAbilityToUse(gameState)
-          if (params.useAbilityTimer.time > useAbilityTimeout + creature.params.inbetweenAbilitiesTime && abilityUsages.nonEmpty && pickedAbilityId.nonEmpty) {
-            creature
-              .modify(_.params.actionDirVector)
-              .setTo(this.pos.vectorTowards(potentialTarget.get.pos))
-              .performAbility(pickedAbilityId.get)
-              .pipe(_.modify(_.params.useAbilityTimer).using(_.restart()))
-              .modify(_.params.inbetweenAbilitiesTime)
-              .setTo(Random.between(2f, 6f))
-          } else creature
+          if (
+            params.useAbilityTimer.time > useAbilityTimeout + creature.params.inbetweenAbilitiesTime && abilityUsages.nonEmpty && pickedAbilityId.nonEmpty
+          ) {
+            gameState
+              .modifyGameStateCreature(creatureId) {
+                _.modify(_.params.actionDirVector)
+                  .setTo(creature.pos.vectorTowards(potentialTarget.get.pos))
+                  .pipe(_.modify(_.params.useAbilityTimer).using(_.restart()))
+                  .modify(_.params.inbetweenAbilitiesTime)
+                  .setTo(Random.between(2f, 6f))
+              }
+              .performAbility(creatureId, pickedAbilityId.get)
+
+          } else gameState
         })
-        .asInstanceOf[Enemy]
-    } else this.modify(_.params.targetCreatureId).setTo(None).stopMoving().asInstanceOf[Enemy]
+    } else
+      gameState.modifyGameStateCreature(creatureId) { _.modify(_.params.targetCreatureId).setTo(None).stopMoving() }
 
   }
 

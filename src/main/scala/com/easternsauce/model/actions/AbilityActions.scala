@@ -3,11 +3,7 @@ package com.easternsauce.model.actions
 import com.badlogic.gdx.math.Vector2
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.ability.AbilityState
-import com.easternsauce.model.event.{
-  PlaySoundEvent,
-  UpdatePhysicsOnComponentCreateBodyEvent,
-  UpdatePhysicsOnComponentDestroyBodyEvent
-}
+import com.easternsauce.model.event.{PlaySoundEvent, UpdatePhysicsOnComponentCreateBodyEvent, UpdatePhysicsOnComponentDestroyBodyEvent}
 import com.easternsauce.view.physics.PhysicsController
 import com.softwaremill.quicklens._
 
@@ -191,6 +187,40 @@ trait AbilityActions {
     } else {
       this.modifyGameStateAbility(creatureId, abilityId)(_.onCollision())
     }
+  }
+
+  def performAbility(creatureId: String, abilityId: String): GameState = {
+    val ability = this.abilities(creatureId, abilityId)
+    val creature = this.creatures(creatureId)
+
+    if (
+      creature.params.stamina > 0 && !ability.componentsActive && !ability.onCooldown
+      /*&& !creature.abilityActive*/
+    ) {
+      ability.components.keys
+        .foldLeft(this)((gameState, componentId) => {
+          gameState
+            .modifyGameStateAbilityComponent(creatureId, abilityId, componentId) {
+              _.modify(_.params.channelTimer)
+                .using(_.restart())
+                .modify(_.params.state)
+                .setTo(AbilityState.DelayedStart)
+            }
+        })
+        .modifyGameStateCreature(creatureId) {
+          _.modify(_.params.staminaRegenerationDisabledTimer)
+            .using(_.restart())
+            .modify(_.params.isStaminaRegenerationDisabled)
+            .setTo(true)
+            .takeStaminaDamage(15f)
+            .modifyAbility(abilityId) {
+              _.modify(_.params.abilityTimer)
+                .using(_.restart())
+            }
+        }
+        .pipe(gameState => creature.performAbility(gameState, abilityId))
+
+    } else this
   }
 
 }

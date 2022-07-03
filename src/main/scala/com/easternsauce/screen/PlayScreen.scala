@@ -11,6 +11,7 @@ import com.easternsauce.helper.LootPickupMenuHelper
 import com.easternsauce.json.JsonCodecs
 import com.easternsauce.model.GameState
 import com.easternsauce.model.creature.Creature
+import com.easternsauce.model.util.EnhancedChainingSyntax.enhancedScalaUtilChainingOps
 import com.easternsauce.system.Assets
 import com.easternsauce.util.{Constants, RendererBatch, Vec2}
 import com.easternsauce.view.physics.PhysicsController
@@ -21,7 +22,6 @@ import io.circe.syntax.EncoderOps
 
 import java.io.{File, PrintWriter}
 import scala.collection.mutable.ListBuffer
-import scala.util.chaining._
 
 class PlayScreen(
   val worldBatch: RendererBatch,
@@ -36,7 +36,7 @@ class PlayScreen(
 
   val b2DebugRenderer: Box2DDebugRenderer = new Box2DDebugRenderer()
 
-  val debugRenderEnabled = false
+  val debugRenderEnabled = true
 
   val worldCamera: OrthographicCamera = new OrthographicCamera()
   val hudCamera: OrthographicCamera = {
@@ -85,16 +85,23 @@ class PlayScreen(
         creature
           .setPosition(pos.x, pos.y)
           .update(delta)
-          .pipe(
-            creature =>
-              if (creature.isControlledAutomatically) creature.updateAutomaticControls(gameState) else creature
-          )
+//          .pipe(
+//            creature =>
+//              if (creature.isControlledAutomatically) creature.updateAutomaticControls(gameState) else creature
+//          )
       } else creature
     }
 
     gameState // TODO: dont update creatures outside the current area
       .modify(_.creatures.each)
       .using(updateCreature)
+      .pipe(
+        gameState =>
+          gameState.creatures.foldLeft(gameState) {
+            case (gameState, (_, creature)) =>
+              if (creature.isControlledAutomatically) creature.updateAutomaticControls(gameState) else gameState
+          }
+      )
       .pipe(gameState => {
         val creatureAbilityPairs =
           gameState.creatures.values.flatMap(creature => creature.params.abilities.keys.map((_, creature.params.id)))
@@ -219,11 +226,10 @@ class PlayScreen(
         val facingVector = Vec2(mouseX - centerX, (Gdx.graphics.getHeight - mouseY) - centerY).normal
 
         val modification: GameState => GameState =
-          _.modifyGameStateCreature("player")(
-            _.modify(_.params.actionDirVector)
-              .setTo(facingVector)
-              .performAbility(gameState.creatures(gameState.currentPlayerId).defaultAbility)
-          )
+          gameState =>
+            gameState
+              .creatures(gameState.currentPlayerId)
+              .attack(gameState, facingVector)
         modification
       } else identity
     }
