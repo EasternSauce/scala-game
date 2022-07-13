@@ -38,7 +38,7 @@ abstract class Creature {
 
   def creatureId: String = this.params.id
 
-  val defaultAbilityId = "swingWeapon"
+  val defaultAbilityId = "bowShot"
 
   val speed: Float = 15f
 
@@ -212,7 +212,12 @@ abstract class Creature {
   def attack(gameState: GameState, dir: Vec2): GameState =
     gameState
       .modifyGameStateCreature(creatureId)(_.modify(_.params.actionDirVector).setTo(dir))
-      .pipe(gameState => gameState.performAbility(creatureId, defaultAbilityId))
+      .pipe(
+        gameState =>
+          if (gameState.creatures(creatureId).abilities.map(_.abilityId).contains(defaultAbilityId))
+            gameState.performAbility(creatureId, defaultAbilityId)
+          else gameState
+      )
 
   def performAbility(gameState: GameState, abilityId: String): GameState = {
 

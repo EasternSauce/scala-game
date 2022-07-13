@@ -7,6 +7,7 @@ import com.easternsauce.model.creature._
 import com.easternsauce.model.creature.ability.AbilityState.AbilityState
 import com.easternsauce.model.creature.ability.ComponentType.ComponentType
 import com.easternsauce.model.creature.ability._
+import com.easternsauce.model.creature.ability.bow.BowShotAbility
 import com.easternsauce.model.creature.ability.magic._
 import com.easternsauce.model.creature.ability.sword.{SwingWeaponAbility, ThrustWeaponAbility}
 import com.easternsauce.model.creature.effect.Effect
@@ -97,6 +98,8 @@ object JsonCodecs {
   implicit val encodeLootPilePickupMenu: Encoder[LootPilePickupMenu] = deriveEncoder
   implicit val decodeDashAbility: Decoder[DashAbility] = deriveDecoder
   implicit val encodeDashAbility: Encoder[DashAbility] = deriveEncoder
+  implicit val decodeBowShotAbility: Decoder[BowShotAbility] = deriveDecoder
+  implicit val encodeBowShotAbility: Encoder[BowShotAbility] = deriveEncoder
 
   implicit val encodeCreature: Encoder[Creature] = Encoder.instance { c =>
     {
@@ -151,6 +154,8 @@ object JsonCodecs {
           Map("ThrustWeaponAbility" -> v).asJson
         case v: DashAbility =>
           Map("DashAbility" -> v).asJson
+        case v: BowShotAbility =>
+          Map("BowShotAbility" -> v).asJson
       }
     }
   }
@@ -166,6 +171,7 @@ object JsonCodecs {
       case "ThrustWeaponAbility" => c.downField(fname).as[ThrustWeaponAbility]
       case "SwingWeaponAbility"  => c.downField(fname).as[SwingWeaponAbility]
       case "DashAbility"         => c.downField(fname).as[DashAbility]
+      case "BowShotAbility"         => c.downField(fname).as[BowShotAbility]
     }
   })
 }
